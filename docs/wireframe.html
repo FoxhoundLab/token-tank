@@ -221,6 +221,7 @@ body {
 .provider-card[data-provider="minimax"] { --accent-color: #e879f9; }
 .provider-card[data-provider="zai"] { --accent-color: #3b82f6; }
 .provider-card[data-provider="ollama"] { --accent-color: #a855f7; }
+.provider-card[data-provider="lmstudio"] { --accent-color: #22c55e; }
 
 .card-header {
   display: flex;
@@ -251,6 +252,7 @@ body {
 .provider-icon[data-provider="minimax"] { background: #e879f9; }
 .provider-icon[data-provider="zai"] { background: #3b82f6; }
 .provider-icon[data-provider="ollama"] { background: #a855f7; }
+.provider-icon[data-provider="lmstudio"] { background: #22c55e; }
 
 .card-header h3 {
   font-size: 1rem;
@@ -517,6 +519,7 @@ body {
 .provider-mini-icon[data-provider="minimax"] { background: #e879f9; }
 .provider-mini-icon[data-provider="zai"] { background: #3b82f6; }
 .provider-mini-icon[data-provider="ollama"] { background: #a855f7; }
+.provider-mini-icon[data-provider="lmstudio"] { background: #22c55e; }
 
 .settings-row-info h4 {
   font-size: 0.9rem;
@@ -1039,6 +1042,58 @@ body {
       </div>
     </div>
 
+    <!-- ▸ LM Studio Card (Local — always full, token tracking only) -->
+    <div class="provider-card" data-provider="lmstudio" onclick="navigate('detail-lmstudio')" style="cursor:pointer">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="provider-icon" data-provider="lmstudio">L</div>
+          <h3>LM Studio</h3>
+        </div>
+        <span class="card-badge" style="color:var(--green)">100% Local</span>
+      </div>
+      <!-- Local model — no cost, no limits, just token generation data -->
+      <div style="display:flex; gap:0.85rem; margin-bottom:1rem;">
+        <div style="flex:1; background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.85rem; text-align:center;">
+          <div style="font-size:1.6rem; font-weight:800; font-family:var(--mono); color:var(--green);">$0.00</div>
+          <div style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-top:0.2rem;">Cost Today</div>
+        </div>
+        <div style="flex:1; background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.85rem; text-align:center;">
+          <div style="font-size:1.6rem; font-weight:800; font-family:var(--mono); color:var(--text);">∞</div>
+          <div style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-top:0.2rem;">No Limit</div>
+        </div>
+      </div>
+      <div style="background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.7rem 0.85rem; margin-bottom:0.75rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+          <span style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">🖥 Active Models</span>
+          <span style="font-size:0.75rem; color:var(--text-dim); font-family:var(--mono);">qwen3.6-35b · glm-5.2</span>
+        </div>
+        <div style="font-size:0.7rem; color:var(--text-faint);">Running locally · No API key · No rate limits</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-cell">
+          <div class="stat-val">12.4K</div>
+          <div class="stat-label">Today</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val" style="color:var(--green)">FREE</div>
+          <div class="stat-label">Cost</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">89K</div>
+          <div class="stat-label">This Month</div>
+        </div>
+      </div>
+      <div class="burn-bar">
+        <div class="burn-bar-label">
+          <span>Burn rate</span>
+          <span>2.1K tok/hr · $0.00/hr</span>
+        </div>
+        <div class="burn-bar-track">
+          <div class="burn-bar-fill" style="width: 40%; background: var(--green);"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ▸ Add Tank -->
     <div class="add-tank-card" onclick="navigate('settings')">
       <div class="add-tank-icon">⛽</div>
@@ -1204,6 +1259,19 @@ body {
         <button class="btn-sm danger" onclick="showToast('Removed Ollama')">Disconnect</button>
       </div>
     </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="provider-mini-icon" data-provider="lmstudio">L</div>
+        <div class="settings-row-info">
+          <h4>LM Studio</h4>
+          <p>localhost:1234 · 100% local · No API key needed</p>
+        </div>
+      </div>
+      <div class="settings-row-actions">
+        <button class="btn-sm" onclick="showToast('Settings for LM Studio')">Configure</button>
+        <button class="btn-sm danger" onclick="showToast('Removed LM Studio')">Disconnect</button>
+      </div>
+    </div>
   </div>
 
   <!-- Add Provider -->
@@ -1225,6 +1293,10 @@ body {
       <div class="provider-pick-item">
         <div class="provider-mini-icon" data-provider="ollama">●</div>
         <span>Ollama</span>
+      </div>
+      <div class="provider-pick-item">
+        <div class="provider-mini-icon" data-provider="lmstudio">L</div>
+        <span>LM Studio</span>
       </div>
     </div>
     <div style="margin-top:1rem">
