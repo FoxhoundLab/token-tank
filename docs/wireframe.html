@@ -218,7 +218,7 @@ body {
 }
 
 .provider-card[data-provider="anthropic"] { --accent-color: #d97757; }
-.provider-card[data-provider="openai"] { --accent-color: #10a37f; }
+.provider-card[data-provider="minimax"] { --accent-color: #e879f9; }
 .provider-card[data-provider="zai"] { --accent-color: #3b82f6; }
 .provider-card[data-provider="ollama"] { --accent-color: #a855f7; }
 
@@ -248,7 +248,7 @@ body {
 }
 
 .provider-icon[data-provider="anthropic"] { background: #d97757; }
-.provider-icon[data-provider="openai"] { background: #10a37f; }
+.provider-icon[data-provider="minimax"] { background: #e879f9; }
 .provider-icon[data-provider="zai"] { background: #3b82f6; }
 .provider-icon[data-provider="ollama"] { background: #a855f7; }
 
@@ -514,7 +514,7 @@ body {
 }
 
 .provider-mini-icon[data-provider="anthropic"] { background: #d97757; }
-.provider-mini-icon[data-provider="openai"] { background: #10a37f; }
+.provider-mini-icon[data-provider="minimax"] { background: #e879f9; }
 .provider-mini-icon[data-provider="zai"] { background: #3b82f6; }
 .provider-mini-icon[data-provider="ollama"] { background: #a855f7; }
 
@@ -857,64 +857,60 @@ body {
       </div>
     </div>
 
-    <!-- ▸ OpenAI Card -->
-    <div class="provider-card" data-provider="openai" onclick="navigate('detail-openai')" style="cursor:pointer">
+    <!-- ▸ MiniMax Card (API — different layout, no usage windows) -->
+    <div class="provider-card" data-provider="minimax" onclick="navigate('detail-minimax')" style="cursor:pointer">
       <div class="card-header">
         <div class="card-header-left">
-          <div class="provider-icon" data-provider="openai">O</div>
-          <h3>OpenAI</h3>
+          <div class="provider-icon" data-provider="minimax">M</div>
+          <h3>MiniMax</h3>
         </div>
-        <span class="card-badge">ChatGPT Plus</span>
+        <span class="card-badge">Token API</span>
       </div>
-      <div class="usage-blocks">
-        <div class="usage-block">
-          <div class="usage-block-header">
-            <span class="usage-block-label">⏱ 5-Hour Window</span>
-            <span class="usage-block-pct" style="color:#f59e0b">84% used</span>
-          </div>
-          <div class="usage-track">
-            <div class="usage-fill med" style="width: 84%"></div>
-          </div>
-          <div class="usage-footer">
-            <span class="usage-reset">🔄 Resets in</span>
-            <span class="usage-countdown soon">52m</span>
-          </div>
+      <!-- API spend model — no reset windows, just spend tracking -->
+      <div style="display:flex; gap:0.85rem; margin-bottom:1rem;">
+        <div style="flex:1; background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.85rem; text-align:center;">
+          <div style="font-size:1.6rem; font-weight:800; font-family:var(--mono); color:var(--amber);">$4.12</div>
+          <div style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-top:0.2rem;">Spent Today</div>
         </div>
-        <div class="usage-block">
-          <div class="usage-block-header">
-            <span class="usage-block-label">📅 Weekly Usage</span>
-            <span class="usage-block-pct" style="color:#f59e0b">71% used</span>
-          </div>
-          <div class="usage-track">
-            <div class="usage-fill med" style="width: 71%"></div>
-          </div>
-          <div class="usage-footer">
-            <span class="usage-reset">🔄 Resets in</span>
-            <span class="usage-countdown">1d 6h</span>
-          </div>
+        <div style="flex:1; background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.85rem; text-align:center;">
+          <div style="font-size:1.6rem; font-weight:800; font-family:var(--mono); color:var(--text);">$38.40</div>
+          <div style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-top:0.2rem;">This Month</div>
+        </div>
+      </div>
+      <div style="background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.7rem 0.85rem; margin-bottom:0.75rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+          <span style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">💳 Balance</span>
+          <span style="font-size:0.85rem; font-weight:700; font-family:var(--mono); color:var(--green)">$12.60</span>
+        </div>
+        <div class="usage-track">
+          <div class="usage-fill low" style="width: 24%"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-top:0.35rem;">
+          <span style="color:var(--text-faint)">Top up when low</span>
+          <span style="color:var(--text-dim); font-family:var(--mono)">24% used</span>
         </div>
       </div>
       <div class="stats-row">
         <div class="stat-cell">
-          <div class="stat-val">8.1K</div>
+          <div class="stat-val">5.7K</div>
           <div class="stat-label">Today</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-val">$2.85</div>
+          <div class="stat-val">$4.12</div>
           <div class="stat-label">Cost</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-val">47K</div>
+          <div class="stat-val">53K</div>
           <div class="stat-label">This Month</div>
         </div>
       </div>
       <div class="burn-bar">
         <div class="burn-bar-label">
           <span>Burn rate</span>
-          <span>1.2K tok/hr · $0.42/hr</span>
+          <span>950 tok/hr · $0.68/hr</span>
         </div>
         <div class="burn-bar-track">
-          <div class="burn-bar-fill" style="width: 68%"></div>
+          <div class="burn-bar-fill" style="width: 55%"></div>
         </div>
       </div>
     </div>
@@ -1068,8 +1064,8 @@ body {
     <div class="alert-left">
       <div class="alert-icon amber">⚠</div>
       <div class="alert-info">
-        <h4>OpenAI — 50% threshold</h4>
-        <p>Notify when daily usage exceeds 50% of average · Last triggered 2h ago</p>
+        <h4>MiniMax — $10/day spend</h4>
+        <p>Alert when daily API spend exceeds $10 · Last triggered yesterday</p>
       </div>
     </div>
     <div class="toggle on" onclick="this.classList.toggle('on')"></div>
@@ -1171,15 +1167,15 @@ body {
     </div>
     <div class="settings-row">
       <div class="settings-row-left">
-        <div class="provider-mini-icon" data-provider="openai">O</div>
+        <div class="provider-mini-icon" data-provider="minimax">M</div>
         <div class="settings-row-info">
-          <h4>OpenAI</h4>
-          <p>sk-...m4k7 · ChatGPT Plus · Tier 3</p>
+          <h4>MiniMax</h4>
+          <p>API key · Token API · Pay-per-token</p>
         </div>
       </div>
       <div class="settings-row-actions">
-        <button class="btn-sm" onclick="showToast('Settings for OpenAI')">Configure</button>
-        <button class="btn-sm danger" onclick="showToast('Removed OpenAI')">Disconnect</button>
+        <button class="btn-sm" onclick="showToast('Settings for MiniMax')">Configure</button>
+        <button class="btn-sm danger" onclick="showToast('Removed MiniMax')">Disconnect</button>
       </div>
     </div>
     <div class="settings-row">
@@ -1219,8 +1215,8 @@ body {
         <span>Anthropic</span>
       </div>
       <div class="provider-pick-item">
-        <div class="provider-mini-icon" data-provider="openai">O</div>
-        <span>OpenAI</span>
+        <div class="provider-mini-icon" data-provider="minimax">M</div>
+        <span>MiniMax</span>
       </div>
       <div class="provider-pick-item">
         <div class="provider-mini-icon" data-provider="zai">Z</div>
