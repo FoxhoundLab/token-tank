@@ -69,18 +69,27 @@ async def handle(request: web.Request) -> web.StreamResponse:
                 logger.debug(f"Could not parse usage from response: {e}")
 
             # Return response to caller (transparent passthrough)
+            # Strip Content-Type from headers — aiohttp rejects passing both
+            # headers containing Content-Type AND the content_type parameter
+            resp_headers = dict(resp.headers)
+            resp_ct = resp.content_type
+            if resp_ct:
+                # Remove from headers so we can set it via content_type param
+                resp_headers.pop("Content-Type", None)
+                resp_headers.pop("content-type", None)
+
             return web.Response(
                 status=resp.status,
                 body=response_body,
-                headers=dict(resp.headers),
-                content_type=resp.content_type,
+                headers=resp_headers,
+                content_type=resp_ct,
             )
 
 
 def _log_usage(provider: str, usage, cost: float) -> None:
     """Write usage record to database."""
-    db = SessionLocal()
     try:
+        db = SessionLocal()
         record = UsageRecord(
             provider=provider,
             model=usage.model,
@@ -94,11 +103,18 @@ def _log_usage(provider: str, usage, cost: float) -> None:
     except Exception as e:
         logger.error(f"Failed to log usage: {e}")
     finally:
-        db.close()
+        try:
+            db.close()
+        except Exception:
+            pass
 
 
 def create_proxy_app() -> web.Application:
     """Create the aiohttp proxy application."""
+    # Ensure DB tables exist
+    from ..database import Base, engine
+    Base.metadata.create_all(engine)
+
     app = web.Application()
     # Catch-all route — forwards everything
     app.router.add_route("*", "/{tail:.*}", handle)
