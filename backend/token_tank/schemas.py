@@ -1,5 +1,7 @@
 """Pydantic schemas for API request/response."""
 
+from __future__ import annotations
+
 from datetime import datetime
 from pydantic import BaseModel
 

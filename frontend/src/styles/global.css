@@ -1,4 +1,7 @@
 /* Token Tank — Global Styles */
+/* Tailwind v4 utilities (available if needed) */
+@import "tailwindcss";
+
 /* Fuel pump / instrument panel theme */
 
 :root {
@@ -169,7 +172,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
 }
 
@@ -185,10 +188,80 @@ body {
   margin-bottom: 1rem;
 }
 
+/* Provider Picker */
+.provider-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.provider-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.provider-tile:hover {
+  border-color: var(--accent);
+  background: var(--surface-light);
+}
+
+.provider-tile-icon {
+  font-size: 1.8rem;
+}
+
+.provider-tile-name {
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+/* Form */
 .form {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.btn-text {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-text:hover {
+  color: var(--accent-red);
+}
+
+.btn-primary {
+  padding: 0.7rem;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
 }
 
 .form input,
@@ -199,6 +272,12 @@ body {
   border-radius: 8px;
   color: var(--text);
   font-size: 0.95rem;
+}
+
+.form input:focus,
+.form select:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 .form button {
@@ -212,6 +291,7 @@ body {
   font-size: 0.95rem;
 }
 
+/* Provider List */
 .provider-list {
   list-style: none;
 }
@@ -228,6 +308,10 @@ body {
   border-bottom: none;
 }
 
+.provider-name {
+  font-weight: 600;
+}
+
 .provider-list button {
   margin-left: auto;
   padding: 0.3rem 0.6rem;
@@ -237,6 +321,35 @@ body {
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.85rem;
+}
+
+/* Config Grid */
+.config-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.config-item:last-child {
+  border-bottom: none;
+}
+
+.config-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.config-value {
+  font-size: 0.9rem;
+  color: var(--text);
 }
 
 /* Utility */

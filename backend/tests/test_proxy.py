@@ -34,6 +34,11 @@ class TestUsageLogging:
 
     def test_log_usage_writes_record(self, db_session):
         """_log_usage should create a UsageRecord in the DB."""
+        # Clean any leftover data from API test seeding
+        from token_tank.models import UsageRecord
+        db_session.query(UsageRecord).delete()
+        db_session.commit()
+
         usage = TokenUsage(
             input_tokens=100,
             output_tokens=50,
