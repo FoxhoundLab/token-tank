@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⛽ Token Tank — Wireframe</title>
+<style>
+/* ═══════════════════════════════════════════════
+   TOKEN TANK — WIREFRAME
+   Fuel pump / instrument panel theme
+   Dark dashboard aesthetic
+   ═══════════════════════════════════════════════ */
+
+:root {
+  --bg-deep: #080a0c;
+  --bg-panel: #12161a;
+  --bg-card: #1a1f24;
+  --bg-card-hover: #222830;
+  --border: #2a3038;
+  --border-light: #353d48;
+  --text: #e8eaed;
+  --text-dim: #8b95a1;
+  --text-faint: #5a6470;
+  --amber: #f59e0b;
+  --amber-glow: rgba(245, 158, 11, 0.15);
+  --green: #22c55e;
+  --green-glow: rgba(34, 197, 94, 0.1);
+  --red: #ef4444;
+  --red-glow: rgba(239, 68, 68, 0.1);
+  --blue: #3b82f6;
+  --blue-glow: rgba(59, 130, 246, 0.1);
+  --purple: #a855f7;
+  --purple-glow: rgba(168, 85, 247, 0.1);
+  --radius: 14px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── Top Bar ─────────────────────────────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.topbar-logo {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.topbar-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.topbar-title span {
+  color: var(--text-dim);
+  font-weight: 400;
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+}
+
+.topbar-nav {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.25rem;
+}
+
+.nav-btn {
+  padding: 0.45rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.nav-btn:hover { color: var(--text); background: var(--bg-card); }
+
+.nav-btn.active {
+  background: var(--amber);
+  color: #000;
+  font-weight: 600;
+}
+
+.topbar-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green-glow);
+}
+
+/* ── Layout ──────────────────────────────── */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.2s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Dashboard Header ────────────────────── */
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.dash-header h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.dash-header p {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.dash-summary {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.summary-stat {
+  text-align: right;
+}
+
+.summary-stat .val {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+
+.summary-stat .label {
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Provider Grid ───────────────────────── */
+.provider-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+.provider-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.provider-card:hover {
+  border-color: var(--border-light);
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+}
+
+/* Colored top accent per provider */
+.provider-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent-color, var(--amber));
+}
+
+.provider-card[data-provider="anthropic"] { --accent-color: #d97757; }
+.provider-card[data-provider="openai"] { --accent-color: #10a37f; }
+.provider-card[data-provider="zai"] { --accent-color: #3b82f6; }
+.provider-card[data-provider="ollama"] { --accent-color: #a855f7; }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.provider-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.provider-icon[data-provider="anthropic"] { background: #d97757; }
+.provider-icon[data-provider="openai"] { background: #10a37f; }
+.provider-icon[data-provider="zai"] { background: #3b82f6; }
+.provider-icon[data-provider="ollama"] { background: #a855f7; }
+
+.card-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.card-badge {
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 5px;
+  background: var(--bg-deep);
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* ── Fuel Gauge ──────────────────────────── */
+.gauge-container {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.gauge-svg {
+  width: 140px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.gauge-info {
+  flex: 1;
+}
+
+.fuel-pct {
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: var(--mono);
+  line-height: 1;
+}
+
+.fuel-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 0.2rem;
+}
+
+.fuel-status {
+  margin-top: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 5px;
+}
+
+.fuel-status.ok { color: var(--green); background: var(--green-glow); }
+.fuel-status.warning { color: var(--amber); background: var(--amber-glow); }
+.fuel-status.critical { color: var(--red); background: var(--red-glow); }
+
+/* ── Stats Row ───────────────────────────── */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.stat-cell {
+  text-align: center;
+}
+
+.stat-cell .stat-val {
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+
+.stat-cell .stat-val.cost { color: var(--amber); }
+
+.stat-cell .stat-label {
+  font-size: 0.65rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.15rem;
+}
+
+/* ── Burn Rate Bar ───────────────────────── */
+.burn-bar {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.burn-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-bottom: 0.4rem;
+}
+
+.burn-bar-label span:last-child {
+  color: var(--text);
+  font-family: var(--mono);
+  font-weight: 600;
+}
+
+.burn-bar-track {
+  height: 6px;
+  background: var(--bg-deep);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.burn-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
+  transition: width 0.5s ease;
+}
+
+/* ── Sparkline ───────────────────────────── */
+.sparkline {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.sparkline-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-bottom: 0.4rem;
+}
+
+.sparkline-svg {
+  width: 100%;
+  height: 36px;
+}
+
+/* ── Add Tank Card ───────────────────────── */
+.add-tank-card {
+  background: var(--bg-card);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 280px;
+}
+
+.add-tank-card:hover {
+  border-color: var(--amber);
+  background: var(--amber-glow);
+}
+
+.add-tank-icon {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+.add-tank-card:hover .add-tank-icon { opacity: 1; }
+
+.add-tank-card p {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+/* ── Settings ────────────────────────────── */
+.settings-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.settings-section h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-row:last-child { border-bottom: none; }
+
+.settings-row-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.provider-mini-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.provider-mini-icon[data-provider="anthropic"] { background: #d97757; }
+.provider-mini-icon[data-provider="openai"] { background: #10a37f; }
+.provider-mini-icon[data-provider="zai"] { background: #3b82f6; }
+.provider-mini-icon[data-provider="ollama"] { background: #a855f7; }
+
+.settings-row-info h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.settings-row-info p {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.settings-row-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--bg-deep);
+  color: var(--text-dim);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-sm:hover { border-color: var(--border-light); color: var(--text); }
+.btn-sm.danger:hover { border-color: var(--red); color: var(--red); }
+
+.btn-primary {
+  padding: 0.6rem 1.5rem;
+  background: var(--amber);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-primary:hover { filter: brightness(1.1); }
+
+/* ── Form ────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.form-input {
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  transition: border-color 0.15s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--amber);
+}
+
+.provider-pick {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.provider-pick-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.provider-pick-item:hover {
+  border-color: var(--border-light);
+  background: var(--bg-card-hover);
+}
+
+.provider-pick-item.selected {
+  border-color: var(--amber);
+  background: var(--amber-glow);
+}
+
+.provider-pick-item .provider-mini-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.provider-pick-item span {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ── Alerts ──────────────────────────────── */
+.alert-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.alert-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.alert-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.alert-icon.amber { background: var(--amber-glow); }
+.alert-icon.red { background: var(--red-glow); }
+.alert-icon.green { background: var(--green-glow); }
+
+.alert-info h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.alert-info p {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.toggle {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  background: var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle.on { background: var(--amber); }
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggle.on::after { transform: translateX(18px); }
+
+/* ── Empty State ─────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-dim);
+}
+
+.empty-state .emoji {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.empty-state h3 {
+  font-size: 1.2rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Wireframe Label ─────────────────────── */
+.wireframe-tag {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.wireframe-tag .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 640px) {
+  .provider-grid { grid-template-columns: 1fr; }
+  .dash-header { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+  .dash-summary { width: 100%; justify-content: space-between; }
+  .topbar-nav { display: none; }
+  .gauge-container { flex-direction: column; text-align: center; }
+  .provider-pick { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <span class="topbar-logo">⛽</span>
+    <div class="topbar-title">Token Tank<span>Wireframe v1</span></div>
+  </div>
+  <nav class="topbar-nav">
+    <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+    <button class="nav-btn" data-view="alerts">Alerts</button>
+    <button class="nav-btn" data-view="settings">Settings</button>
+  </nav>
+  <div class="topbar-status">
+    <div class="status-dot"></div>
+    <span>Proxy: localhost:8848</span>
+  </div>
+</header>
+
+<!-- ═══ DASHBOARD VIEW ═══ -->
+<div class="page view active" id="view-dashboard">
+  <div class="dash-header">
+    <div>
+      <h2>Fuel Dashboard</h2>
+      <p>All your AI providers at a glance · Last updated: just now</p>
+    </div>
+    <div class="dash-summary">
+      <div class="summary-stat">
+        <div class="val">$8.42</div>
+        <div class="label">Today's Cost</div>
+      </div>
+      <div class="summary-stat">
+        <div class="val">312K</div>
+        <div class="label">Today's Tokens</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="provider-grid">
+
+    <!-- ▸ Anthropic Card -->
+    <div class="provider-card" data-provider="anthropic" onclick="navigate('detail-anthropic')" style="cursor:pointer">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="provider-icon" data-provider="anthropic">A</div>
+          <h3>Anthropic</h3>
+        </div>
+        <span class="card-badge">Claude Pro</span>
+      </div>
+      <div class="gauge-container">
+        <svg class="gauge-svg" viewBox="0 0 100 60">
+          <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="#2a3038" stroke-width="6" stroke-linecap="round"/>
+          <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" stroke-dasharray="82 110"/>
+          <line x1="50" y1="50" x2="73" y2="26" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="4" fill="#888"/>
+          <text x="12" y="58" font-size="7" fill="#5a6470">E</text>
+          <text x="82" y="58" font-size="7" fill="#5a6470">F</text>
+        </svg>
+        <div class="gauge-info">
+          <div class="fuel-pct" style="color:#22c55e">75%</div>
+          <div class="fuel-label">Fuel remaining</div>
+          <div class="fuel-status ok">● Nominal</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-cell">
+          <div class="stat-val">2.4K</div>
+          <div class="stat-label">Today</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">$3.20</div>
+          <div class="stat-label">Cost</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">12K</div>
+          <div class="stat-label">This Month</div>
+        </div>
+      </div>
+      <div class="burn-bar">
+        <div class="burn-bar-label">
+          <span>Burn rate</span>
+          <span>480 tok/hr · $0.13/hr</span>
+        </div>
+        <div class="burn-bar-track">
+          <div class="burn-bar-fill" style="width: 35%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ OpenAI Card -->
+    <div class="provider-card" data-provider="openai" onclick="navigate('detail-openai')" style="cursor:pointer">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="provider-icon" data-provider="openai">O</div>
+          <h3>OpenAI</h3>
+        </div>
+        <span class="card-badge">ChatGPT Plus</span>
+      </div>
+      <div class="gauge-container">
+        <svg class="gauge-svg" viewBox="0 0 100 60">
+          <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="#2a3038" stroke-width="6" stroke-linecap="round"/>
+          <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="#f59e0b" stroke-width="6" stroke-linecap="round" stroke-dasharray="40 110"/>
+          <line x1="50" y1="50" x2="47" y2="16" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="4" fill="#888"/>
+          <text x="12" y="58" font-size="7" fill="#5a6470">E</text>
+          <text x="82" y="58" font-size="7" fill="#5a6470">F</text>
+        </svg>
+        <div class="gauge-info">
+          <div class="fuel-pct" style="color:#f59e0b">36%</div>
+          <div class="fuel-label">Fuel remaining</div>
+          <div class="fuel-status warning">● Getting low</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-cell">
+          <div class="stat-val">8.1K</div>
+          <div class="stat-label">Today</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">$2.85</div>
+          <div class="stat-label">Cost</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">47K</div>
+          <div class="stat-label">This Month</div>
+        </div>
+      </div>
+      <div class="burn-bar">
+        <div class="burn-bar-label">
+          <span>Burn rate</span>
+          <span>1.2K tok/hr · $0.42/hr</span>
+        </div>
+        <div class="burn-bar-track">
+          <div class="burn-bar-fill" style="width: 68%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ Z.AI Card (Critical) -->
+    <div class="provider-card" data-provider="zai" onclick="navigate('detail-zai')" style="cursor:pointer">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="provider-icon" data-provider="zai">Z</div>
+          <h3>Z.AI</h3>
+        </div>
+        <span class="card-badge">Coding Plan</span>
+      </div>
+      <div class="gauge-container">
+        <svg class="gauge-svg" viewBox="0 0 100 60">
+          <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="#2a3038" stroke-width="6" stroke-linecap="round"/>
+          <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="#ef4444" stroke-width="6" stroke-linecap="round" stroke-dasharray="12 110"/>
+          <line x1="50" y1="50" x2="22" y2="40" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="4" fill="#888"/>
+          <text x="12" y="58" font-size="7" fill="#5a6470">E</text>
+          <text x="82" y="58" font-size="7" fill="#5a6470">F</text>
+        </svg>
+        <div class="gauge-info">
+          <div class="fuel-pct" style="color:#ef4444">8%</div>
+          <div class="fuel-label">Fuel remaining</div>
+          <div class="fuel-status critical">⚠ Near empty</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-cell">
+          <div class="stat-val">5.3K</div>
+          <div class="stat-label">Today</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">$1.87</div>
+          <div class="stat-label">Cost</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">38K</div>
+          <div class="stat-label">This Month</div>
+        </div>
+      </div>
+      <div class="burn-bar">
+        <div class="burn-bar-label">
+          <span>Burn rate</span>
+          <span style="color:#ef4444">2.8K tok/hr · $0.98/hr</span>
+        </div>
+        <div class="burn-bar-track">
+          <div class="burn-bar-fill" style="width: 92%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ Ollama Card -->
+    <div class="provider-card" data-provider="ollama" onclick="navigate('detail-ollama')" style="cursor:pointer">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="provider-icon" data-provider="ollama">●</div>
+          <h3>Ollama Pro</h3>
+        </div>
+        <span class="card-badge">Max Plan</span>
+      </div>
+      <div class="gauge-container">
+        <svg class="gauge-svg" viewBox="0 0 100 60">
+          <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="#2a3038" stroke-width="6" stroke-linecap="round"/>
+          <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" stroke-dasharray="95 110"/>
+          <line x1="50" y1="50" x2="80" y2="35" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="4" fill="#888"/>
+          <text x="12" y="58" font-size="7" fill="#5a6470">E</text>
+          <text x="82" y="58" font-size="7" fill="#5a6470">F</text>
+        </svg>
+        <div class="gauge-info">
+          <div class="fuel-pct" style="color:#22c55e">86%</div>
+          <div class="fuel-label">Fuel remaining</div>
+          <div class="fuel-status ok">● Full tank</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-cell">
+          <div class="stat-val">890</div>
+          <div class="stat-label">Today</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">$0.50</div>
+          <div class="stat-label">Cost</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">6.2K</div>
+          <div class="stat-label">This Month</div>
+        </div>
+      </div>
+      <div class="burn-bar">
+        <div class="burn-bar-label">
+          <span>Burn rate</span>
+          <span>150 tok/hr · $0.08/hr</span>
+        </div>
+        <div class="burn-bar-track">
+          <div class="burn-bar-fill" style="width: 15%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ Add Tank -->
+    <div class="add-tank-card" onclick="navigate('settings')">
+      <div class="add-tank-icon">⛽</div>
+      <p><strong>Add a new tank</strong></p>
+      <p style="font-size:0.75rem">Connect another AI provider</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ ALERTS VIEW ═══ -->
+<div class="page view" id="view-alerts">
+  <div class="dash-header">
+    <div>
+      <h2>Alerts & Notifications</h2>
+      <p>Get notified when your tanks run low</p>
+    </div>
+    <button class="btn-primary" onclick="showToast('Alert creation form would appear here')">+ New Alert</button>
+  </div>
+
+  <!-- Active Alert Examples -->
+  <div class="alert-card">
+    <div class="alert-left">
+      <div class="alert-icon amber">⚠</div>
+      <div class="alert-info">
+        <h4>OpenAI — 50% threshold</h4>
+        <p>Notify when daily usage exceeds 50% of average · Last triggered 2h ago</p>
+      </div>
+    </div>
+    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+  </div>
+
+  <div class="alert-card">
+    <div class="alert-left">
+      <div class="alert-icon red">🚨</div>
+      <div class="alert-info">
+        <h4>Z.AI — 90% threshold</h4>
+        <p>Critical alert when weekly quota hits 90% · Last triggered 6h ago</p>
+      </div>
+    </div>
+    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+  </div>
+
+  <div class="alert-card">
+    <div class="alert-left">
+      <div class="alert-icon green">💰</div>
+      <div class="alert-info">
+        <h4>All Providers — $50/day budget</h4>
+        <p>Alert when combined daily cost exceeds $50 · Never triggered</p>
+      </div>
+    </div>
+    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+  </div>
+
+  <div class="alert-card">
+    <div class="alert-left">
+      <div class="alert-icon amber">📊</div>
+      <div class="alert-info">
+        <h4>Anthropic — Burn rate spike</h4>
+        <p>Alert when burn rate exceeds 2x weekly average · Paused</p>
+      </div>
+    </div>
+    <div class="toggle" onclick="this.classList.toggle('on')"></div>
+  </div>
+
+  <!-- Alert Options Info -->
+  <div class="settings-section" style="margin-top:1.5rem">
+    <h3>📡 Alert Channels</h3>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <span style="font-size:1.2rem">🔔</span>
+        <div class="settings-row-info">
+          <h4>macOS Notifications</h4>
+          <p>Native system notifications</p>
+        </div>
+      </div>
+      <span class="card-badge" style="color:var(--green)">Active</span>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <span style="font-size:1.2rem">🔗</span>
+        <div class="settings-row-info">
+          <h4>Webhook</h4>
+          <p>POST to any URL (Slack, Discord, etc.)</p>
+        </div>
+      </div>
+      <span class="card-badge">Not configured</span>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <span style="font-size:1.2rem">📧</span>
+        <div class="settings-row-info">
+          <h4>Email</h4>
+          <p>Send alerts to your inbox</p>
+        </div>
+      </div>
+      <span class="card-badge">Not configured</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS VIEW ═══ -->
+<div class="page view" id="view-settings">
+  <div class="dash-header">
+    <div>
+      <h2>Settings</h2>
+      <p>Manage your provider connections and preferences</p>
+    </div>
+  </div>
+
+  <!-- Connected Providers -->
+  <div class="settings-section">
+    <h3>🔌 Connected Providers</h3>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="provider-mini-icon" data-provider="anthropic">A</div>
+        <div class="settings-row-info">
+          <h4>Anthropic</h4>
+          <p>sk-ant-...x9f2 · Claude Pro · Org: FoxhoundLab</p>
+        </div>
+      </div>
+      <div class="settings-row-actions">
+        <button class="btn-sm" onclick="showToast('Settings for Anthropic')">Configure</button>
+        <button class="btn-sm danger" onclick="showToast('Removed Anthropic')">Disconnect</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="provider-mini-icon" data-provider="openai">O</div>
+        <div class="settings-row-info">
+          <h4>OpenAI</h4>
+          <p>sk-...m4k7 · ChatGPT Plus · Tier 3</p>
+        </div>
+      </div>
+      <div class="settings-row-actions">
+        <button class="btn-sm" onclick="showToast('Settings for OpenAI')">Configure</button>
+        <button class="btn-sm danger" onclick="showToast('Removed OpenAI')">Disconnect</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="provider-mini-icon" data-provider="zai">Z</div>
+        <div class="settings-row-info">
+          <h4>Z.AI</h4>
+          <p>glm-...p8r3 · Coding Plan · Proxy tracking only</p>
+        </div>
+      </div>
+      <div class="settings-row-actions">
+        <button class="btn-sm" onclick="showToast('Settings for Z.AI')">Configure</button>
+        <button class="btn-sm danger" onclick="showToast('Removed Z.AI')">Disconnect</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="provider-mini-icon" data-provider="ollama">●</div>
+        <div class="settings-row-info">
+          <h4>Ollama Pro</h4>
+          <p>API key configured · Max Plan · Proxy tracking only</p>
+        </div>
+      </div>
+      <div class="settings-row-actions">
+        <button class="btn-sm" onclick="showToast('Settings for Ollama')">Configure</button>
+        <button class="btn-sm danger" onclick="showToast('Removed Ollama')">Disconnect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Provider -->
+  <div class="settings-section">
+    <h3>➕ Add New Provider</h3>
+    <div class="provider-pick">
+      <div class="provider-pick-item selected">
+        <div class="provider-mini-icon" data-provider="anthropic">A</div>
+        <span>Anthropic</span>
+      </div>
+      <div class="provider-pick-item">
+        <div class="provider-mini-icon" data-provider="openai">O</div>
+        <span>OpenAI</span>
+      </div>
+      <div class="provider-pick-item">
+        <div class="provider-mini-icon" data-provider="zai">Z</div>
+        <span>Z.AI</span>
+      </div>
+      <div class="provider-pick-item">
+        <div class="provider-mini-icon" data-provider="ollama">●</div>
+        <span>Ollama</span>
+      </div>
+    </div>
+    <div style="margin-top:1rem">
+      <div class="form-group">
+        <label>Display Name</label>
+        <input class="form-input" type="text" placeholder="Anthropic Work" value="Anthropic Work">
+      </div>
+      <div class="form-group">
+        <label>API Key</label>
+        <input class="form-input" type="password" placeholder="sk-ant-admin01-..." value="••••••••••••">
+      </div>
+      <div class="form-group">
+        <label>Organization ID (Anthropic Admin API only)</label>
+        <input class="form-input" type="text" placeholder="org-xxxxx" value="">
+      </div>
+      <button class="btn-primary" onclick="showToast('Provider connected! ⛽')">Connect Provider</button>
+    </div>
+  </div>
+
+  <!-- Proxy Settings -->
+  <div class="settings-section">
+    <h3>⚙️ Proxy Configuration</h3>
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <h4>Proxy Address</h4>
+        <p>Point your AI tools to this address</p>
+      </div>
+      <code style="background:var(--bg-deep);padding:0.4rem 0.8rem;border-radius:6px;font-family:var(--mono);font-size:0.85rem;color:var(--amber)">localhost:8848</code>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <h4>Auto-start proxy</h4>
+        <p>Start proxy on app launch</p>
+      </div>
+      <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <h4>Data retention</h4>
+        <p>How long to keep usage records</p>
+      </div>
+      <code style="background:var(--bg-deep);padding:0.4rem 0.8rem;border-radius:6px;font-family:var(--mono);font-size:0.85rem">90 days</code>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <h4>Billing poll interval</h4>
+        <p>How often to check provider billing APIs</p>
+      </div>
+      <code style="background:var(--bg-deep);padding:0.4rem 0.8rem;border-radius:6px;font-family:var(--mono);font-size:0.85rem">5 min</code>
+    </div>
+  </div>
+
+  <!-- Privacy -->
+  <div class="settings-section">
+    <h3>🔒 Privacy & Security</h3>
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <h4>API Key Encryption</h4>
+        <p>Keys encrypted at rest with Fernet (AES-128)</p>
+      </div>
+      <span class="card-badge" style="color:var(--green)">✓ Enabled</span>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <h4>Log request content</h4>
+        <p>Store prompt/response content in logs (off by default)</p>
+      </div>
+      <div class="toggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-info">
+        <h4>Telemetry</h4>
+        <p>Anonymous usage data to improve Token Tank</p>
+      </div>
+      <div class="toggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WIREFRAME TAG ═══ -->
+<div class="wireframe-tag">
+  <div class="dot"></div>
+  <span>WIREFRAME — Token Tank v1</span>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div id="toast" style="
+  position:fixed;bottom:4rem;left:50%;transform:translateX(-50%);
+  background:var(--bg-panel);border:1px solid var(--amber);
+  border-radius:8px;padding:0.75rem 1.5rem;color:var(--text);
+  font-size:0.85rem;z-index:1000;display:none;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+"></div>
+
+<script>
+// ── Navigation ─────────────────────────────
+function navigate(viewName) {
+  // Handle detail views (not built yet — just show dashboard)
+  if (viewName.startsWith('detail-')) {
+    showToast('Provider detail view coming in Phase 2');
+    return;
+  }
+  
+  // Hide all views
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  // Show target
+  const target = document.getElementById('view-' + viewName);
+  if (target) target.classList.add('active');
+  
+  // Update nav buttons
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const navBtn = document.querySelector(`.nav-btn[data-view="${viewName}"]`);
+  if (navBtn) navBtn.classList.add('active');
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => navigate(btn.dataset.view));
+});
+
+// ── Provider Picker ────────────────────────
+document.querySelectorAll('.provider-pick-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.provider-pick-item').forEach(i => i.classList.remove('selected'));
+    item.classList.add('selected');
+  });
+});
+
+// ── Toast ──────────────────────────────────
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 2500);
+}
+</script>
+
+</body>
+</html>
