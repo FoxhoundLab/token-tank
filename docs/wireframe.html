@@ -5,47 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>⛽ Token Tank — Wireframe</title>
 <style>
-/* ═══════════════════════════════════════════════
-   TOKEN TANK — WIREFRAME
-   Fuel pump / instrument panel theme
-   Dark dashboard aesthetic
-   ═══════════════════════════════════════════════ */
-
 :root {
-  --bg-deep: #080a0c;
-  --bg-panel: #12161a;
-  --bg-card: #1a1f24;
-  --bg-card-hover: #222830;
-  --border: #2a3038;
-  --border-light: #353d48;
+  --bg-deep: #060809;
+  --bg-panel: #0e1216;
+  --bg-card: #14181d;
+  --bg-card-hover: #181d23;
+  --border: #232a32;
+  --border-light: #2e3640;
   --text: #e8eaed;
   --text-dim: #8b95a1;
-  --text-faint: #5a6470;
-  --amber: #f59e0b;
-  --amber-glow: rgba(245, 158, 11, 0.15);
-  --green: #22c55e;
-  --green-glow: rgba(34, 197, 94, 0.1);
-  --red: #ef4444;
-  --red-glow: rgba(239, 68, 68, 0.1);
-  --blue: #3b82f6;
-  --blue-glow: rgba(59, 130, 246, 0.1);
-  --purple: #a855f7;
-  --purple-glow: rgba(168, 85, 247, 0.1);
-  --radius: 14px;
-  --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  --mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --text-faint: #525c68;
+  --amber: #f5a623;
+  --amber-glow: rgba(245, 166, 35, 0.2);
+  --green: #2dd4bf;
+  --green-glow: rgba(45, 212, 191, 0.15);
+  --red: #f0464f;
+  --red-glow: rgba(240, 70, 79, 0.15);
+  --blue: #4d8aff;
+  --purple: #a974ff;
+  --pink: #e879f9;
+  --orange: #e8734a;
+  --radius: 16px;
+  --mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse 800px 600px at 20% -10%, rgba(245, 166, 35, 0.06), transparent),
+    radial-gradient(ellipse 600px 400px at 80% 100%, rgba(45, 212, 191, 0.04), transparent);
+  background-attachment: fixed;
   color: var(--text);
-  overflow-x: hidden;
+  min-height: 100vh;
 }
 
-/* ── Top Bar ─────────────────────────────── */
+/* ═══ TOP BAR ═══ */
 .topbar {
   position: sticky;
   top: 0;
@@ -53,39 +50,40 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1.5rem;
-  background: var(--bg-panel);
+  padding: 0.85rem 2rem;
+  background: rgba(14, 18, 22, 0.85);
   border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .topbar-brand {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
 }
 
 .topbar-logo {
-  font-size: 1.5rem;
-  line-height: 1;
+  font-size: 1.6rem;
+  filter: drop-shadow(0 0 8px rgba(245, 166, 35, 0.3));
 }
 
 .topbar-title {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .topbar-title span {
-  color: var(--text-dim);
+  color: var(--text-faint);
   font-weight: 400;
-  font-size: 0.8rem;
-  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  margin-left: 0.4rem;
 }
 
 .topbar-nav {
   display: flex;
-  gap: 0.25rem;
+  gap: 0.2rem;
   background: var(--bg-deep);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -93,7 +91,7 @@ body {
 }
 
 .nav-btn {
-  padding: 0.45rem 1rem;
+  padding: 0.45rem 1.1rem;
   border: none;
   background: transparent;
   color: var(--text-dim);
@@ -104,91 +102,88 @@ body {
   transition: all 0.15s;
 }
 
-.nav-btn:hover { color: var(--text); background: var(--bg-card); }
-
-.nav-btn.active {
-  background: var(--amber);
-  color: #000;
-  font-weight: 600;
-}
+.nav-btn:hover { color: var(--text); }
+.nav-btn.active { background: var(--amber); color: #000; font-weight: 600; }
 
 .topbar-status {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 0.8rem;
+  gap: 0.5rem;
+  font-size: 0.78rem;
   color: var(--text-dim);
+  font-family: var(--mono);
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px; height: 7px;
   border-radius: 50%;
   background: var(--green);
-  box-shadow: 0 0 8px var(--green-glow);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s ease-in-out infinite;
 }
 
-/* ── Layout ──────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ═══ PAGE ═══ */
 .page {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 2rem 1.5rem 4rem;
 }
 
 .view { display: none; }
-.view.active { display: block; animation: fadeIn 0.2s ease; }
+.view.active { display: block; animation: fadeIn 0.25s ease; }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Dashboard Header ────────────────────── */
+/* ═══ DASHBOARD HEADER ═══ */
 .dash-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .dash-header h2 {
-  font-size: 1.4rem;
+  font-size: 1.45rem;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .dash-header p {
   color: var(--text-dim);
-  font-size: 0.85rem;
+  font-size: 0.83rem;
   margin-top: 0.25rem;
 }
 
 .dash-summary {
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
-.summary-stat {
-  text-align: right;
-}
-
+.summary-stat { text-align: right; }
 .summary-stat .val {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 700;
   font-family: var(--mono);
 }
-
 .summary-stat .label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: var(--text-faint);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
-/* ── Provider Grid ───────────────────────── */
+/* ═══ PROVIDER GRID ═══ */
 .provider-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1.25rem;
 }
 
@@ -197,7 +192,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.5rem;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
 }
@@ -205,251 +200,342 @@ body {
 .provider-card:hover {
   border-color: var(--border-light);
   background: var(--bg-card-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 
-/* Colored top accent per provider */
+/* Top accent glow strip */
 .provider-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 3px;
+  height: 2px;
   background: var(--accent-color, var(--amber));
+  box-shadow: 0 0 12px var(--accent-color, var(--amber));
 }
 
-.provider-card[data-provider="anthropic"] { --accent-color: #d97757; }
-.provider-card[data-provider="minimax"] { --accent-color: #e879f9; }
-.provider-card[data-provider="zai"] { --accent-color: #3b82f6; }
-.provider-card[data-provider="ollama"] { --accent-color: #a855f7; }
-.provider-card[data-provider="lmstudio"] { --accent-color: #22c55e; }
+.provider-card[data-provider="anthropic"]  { --accent-color: var(--orange); }
+.provider-card[data-provider="minimax"]    { --accent-color: var(--pink); }
+.provider-card[data-provider="zai"]        { --accent-color: var(--blue); }
+.provider-card[data-provider="ollama"]     { --accent-color: var(--purple); }
+.provider-card[data-provider="lmstudio"]   { --accent-color: var(--green); }
 
+/* ═══ CARD HEADER ═══ */
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.card-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.provider-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.provider-icon[data-provider="anthropic"] { background: #d97757; }
-.provider-icon[data-provider="minimax"] { background: #e879f9; }
-.provider-icon[data-provider="zai"] { background: #3b82f6; }
-.provider-icon[data-provider="ollama"] { background: #a855f7; }
-.provider-icon[data-provider="lmstudio"] { background: #22c55e; }
-
-.card-header h3 {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.card-badge {
-  font-size: 0.65rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 5px;
-  background: var(--bg-deep);
-  color: var(--text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-}
-
-/* ── Usage Window Blocks ─────────────────── */
-.usage-blocks {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  margin-bottom: 1rem;
-}
-
-.usage-block {
-  background: var(--bg-deep);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.7rem 0.85rem;
-}
-
-.usage-block-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
 }
 
-.usage-block-label {
-  font-size: 0.65rem;
+.card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.provider-icon {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.provider-icon[data-provider="anthropic"] { background: linear-gradient(135deg, #e8734a, #c9553a); }
+.provider-icon[data-provider="minimax"]   { background: linear-gradient(135deg, #e879f9, #b82bcf); }
+.provider-icon[data-provider="zai"]       { background: linear-gradient(135deg, #4d8aff, #2563eb); }
+.provider-icon[data-provider="ollama"]    { background: linear-gradient(135deg, #a974ff, #7c3aed); }
+.provider-icon[data-provider="lmstudio"]  { background: linear-gradient(135deg, #2dd4bf, #0d9488); }
+
+.card-header h3 {
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.card-badge {
+  font-size: 0.62rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.06);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
 }
 
-.usage-block-pct {
-  font-size: 0.9rem;
-  font-weight: 700;
+.card-badge.local { color: var(--green); background: var(--green-glow); }
+
+/* ═══ FUEL GAUGE (HERO) ═══ */
+.gauge-hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 0 0.75rem;
+}
+
+.gauge-svg {
+  width: 180px;
+  height: 110px;
+}
+
+/* Gauge readout below */
+.gauge-readout {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.gauge-readout .pct {
+  font-size: 2.2rem;
+  font-weight: 800;
   font-family: var(--mono);
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
-.usage-track {
-  height: 8px;
-  background: var(--bg-panel);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-}
-
-.usage-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.5s ease;
-}
-
-.usage-fill.low { background: var(--green); }
-.usage-fill.med { background: var(--amber); }
-.usage-fill.high { background: var(--red); }
-
-.usage-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.45rem;
+.gauge-readout .label {
   font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 0.3rem;
 }
 
-.usage-reset {
-  color: var(--text-faint);
+/* ═══ USAGE WINDOWS (below gauge) ═══ */
+.usage-windows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.usage-win {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.6rem;
+  padding: 0.55rem 0.75rem;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--border);
+  border-radius: 9px;
 }
 
-.usage-countdown {
-  font-family: var(--mono);
-  font-weight: 600;
+.usage-win-icon {
+  font-size: 0.85rem;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.usage-win-body { flex: 1; }
+
+.usage-win-label {
+  font-size: 0.68rem;
   color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
-.usage-countdown.urgent { color: var(--red); }
-.usage-countdown.soon { color: var(--amber); }
+.usage-win-track {
+  height: 5px;
+  background: var(--bg-deep);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 0.35rem;
+}
 
-/* ── Stats Row ───────────────────────────── */
-.stats-row {
+.usage-win-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.fill-green { background: var(--green); box-shadow: 0 0 6px rgba(45,212,191,0.3); }
+.fill-amber { background: var(--amber); box-shadow: 0 0 6px rgba(245,166,35,0.3); }
+.fill-red   { background: var(--red); box-shadow: 0 0 6px rgba(240,70,79,0.3); }
+
+.usage-win-reset {
+  text-align: right;
+  flex-shrink: 0;
+  font-size: 0.68rem;
+}
+
+.usage-win-reset .countdown {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.countdown.urgent { color: var(--red); }
+.countdown.soon   { color: var(--amber); }
+
+.usage-win-reset .resets {
+  color: var(--text-faint);
+  font-size: 0.6rem;
+}
+
+/* ═══ API SPEND MODEL (MiniMax) ═══ */
+.spend-tiles {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.75rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
 }
 
-.stat-cell {
+.spend-tile {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem;
   text-align: center;
 }
 
-.stat-cell .stat-val {
-  font-size: 1rem;
+.spend-tile .amount {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: var(--mono);
+  letter-spacing: -0.02em;
+}
+
+.spend-tile .desc {
+  font-size: 0.62rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.2rem;
+}
+
+/* Balance bar */
+.balance-bar {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.balance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.balance-header .label {
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.balance-header .amount {
+  font-size: 0.85rem;
   font-weight: 700;
   font-family: var(--mono);
 }
 
-.stat-cell .stat-val.cost { color: var(--amber); }
+/* Active models (LM Studio) */
+.models-bar {
+  background: rgba(45, 212, 191, 0.04);
+  border: 1px solid rgba(45, 212, 191, 0.15);
+  border-radius: 9px;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
 
-.stat-cell .stat-label {
-  font-size: 0.65rem;
-  color: var(--text-faint);
+.models-bar .label {
+  font-size: 0.62rem;
+  color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.models-bar .names {
+  font-size: 0.75rem;
+  font-family: var(--mono);
+  color: var(--green);
   margin-top: 0.15rem;
 }
 
-/* ── Burn Rate Bar ───────────────────────── */
+.models-bar .sub {
+  font-size: 0.65rem;
+  color: var(--text-faint);
+  margin-top: 0.25rem;
+}
+
+/* ═══ STATS ROW ═══ */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.stat-cell { text-align: center; }
+
+.stat-cell .val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+
+.stat-cell .val.cost { color: var(--amber); }
+.stat-cell .val.free { color: var(--green); }
+
+.stat-cell .label {
+  font-size: 0.6rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.1rem;
+}
+
+/* ═══ BURN RATE ═══ */
 .burn-bar {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
   border-top: 1px solid var(--border);
 }
 
 .burn-bar-label {
   display: flex;
   justify-content: space-between;
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  margin-bottom: 0.4rem;
+  font-size: 0.68rem;
+  margin-bottom: 0.3rem;
 }
 
-.burn-bar-label span:last-child {
-  color: var(--text);
-  font-family: var(--mono);
-  font-weight: 600;
-}
+.burn-bar-label .label { color: var(--text-dim); }
+.burn-bar-label .rate  { color: var(--text); font-family: var(--mono); font-weight: 600; }
 
 .burn-bar-track {
-  height: 6px;
+  height: 5px;
   background: var(--bg-deep);
   border-radius: 3px;
   overflow: hidden;
-  position: relative;
 }
 
 .burn-bar-fill {
   height: 100%;
   border-radius: 3px;
-  background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
-  transition: width 0.5s ease;
 }
 
-/* ── Sparkline ───────────────────────────── */
-.sparkline {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-}
-
-.sparkline-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  margin-bottom: 0.4rem;
-}
-
-.sparkline-svg {
-  width: 100%;
-  height: 36px;
-}
-
-/* ── Add Tank Card ───────────────────────── */
+/* ═══ ADD TANK ═══ */
 .add-tank-card {
   background: var(--bg-card);
   border: 2px dashed var(--border);
   border-radius: var(--radius);
-  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
   cursor: pointer;
   transition: all 0.2s;
-  min-height: 280px;
+  min-height: 360px;
 }
 
 .add-tank-card:hover {
@@ -457,34 +543,77 @@ body {
   background: var(--amber-glow);
 }
 
-.add-tank-icon {
-  font-size: 2rem;
-  opacity: 0.5;
+.add-tank-icon { font-size: 2.5rem; opacity: 0.3; }
+.add-tank-card:hover .add-tank-icon { opacity: 0.7; }
+.add-tank-card p { color: var(--text-dim); font-size: 0.85rem; }
+
+/* ═══ ALERTS ═══ */
+.alert-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.15s;
 }
 
-.add-tank-card:hover .add-tank-icon { opacity: 1; }
+.alert-card:hover { border-color: var(--border-light); }
 
-.add-tank-card p {
-  color: var(--text-dim);
-  font-size: 0.85rem;
+.alert-left { display: flex; align-items: center; gap: 0.75rem; }
+
+.alert-icon {
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
 }
 
-/* ── Settings ────────────────────────────── */
+.alert-icon.amber { background: var(--amber-glow); }
+.alert-icon.red   { background: var(--red-glow); }
+.alert-icon.green { background: var(--green-glow); }
+
+.alert-info h4 { font-size: 0.88rem; font-weight: 600; }
+.alert-info p  { font-size: 0.73rem; color: var(--text-dim); }
+
+.toggle {
+  position: relative;
+  width: 44px; height: 24px;
+  background: var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle.on { background: var(--amber); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(20px); }
+
+/* ═══ SETTINGS ═══ */
 .settings-section {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 14px;
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .settings-section h3 {
   font-size: 0.95rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
 }
 
 .settings-row {
@@ -497,44 +626,29 @@ body {
 
 .settings-row:last-child { border-bottom: none; }
 
-.settings-row-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
+.settings-row-left { display: flex; align-items: center; gap: 0.75rem; }
 
 .provider-mini-icon {
-  width: 32px;
-  height: 32px;
+  width: 32px; height: 32px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #fff;
 }
 
-.provider-mini-icon[data-provider="anthropic"] { background: #d97757; }
-.provider-mini-icon[data-provider="minimax"] { background: #e879f9; }
-.provider-mini-icon[data-provider="zai"] { background: #3b82f6; }
-.provider-mini-icon[data-provider="ollama"] { background: #a855f7; }
-.provider-mini-icon[data-provider="lmstudio"] { background: #22c55e; }
+.provider-mini-icon[data-provider="anthropic"] { background: linear-gradient(135deg, #e8734a, #c9553a); }
+.provider-mini-icon[data-provider="minimax"]   { background: linear-gradient(135deg, #e879f9, #b82bcf); }
+.provider-mini-icon[data-provider="zai"]       { background: linear-gradient(135deg, #4d8aff, #2563eb); }
+.provider-mini-icon[data-provider="ollama"]    { background: linear-gradient(135deg, #a974ff, #7c3aed); }
+.provider-mini-icon[data-provider="lmstudio"]  { background: linear-gradient(135deg, #2dd4bf, #0d9488); }
 
-.settings-row-info h4 {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
+.settings-row-info h4 { font-size: 0.88rem; font-weight: 600; }
+.settings-row-info p  { font-size: 0.73rem; color: var(--text-dim); }
 
-.settings-row-info p {
-  font-size: 0.75rem;
-  color: var(--text-dim);
-}
-
-.settings-row-actions {
-  display: flex;
-  gap: 0.5rem;
-}
+.settings-row-actions { display: flex; gap: 0.5rem; }
 
 .btn-sm {
   padding: 0.35rem 0.75rem;
@@ -557,14 +671,10 @@ body {
   border: none;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
-  transition: all 0.15s;
 }
 
-.btn-primary:hover { filter: brightness(1.1); }
-
-/* ── Form ────────────────────────────────── */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -573,7 +683,7 @@ body {
 }
 
 .form-group label {
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   color: var(--text-dim);
   font-weight: 500;
 }
@@ -584,18 +694,14 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 0.9rem;
-  transition: border-color 0.15s;
+  font-size: 0.88rem;
 }
 
-.form-input:focus {
-  outline: none;
-  border-color: var(--amber);
-}
+.form-input:focus { outline: none; border-color: var(--amber); }
 
 .provider-pick {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
 }
 
@@ -603,7 +709,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   padding: 0.75rem;
   border: 2px solid var(--border);
   border-radius: 10px;
@@ -611,149 +717,42 @@ body {
   transition: all 0.15s;
 }
 
-.provider-pick-item:hover {
-  border-color: var(--border-light);
-  background: var(--bg-card-hover);
-}
+.provider-pick-item:hover { border-color: var(--border-light); }
+.provider-pick-item.selected { border-color: var(--amber); background: var(--amber-glow); }
 
-.provider-pick-item.selected {
-  border-color: var(--amber);
-  background: var(--amber-glow);
-}
+.provider-pick-item .provider-mini-icon { width: 36px; height: 36px; }
+.provider-pick-item span { font-size: 0.73rem; font-weight: 500; }
 
-.provider-pick-item .provider-mini-icon {
-  width: 36px;
-  height: 36px;
-}
-
-.provider-pick-item span {
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-/* ── Alerts ──────────────────────────────── */
-.alert-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  margin-bottom: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.alert-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.alert-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-}
-
-.alert-icon.amber { background: var(--amber-glow); }
-.alert-icon.red { background: var(--red-glow); }
-.alert-icon.green { background: var(--green-glow); }
-
-.alert-info h4 {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.alert-info p {
-  font-size: 0.75rem;
-  color: var(--text-dim);
-}
-
-.toggle {
-  position: relative;
-  width: 42px;
-  height: 24px;
-  background: var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.toggle.on { background: var(--amber); }
-
-.toggle::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 18px;
-  height: 18px;
-  background: #fff;
-  border-radius: 50%;
-  transition: transform 0.2s;
-}
-
-.toggle.on::after { transform: translateX(18px); }
-
-/* ── Empty State ─────────────────────────── */
-.empty-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: var(--text-dim);
-}
-
-.empty-state .emoji {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  opacity: 0.3;
-}
-
-.empty-state h3 {
-  font-size: 1.2rem;
-  color: var(--text);
-  margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
-}
-
-/* ── Wireframe Label ─────────────────────── */
+/* ═══ WIREFRAME TAG ═══ */
 .wireframe-tag {
   position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  background: var(--bg-panel);
+  bottom: 1rem; right: 1rem;
+  background: rgba(14, 18, 22, 0.9);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.4rem 0.75rem;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--text-faint);
   z-index: 999;
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  backdrop-filter: blur(10px);
 }
 
 .wireframe-tag .dot {
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--amber);
+  box-shadow: 0 0 4px var(--amber);
 }
 
-/* ── Responsive ──────────────────────────── */
+/* ═══ RESPONSIVE ═══ */
 @media (max-width: 640px) {
   .provider-grid { grid-template-columns: 1fr; }
   .dash-header { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
   .dash-summary { width: 100%; justify-content: space-between; }
   .topbar-nav { display: none; }
-  .gauge-container { flex-direction: column; text-align: center; }
   .provider-pick { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
@@ -764,7 +763,7 @@ body {
 <header class="topbar">
   <div class="topbar-brand">
     <span class="topbar-logo">⛽</span>
-    <div class="topbar-title">Token Tank<span>Wireframe v1</span></div>
+    <div class="topbar-title">Token Tank<span>Wireframe v5</span></div>
   </div>
   <nav class="topbar-nav">
     <button class="nav-btn active" data-view="dashboard">Dashboard</button>
@@ -773,16 +772,16 @@ body {
   </nav>
   <div class="topbar-status">
     <div class="status-dot"></div>
-    <span>Proxy: localhost:8848</span>
+    <span>localhost:8848</span>
   </div>
 </header>
 
-<!-- ═══ DASHBOARD VIEW ═══ -->
+<!-- ═══ DASHBOARD ═══ -->
 <div class="page view active" id="view-dashboard">
   <div class="dash-header">
     <div>
       <h2>Fuel Dashboard</h2>
-      <p>All your AI providers at a glance · Last updated: just now</p>
+      <p>All your AI providers at a glance · Updated just now</p>
     </div>
     <div class="dash-summary">
       <div class="summary-stat">
@@ -790,7 +789,7 @@ body {
         <div class="label">Today's Cost</div>
       </div>
       <div class="summary-stat">
-        <div class="val">312K</div>
+        <div class="val">324K</div>
         <div class="label">Today's Tokens</div>
       </div>
     </div>
@@ -798,8 +797,8 @@ body {
 
   <div class="provider-grid">
 
-    <!-- ▸ Anthropic Card -->
-    <div class="provider-card" data-provider="anthropic" onclick="navigate('detail-anthropic')" style="cursor:pointer">
+    <!-- ═══ ANTHROPIC ═══ -->
+    <div class="provider-card" data-provider="anthropic" style="cursor:pointer">
       <div class="card-header">
         <div class="card-header-left">
           <div class="provider-icon" data-provider="anthropic">A</div>
@@ -807,61 +806,78 @@ body {
         </div>
         <span class="card-badge">Claude Pro</span>
       </div>
-      <div class="usage-blocks">
-        <div class="usage-block">
-          <div class="usage-block-header">
-            <span class="usage-block-label">⏱ 5-Hour Window</span>
-            <span class="usage-block-pct" style="color:#22c55e">62% used</span>
+
+      <!-- Gauge: 5hr window at 62% -->
+      <div class="gauge-hero">
+        <svg class="gauge-svg" viewBox="0 0 200 115">
+          <!-- Zone arcs -->
+          <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#1a1f24" stroke-width="10" stroke-linecap="round"/>
+          <!-- Green zone (0-60%) -->
+          <path d="M 20 100 A 80 80 0 0 1 144 33" fill="none" stroke="#2dd4bf" stroke-width="10" stroke-linecap="round" opacity="0.8"/>
+          <!-- Amber zone (60-85%) -->
+          <path d="M 144 33 A 80 80 0 0 1 174 60" fill="none" stroke="#f5a623" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+          <!-- Red zone (85-100%) -->
+          <path d="M 174 60 A 80 80 0 0 1 180 100" fill="none" stroke="#f0464f" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+          <!-- Tick marks -->
+          <g stroke="#525c68" stroke-width="1.5">
+            <line x1="20" y1="100" x2="26" y2="96"/>
+            <line x1="39" y1="57" x2="46" y2="58"/>
+            <line x1="100" y1="20" x2="100" y2="28"/>
+            <line x1="161" y1="57" x2="155" y2="58"/>
+            <line x1="180" y1="100" x2="174" y2="96"/>
+          </g>
+          <!-- Needle (62% → angle from -90° to +90°, 62% = -90+62*1.8 = 21.6°) -->
+          <line x1="100" y1="100" x2="174" y2="71" stroke="#e8eaed" stroke-width="2.5" stroke-linecap="round" filter="drop-shadow(0 0 3px rgba(255,255,255,0.3))"/>
+          <!-- Hub -->
+          <circle cx="100" cy="100" r="6" fill="#2a3038" stroke="#525c68" stroke-width="1.5"/>
+          <!-- E / F labels -->
+          <text x="14" y="113" font-size="9" fill="#525c68" font-family="monospace">E</text>
+          <text x="176" y="113" font-size="9" fill="#525c68" font-family="monospace">F</text>
+        </svg>
+      </div>
+      <div class="gauge-readout">
+        <div class="pct" style="color:#2dd4bf">62%</div>
+        <div class="label">5-Hour Window Used</div>
+      </div>
+
+      <div class="usage-windows">
+        <div class="usage-win">
+          <span class="usage-win-icon">⏱</span>
+          <div class="usage-win-body">
+            <div class="usage-win-label">5-Hour Window · 62%</div>
+            <div class="usage-win-track"><div class="usage-win-fill fill-green" style="width:62%"></div></div>
           </div>
-          <div class="usage-track">
-            <div class="usage-fill low" style="width: 62%"></div>
-          </div>
-          <div class="usage-footer">
-            <span class="usage-reset">🔄 Resets in</span>
-            <span class="usage-countdown">2h 14m</span>
+          <div class="usage-win-reset">
+            <div class="countdown">2h 14m</div>
+            <div class="resets">until reset</div>
           </div>
         </div>
-        <div class="usage-block">
-          <div class="usage-block-header">
-            <span class="usage-block-label">📅 Weekly Usage</span>
-            <span class="usage-block-pct" style="color:#22c55e">34% used</span>
+        <div class="usage-win">
+          <span class="usage-win-icon">📅</span>
+          <div class="usage-win-body">
+            <div class="usage-win-label">Weekly · 34%</div>
+            <div class="usage-win-track"><div class="usage-win-fill fill-green" style="width:34%"></div></div>
           </div>
-          <div class="usage-track">
-            <div class="usage-fill low" style="width: 34%"></div>
-          </div>
-          <div class="usage-footer">
-            <span class="usage-reset">🔄 Resets in</span>
-            <span class="usage-countdown">3d 22h</span>
+          <div class="usage-win-reset">
+            <div class="countdown">3d 22h</div>
+            <div class="resets">until reset</div>
           </div>
         </div>
       </div>
+
       <div class="stats-row">
-        <div class="stat-cell">
-          <div class="stat-val">2.4K</div>
-          <div class="stat-label">Today</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val">$3.20</div>
-          <div class="stat-label">Cost</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val">12K</div>
-          <div class="stat-label">This Month</div>
-        </div>
+        <div class="stat-cell"><div class="val">2.4K</div><div class="label">Today</div></div>
+        <div class="stat-cell"><div class="val cost">$3.20</div><div class="label">Cost</div></div>
+        <div class="stat-cell"><div class="val">12K</div><div class="label">Month</div></div>
       </div>
       <div class="burn-bar">
-        <div class="burn-bar-label">
-          <span>Burn rate</span>
-          <span>480 tok/hr · $0.13/hr</span>
-        </div>
-        <div class="burn-bar-track">
-          <div class="burn-bar-fill" style="width: 35%"></div>
-        </div>
+        <div class="burn-bar-label"><span class="label">Burn rate</span><span class="rate">480 tok/hr · $0.13/hr</span></div>
+        <div class="burn-bar-track"><div class="burn-bar-fill fill-green" style="width:35%"></div></div>
       </div>
     </div>
 
-    <!-- ▸ MiniMax Card (API — different layout, no usage windows) -->
-    <div class="provider-card" data-provider="minimax" onclick="navigate('detail-minimax')" style="cursor:pointer">
+    <!-- ═══ MINIMAX ═══ -->
+    <div class="provider-card" data-provider="minimax" style="cursor:pointer">
       <div class="card-header">
         <div class="card-header-left">
           <div class="provider-icon" data-provider="minimax">M</div>
@@ -869,57 +885,57 @@ body {
         </div>
         <span class="card-badge">Token API</span>
       </div>
-      <!-- API spend model — no reset windows, just spend tracking -->
-      <div style="display:flex; gap:0.85rem; margin-bottom:1rem;">
-        <div style="flex:1; background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.85rem; text-align:center;">
-          <div style="font-size:1.6rem; font-weight:800; font-family:var(--mono); color:var(--amber);">$4.12</div>
-          <div style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-top:0.2rem;">Spent Today</div>
+
+      <!-- Gauge: balance at 76% remaining -->
+      <div class="gauge-hero">
+        <svg class="gauge-svg" viewBox="0 0 200 115">
+          <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#1a1f24" stroke-width="10" stroke-linecap="round"/>
+          <path d="M 20 100 A 80 80 0 0 1 153 37" fill="none" stroke="#2dd4bf" stroke-width="10" stroke-linecap="round" opacity="0.8"/>
+          <path d="M 153 37 A 80 80 0 0 1 174 60" fill="none" stroke="#f5a623" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+          <path d="M 174 60 A 80 80 0 0 1 180 100" fill="none" stroke="#f0464f" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+          <g stroke="#525c68" stroke-width="1.5">
+            <line x1="20" y1="100" x2="26" y2="96"/>
+            <line x1="39" y1="57" x2="46" y2="58"/>
+            <line x1="100" y1="20" x2="100" y2="28"/>
+            <line x1="161" y1="57" x2="155" y2="58"/>
+            <line x1="180" y1="100" x2="174" y2="96"/>
+          </g>
+          <!-- 76% → needle at -90+76*1.8=46.8° -->
+          <line x1="100" y1="100" x2="154" y2="42" stroke="#e8eaed" stroke-width="2.5" stroke-linecap="round" filter="drop-shadow(0 0 3px rgba(255,255,255,0.3))"/>
+          <circle cx="100" cy="100" r="6" fill="#2a3038" stroke="#525c68" stroke-width="1.5"/>
+          <text x="14" y="113" font-size="9" fill="#525c68" font-family="monospace">E</text>
+          <text x="176" y="113" font-size="9" fill="#525c68" font-family="monospace">F</text>
+        </svg>
+      </div>
+      <div class="gauge-readout">
+        <div class="pct" style="color:#2dd4bf">$12.60</div>
+        <div class="label">Balance Remaining</div>
+      </div>
+
+      <div class="spend-tiles">
+        <div class="spend-tile">
+          <div class="amount" style="color:#f5a623">$4.12</div>
+          <div class="desc">Spent Today</div>
         </div>
-        <div style="flex:1; background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.85rem; text-align:center;">
-          <div style="font-size:1.6rem; font-weight:800; font-family:var(--mono); color:var(--text);">$38.40</div>
-          <div style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-top:0.2rem;">This Month</div>
+        <div class="spend-tile">
+          <div class="amount">$38.40</div>
+          <div class="desc">This Month</div>
         </div>
       </div>
-      <div style="background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.7rem 0.85rem; margin-bottom:0.75rem;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-          <span style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">💳 Balance</span>
-          <span style="font-size:0.85rem; font-weight:700; font-family:var(--mono); color:var(--green)">$12.60</span>
-        </div>
-        <div class="usage-track">
-          <div class="usage-fill low" style="width: 24%"></div>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-top:0.35rem;">
-          <span style="color:var(--text-faint)">Top up when low</span>
-          <span style="color:var(--text-dim); font-family:var(--mono)">24% used</span>
-        </div>
-      </div>
+
       <div class="stats-row">
-        <div class="stat-cell">
-          <div class="stat-val">5.7K</div>
-          <div class="stat-label">Today</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val">$4.12</div>
-          <div class="stat-label">Cost</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val">53K</div>
-          <div class="stat-label">This Month</div>
-        </div>
+        <div class="stat-cell"><div class="val">5.7K</div><div class="label">Today</div></div>
+        <div class="stat-cell"><div class="val cost">$4.12</div><div class="label">Cost</div></div>
+        <div class="stat-cell"><div class="val">53K</div><div class="label">Month</div></div>
       </div>
       <div class="burn-bar">
-        <div class="burn-bar-label">
-          <span>Burn rate</span>
-          <span>950 tok/hr · $0.68/hr</span>
-        </div>
-        <div class="burn-bar-track">
-          <div class="burn-bar-fill" style="width: 55%"></div>
-        </div>
+        <div class="burn-bar-label"><span class="label">Burn rate</span><span class="rate">950 tok/hr · $0.68/hr</span></div>
+        <div class="burn-bar-track"><div class="burn-bar-fill fill-amber" style="width:55%"></div></div>
       </div>
     </div>
 
-    <!-- ▸ Z.AI Card (Critical) -->
-    <div class="provider-card" data-provider="zai" onclick="navigate('detail-zai')" style="cursor:pointer">
+    <!-- ═══ Z.AI (CRITICAL) ═══ -->
+    <div class="provider-card" data-provider="zai" style="cursor:pointer">
       <div class="card-header">
         <div class="card-header-left">
           <div class="provider-icon" data-provider="zai">Z</div>
@@ -927,61 +943,71 @@ body {
         </div>
         <span class="card-badge">Coding Plan</span>
       </div>
-      <div class="usage-blocks">
-        <div class="usage-block">
-          <div class="usage-block-header">
-            <span class="usage-block-label">⏱ 5-Hour Window</span>
-            <span class="usage-block-pct" style="color:#ef4444">98% used</span>
+
+      <!-- Gauge: 5hr at 98% — needle in red zone -->
+      <div class="gauge-hero">
+        <svg class="gauge-svg" viewBox="0 0 200 115">
+          <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#1a1f24" stroke-width="10" stroke-linecap="round"/>
+          <path d="M 20 100 A 80 80 0 0 1 144 33" fill="none" stroke="#2dd4bf" stroke-width="10" stroke-linecap="round" opacity="0.4"/>
+          <path d="M 144 33 A 80 80 0 0 1 174 60" fill="none" stroke="#f5a623" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+          <path d="M 174 60 A 80 80 0 0 1 180 100" fill="none" stroke="#f0464f" stroke-width="12" stroke-linecap="round" opacity="0.9"/>
+          <g stroke="#525c68" stroke-width="1.5">
+            <line x1="20" y1="100" x2="26" y2="96"/>
+            <line x1="39" y1="57" x2="46" y2="58"/>
+            <line x1="100" y1="20" x2="100" y2="28"/>
+            <line x1="161" y1="57" x2="155" y2="58"/>
+            <line x1="180" y1="100" x2="174" y2="96"/>
+          </g>
+          <!-- 98% → -90+98*1.8=86.4° → needle pointing far right -->
+          <line x1="100" y1="100" x2="178" y2="95" stroke="#f0464f" stroke-width="3" stroke-linecap="round" filter="drop-shadow(0 0 5px rgba(240,70,79,0.6))"/>
+          <circle cx="100" cy="100" r="6" fill="#2a3038" stroke="#525c68" stroke-width="1.5"/>
+          <text x="14" y="113" font-size="9" fill="#525c68" font-family="monospace">E</text>
+          <text x="176" y="113" font-size="9" fill="#525c68" font-family="monospace">F</text>
+        </svg>
+      </div>
+      <div class="gauge-readout">
+        <div class="pct" style="color:#f0464f">98%</div>
+        <div class="label" style="color:#f0464f">⚠ 5-Hour Window — Near Empty</div>
+      </div>
+
+      <div class="usage-windows">
+        <div class="usage-win" style="border-color:rgba(240,70,79,0.2); background:rgba(240,70,79,0.04)">
+          <span class="usage-win-icon">⏱</span>
+          <div class="usage-win-body">
+            <div class="usage-win-label">5-Hour Window · 98%</div>
+            <div class="usage-win-track"><div class="usage-win-fill fill-red" style="width:98%"></div></div>
           </div>
-          <div class="usage-track">
-            <div class="usage-fill high" style="width: 98%"></div>
-          </div>
-          <div class="usage-footer">
-            <span class="usage-reset">🔄 Resets in</span>
-            <span class="usage-countdown urgent">8m</span>
+          <div class="usage-win-reset">
+            <div class="countdown urgent">8m</div>
+            <div class="resets">until reset</div>
           </div>
         </div>
-        <div class="usage-block">
-          <div class="usage-block-header">
-            <span class="usage-block-label">📅 Weekly Usage</span>
-            <span class="usage-block-pct" style="color:#ef4444">94% used</span>
+        <div class="usage-win" style="border-color:rgba(240,70,79,0.15); background:rgba(240,70,79,0.03)">
+          <span class="usage-win-icon">📅</span>
+          <div class="usage-win-body">
+            <div class="usage-win-label">Weekly · 94%</div>
+            <div class="usage-win-track"><div class="usage-win-fill fill-red" style="width:94%"></div></div>
           </div>
-          <div class="usage-track">
-            <div class="usage-fill high" style="width: 94%"></div>
-          </div>
-          <div class="usage-footer">
-            <span class="usage-reset">🔄 Resets in</span>
-            <span class="usage-countdown urgent">4h 22m</span>
+          <div class="usage-win-reset">
+            <div class="countdown urgent">4h 22m</div>
+            <div class="resets">until reset</div>
           </div>
         </div>
       </div>
+
       <div class="stats-row">
-        <div class="stat-cell">
-          <div class="stat-val">5.3K</div>
-          <div class="stat-label">Today</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val">$1.87</div>
-          <div class="stat-label">Cost</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val">38K</div>
-          <div class="stat-label">This Month</div>
-        </div>
+        <div class="stat-cell"><div class="val">5.3K</div><div class="label">Today</div></div>
+        <div class="stat-cell"><div class="val cost">$1.87</div><div class="label">Cost</div></div>
+        <div class="stat-cell"><div class="val">38K</div><div class="label">Month</div></div>
       </div>
       <div class="burn-bar">
-        <div class="burn-bar-label">
-          <span>Burn rate</span>
-          <span style="color:#ef4444">2.8K tok/hr · $0.98/hr</span>
-        </div>
-        <div class="burn-bar-track">
-          <div class="burn-bar-fill" style="width: 92%"></div>
-        </div>
+        <div class="burn-bar-label"><span class="label">Burn rate</span><span class="rate" style="color:#f0464f">2.8K tok/hr · $0.98/hr</span></div>
+        <div class="burn-bar-track"><div class="burn-bar-fill fill-red" style="width:92%"></div></div>
       </div>
     </div>
 
-    <!-- ▸ Ollama Card -->
-    <div class="provider-card" data-provider="ollama" onclick="navigate('detail-ollama')" style="cursor:pointer">
+    <!-- ═══ OLLAMA PRO ═══ -->
+    <div class="provider-card" data-provider="ollama" style="cursor:pointer">
       <div class="card-header">
         <div class="card-header-left">
           <div class="provider-icon" data-provider="ollama">●</div>
@@ -989,122 +1015,137 @@ body {
         </div>
         <span class="card-badge">Max Plan</span>
       </div>
-      <div class="usage-blocks">
-        <div class="usage-block">
-          <div class="usage-block-header">
-            <span class="usage-block-label">⏱ 5-Hour Window</span>
-            <span class="usage-block-pct" style="color:#22c55e">18% used</span>
+
+      <!-- Gauge: 18% — needle in green -->
+      <div class="gauge-hero">
+        <svg class="gauge-svg" viewBox="0 0 200 115">
+          <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#1a1f24" stroke-width="10" stroke-linecap="round"/>
+          <path d="M 20 100 A 80 80 0 0 1 144 33" fill="none" stroke="#2dd4bf" stroke-width="10" stroke-linecap="round" opacity="0.8"/>
+          <path d="M 144 33 A 80 80 0 0 1 174 60" fill="none" stroke="#f5a623" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+          <path d="M 174 60 A 80 80 0 0 1 180 100" fill="none" stroke="#f0464f" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+          <g stroke="#525c68" stroke-width="1.5">
+            <line x1="20" y1="100" x2="26" y2="96"/>
+            <line x1="39" y1="57" x2="46" y2="58"/>
+            <line x1="100" y1="20" x2="100" y2="28"/>
+            <line x1="161" y1="57" x2="155" y2="58"/>
+            <line x1="180" y1="100" x2="174" y2="96"/>
+          </g>
+          <!-- 18% → -90+18*1.8=-57.6° -->
+          <line x1="100" y1="100" x2="53" y2="63" stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round" filter="drop-shadow(0 0 4px rgba(45,212,191,0.4))"/>
+          <circle cx="100" cy="100" r="6" fill="#2a3038" stroke="#525c68" stroke-width="1.5"/>
+          <text x="14" y="113" font-size="9" fill="#525c68" font-family="monospace">E</text>
+          <text x="176" y="113" font-size="9" fill="#525c68" font-family="monospace">F</text>
+        </svg>
+      </div>
+      <div class="gauge-readout">
+        <div class="pct" style="color:#2dd4bf">18%</div>
+        <div class="label">5-Hour Window Used</div>
+      </div>
+
+      <div class="usage-windows">
+        <div class="usage-win">
+          <span class="usage-win-icon">⏱</span>
+          <div class="usage-win-body">
+            <div class="usage-win-label">5-Hour Window · 18%</div>
+            <div class="usage-win-track"><div class="usage-win-fill fill-green" style="width:18%"></div></div>
           </div>
-          <div class="usage-track">
-            <div class="usage-fill low" style="width: 18%"></div>
-          </div>
-          <div class="usage-footer">
-            <span class="usage-reset">🔄 Resets in</span>
-            <span class="usage-countdown">4h 02m</span>
+          <div class="usage-win-reset">
+            <div class="countdown">4h 02m</div>
+            <div class="resets">until reset</div>
           </div>
         </div>
-        <div class="usage-block">
-          <div class="usage-block-header">
-            <span class="usage-block-label">📅 Weekly Usage</span>
-            <span class="usage-block-pct" style="color:#22c55e">12% used</span>
+        <div class="usage-win">
+          <span class="usage-win-icon">📅</span>
+          <div class="usage-win-body">
+            <div class="usage-win-label">Weekly · 12%</div>
+            <div class="usage-win-track"><div class="usage-win-fill fill-green" style="width:12%"></div></div>
           </div>
-          <div class="usage-track">
-            <div class="usage-fill low" style="width: 12%"></div>
-          </div>
-          <div class="usage-footer">
-            <span class="usage-reset">🔄 Resets in</span>
-            <span class="usage-countdown">5d 18h</span>
+          <div class="usage-win-reset">
+            <div class="countdown">5d 18h</div>
+            <div class="resets">until reset</div>
           </div>
         </div>
       </div>
+
       <div class="stats-row">
-        <div class="stat-cell">
-          <div class="stat-val">890</div>
-          <div class="stat-label">Today</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val">$0.50</div>
-          <div class="stat-label">Cost</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val">6.2K</div>
-          <div class="stat-label">This Month</div>
-        </div>
+        <div class="stat-cell"><div class="val">890</div><div class="label">Today</div></div>
+        <div class="stat-cell"><div class="val cost">$0.50</div><div class="label">Cost</div></div>
+        <div class="stat-cell"><div class="val">6.2K</div><div class="label">Month</div></div>
       </div>
       <div class="burn-bar">
-        <div class="burn-bar-label">
-          <span>Burn rate</span>
-          <span>150 tok/hr · $0.08/hr</span>
-        </div>
-        <div class="burn-bar-track">
-          <div class="burn-bar-fill" style="width: 15%"></div>
-        </div>
+        <div class="burn-bar-label"><span class="label">Burn rate</span><span class="rate">150 tok/hr · $0.08/hr</span></div>
+        <div class="burn-bar-track"><div class="burn-bar-fill fill-green" style="width:15%"></div></div>
       </div>
     </div>
 
-    <!-- ▸ LM Studio Card (Local — always full, token tracking only) -->
-    <div class="provider-card" data-provider="lmstudio" onclick="navigate('detail-lmstudio')" style="cursor:pointer">
+    <!-- ═══ LM STUDIO (LOCAL) ═══ -->
+    <div class="provider-card" data-provider="lmstudio" style="cursor:pointer">
       <div class="card-header">
         <div class="card-header-left">
           <div class="provider-icon" data-provider="lmstudio">L</div>
           <h3>LM Studio</h3>
         </div>
-        <span class="card-badge" style="color:var(--green)">100% Local</span>
+        <span class="card-badge local">100% Local</span>
       </div>
-      <!-- Local model — no cost, no limits, just token generation data -->
-      <div style="display:flex; gap:0.85rem; margin-bottom:1rem;">
-        <div style="flex:1; background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.85rem; text-align:center;">
-          <div style="font-size:1.6rem; font-weight:800; font-family:var(--mono); color:var(--green);">$0.00</div>
-          <div style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-top:0.2rem;">Cost Today</div>
+
+      <!-- Gauge: Full — needle pinned right, glowing green -->
+      <div class="gauge-hero">
+        <svg class="gauge-svg" viewBox="0 0 200 115">
+          <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#1a1f24" stroke-width="10" stroke-linecap="round"/>
+          <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#2dd4bf" stroke-width="10" stroke-linecap="round" opacity="0.3"/>
+          <g stroke="#2dd4bf" stroke-width="1.5" opacity="0.4">
+            <line x1="20" y1="100" x2="26" y2="96"/>
+            <line x1="39" y1="57" x2="46" y2="58"/>
+            <line x1="100" y1="20" x2="100" y2="28"/>
+            <line x1="161" y1="57" x2="155" y2="58"/>
+            <line x1="180" y1="100" x2="174" y2="96"/>
+          </g>
+          <!-- Pinned at Full (100%) -->
+          <line x1="100" y1="100" x2="180" y2="100" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round" filter="drop-shadow(0 0 6px rgba(45,212,191,0.5))"/>
+          <circle cx="100" cy="100" r="6" fill="#2a3038" stroke="#2dd4bf" stroke-width="1.5"/>
+          <text x="14" y="113" font-size="9" fill="#525c68" font-family="monospace">E</text>
+          <text x="176" y="113" font-size="9" fill="#2dd4bf" font-family="monospace">F</text>
+        </svg>
+      </div>
+      <div class="gauge-readout">
+        <div class="pct" style="color:#2dd4bf">∞</div>
+        <div class="label">Unlimited — Running Locally</div>
+      </div>
+
+      <div class="models-bar">
+        <div class="label">🖥 Active Models</div>
+        <div class="names">qwen3.6-35b · glm-5.2</div>
+        <div class="sub">No API key · No rate limits · No cost</div>
+      </div>
+
+      <div class="spend-tiles">
+        <div class="spend-tile">
+          <div class="amount" style="color:#2dd4bf">12.4K</div>
+          <div class="desc">Tokens Today</div>
         </div>
-        <div style="flex:1; background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.85rem; text-align:center;">
-          <div style="font-size:1.6rem; font-weight:800; font-family:var(--mono); color:var(--text);">∞</div>
-          <div style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-top:0.2rem;">No Limit</div>
+        <div class="spend-tile">
+          <div class="amount" style="color:#2dd4bf">$0.00</div>
+          <div class="desc">Cost (Forever)</div>
         </div>
       </div>
-      <div style="background:var(--bg-deep); border:1px solid var(--border); border-radius:10px; padding:0.7rem 0.85rem; margin-bottom:0.75rem;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-          <span style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">🖥 Active Models</span>
-          <span style="font-size:0.75rem; color:var(--text-dim); font-family:var(--mono);">qwen3.6-35b · glm-5.2</span>
-        </div>
-        <div style="font-size:0.7rem; color:var(--text-faint);">Running locally · No API key · No rate limits</div>
-      </div>
-      <div class="stats-row">
-        <div class="stat-cell">
-          <div class="stat-val">12.4K</div>
-          <div class="stat-label">Today</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val" style="color:var(--green)">FREE</div>
-          <div class="stat-label">Cost</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val">89K</div>
-          <div class="stat-label">This Month</div>
-        </div>
-      </div>
+
       <div class="burn-bar">
-        <div class="burn-bar-label">
-          <span>Burn rate</span>
-          <span>2.1K tok/hr · $0.00/hr</span>
-        </div>
-        <div class="burn-bar-track">
-          <div class="burn-bar-fill" style="width: 40%; background: var(--green);"></div>
-        </div>
+        <div class="burn-bar-label"><span class="label">Burn rate</span><span class="rate" style="color:#2dd4bf">2.1K tok/hr · $0.00/hr</span></div>
+        <div class="burn-bar-track"><div class="burn-bar-fill fill-green" style="width:40%"></div></div>
       </div>
     </div>
 
-    <!-- ▸ Add Tank -->
+    <!-- ═══ ADD TANK ═══ -->
     <div class="add-tank-card" onclick="navigate('settings')">
       <div class="add-tank-icon">⛽</div>
       <p><strong>Add a new tank</strong></p>
-      <p style="font-size:0.75rem">Connect another AI provider</p>
+      <p style="font-size:0.75rem; color:var(--text-faint)">Connect another AI provider</p>
     </div>
 
   </div>
 </div>
 
-<!-- ═══ ALERTS VIEW ═══ -->
+<!-- ═══ ALERTS ═══ -->
 <div class="page view" id="view-alerts">
   <div class="dash-header">
     <div>
@@ -1114,299 +1155,130 @@ body {
     <button class="btn-primary" onclick="showToast('Alert creation form would appear here')">+ New Alert</button>
   </div>
 
-  <!-- Active Alert Examples -->
   <div class="alert-card">
     <div class="alert-left">
       <div class="alert-icon amber">⚠</div>
-      <div class="alert-info">
-        <h4>MiniMax — $10/day spend</h4>
-        <p>Alert when daily API spend exceeds $10 · Last triggered yesterday</p>
-      </div>
+      <div class="alert-info"><h4>MiniMax — $10/day spend</h4><p>Alert when daily API spend exceeds $10 · Last triggered yesterday</p></div>
     </div>
     <div class="toggle on" onclick="this.classList.toggle('on')"></div>
   </div>
-
   <div class="alert-card">
     <div class="alert-left">
       <div class="alert-icon red">🚨</div>
-      <div class="alert-info">
-        <h4>Z.AI — 90% threshold</h4>
-        <p>Critical alert when weekly quota hits 90% · Last triggered 6h ago</p>
-      </div>
+      <div class="alert-info"><h4>Z.AI — 90% threshold</h4><p>Critical alert when weekly quota hits 90% · Last triggered 6h ago</p></div>
     </div>
     <div class="toggle on" onclick="this.classList.toggle('on')"></div>
   </div>
-
   <div class="alert-card">
     <div class="alert-left">
       <div class="alert-icon green">💰</div>
-      <div class="alert-info">
-        <h4>All Providers — $50/day budget</h4>
-        <p>Alert when combined daily cost exceeds $50 · Never triggered</p>
-      </div>
+      <div class="alert-info"><h4>All Providers — $50/day budget</h4><p>Alert when combined daily cost exceeds $50 · Never triggered</p></div>
     </div>
     <div class="toggle on" onclick="this.classList.toggle('on')"></div>
   </div>
-
   <div class="alert-card">
     <div class="alert-left">
       <div class="alert-icon amber">📊</div>
-      <div class="alert-info">
-        <h4>Anthropic — Burn rate spike</h4>
-        <p>Alert when burn rate exceeds 2x weekly average · Paused</p>
-      </div>
+      <div class="alert-info"><h4>Anthropic — Burn rate spike</h4><p>Alert when burn rate exceeds 2x weekly average · Paused</p></div>
     </div>
     <div class="toggle" onclick="this.classList.toggle('on')"></div>
   </div>
 
-  <!-- Alert Options Info -->
   <div class="settings-section" style="margin-top:1.5rem">
     <h3>📡 Alert Channels</h3>
     <div class="settings-row">
-      <div class="settings-row-left">
-        <span style="font-size:1.2rem">🔔</span>
-        <div class="settings-row-info">
-          <h4>macOS Notifications</h4>
-          <p>Native system notifications</p>
-        </div>
-      </div>
+      <div class="settings-row-left"><span style="font-size:1.2rem">🔔</span><div class="settings-row-info"><h4>macOS Notifications</h4><p>Native system notifications</p></div></div>
       <span class="card-badge" style="color:var(--green)">Active</span>
     </div>
     <div class="settings-row">
-      <div class="settings-row-left">
-        <span style="font-size:1.2rem">🔗</span>
-        <div class="settings-row-info">
-          <h4>Webhook</h4>
-          <p>POST to any URL (Slack, Discord, etc.)</p>
-        </div>
-      </div>
+      <div class="settings-row-left"><span style="font-size:1.2rem">🔗</span><div class="settings-row-info"><h4>Webhook</h4><p>POST to any URL (Slack, Discord, etc.)</p></div></div>
       <span class="card-badge">Not configured</span>
     </div>
     <div class="settings-row">
-      <div class="settings-row-left">
-        <span style="font-size:1.2rem">📧</span>
-        <div class="settings-row-info">
-          <h4>Email</h4>
-          <p>Send alerts to your inbox</p>
-        </div>
-      </div>
+      <div class="settings-row-left"><span style="font-size:1.2rem">📧</span><div class="settings-row-info"><h4>Email</h4><p>Send alerts to your inbox</p></div></div>
       <span class="card-badge">Not configured</span>
     </div>
   </div>
 </div>
 
-<!-- ═══ SETTINGS VIEW ═══ -->
+<!-- ═══ SETTINGS ═══ -->
 <div class="page view" id="view-settings">
   <div class="dash-header">
-    <div>
-      <h2>Settings</h2>
-      <p>Manage your provider connections and preferences</p>
-    </div>
+    <div><h2>Settings</h2><p>Manage your provider connections and preferences</p></div>
   </div>
 
-  <!-- Connected Providers -->
   <div class="settings-section">
     <h3>🔌 Connected Providers</h3>
     <div class="settings-row">
-      <div class="settings-row-left">
-        <div class="provider-mini-icon" data-provider="anthropic">A</div>
-        <div class="settings-row-info">
-          <h4>Anthropic</h4>
-          <p>sk-ant-...x9f2 · Claude Pro · Org: FoxhoundLab</p>
-        </div>
-      </div>
-      <div class="settings-row-actions">
-        <button class="btn-sm" onclick="showToast('Settings for Anthropic')">Configure</button>
-        <button class="btn-sm danger" onclick="showToast('Removed Anthropic')">Disconnect</button>
-      </div>
+      <div class="settings-row-left"><div class="provider-mini-icon" data-provider="anthropic">A</div><div class="settings-row-info"><h4>Anthropic</h4><p>sk-ant-...x9f2 · Claude Pro · Org: FoxhoundLab</p></div></div>
+      <div class="settings-row-actions"><button class="btn-sm">Configure</button><button class="btn-sm danger">Disconnect</button></div>
     </div>
     <div class="settings-row">
-      <div class="settings-row-left">
-        <div class="provider-mini-icon" data-provider="minimax">M</div>
-        <div class="settings-row-info">
-          <h4>MiniMax</h4>
-          <p>API key · Token API · Pay-per-token</p>
-        </div>
-      </div>
-      <div class="settings-row-actions">
-        <button class="btn-sm" onclick="showToast('Settings for MiniMax')">Configure</button>
-        <button class="btn-sm danger" onclick="showToast('Removed MiniMax')">Disconnect</button>
-      </div>
+      <div class="settings-row-left"><div class="provider-mini-icon" data-provider="minimax">M</div><div class="settings-row-info"><h4>MiniMax</h4><p>API key · Token API · Pay-per-token</p></div></div>
+      <div class="settings-row-actions"><button class="btn-sm">Configure</button><button class="btn-sm danger">Disconnect</button></div>
     </div>
     <div class="settings-row">
-      <div class="settings-row-left">
-        <div class="provider-mini-icon" data-provider="zai">Z</div>
-        <div class="settings-row-info">
-          <h4>Z.AI</h4>
-          <p>glm-...p8r3 · Coding Plan · Proxy tracking only</p>
-        </div>
-      </div>
-      <div class="settings-row-actions">
-        <button class="btn-sm" onclick="showToast('Settings for Z.AI')">Configure</button>
-        <button class="btn-sm danger" onclick="showToast('Removed Z.AI')">Disconnect</button>
-      </div>
+      <div class="settings-row-left"><div class="provider-mini-icon" data-provider="zai">Z</div><div class="settings-row-info"><h4>Z.AI</h4><p>glm-...p8r3 · Coding Plan · Proxy tracking only</p></div></div>
+      <div class="settings-row-actions"><button class="btn-sm">Configure</button><button class="btn-sm danger">Disconnect</button></div>
     </div>
     <div class="settings-row">
-      <div class="settings-row-left">
-        <div class="provider-mini-icon" data-provider="ollama">●</div>
-        <div class="settings-row-info">
-          <h4>Ollama Pro</h4>
-          <p>API key configured · Max Plan · Proxy tracking only</p>
-        </div>
-      </div>
-      <div class="settings-row-actions">
-        <button class="btn-sm" onclick="showToast('Settings for Ollama')">Configure</button>
-        <button class="btn-sm danger" onclick="showToast('Removed Ollama')">Disconnect</button>
-      </div>
+      <div class="settings-row-left"><div class="provider-mini-icon" data-provider="ollama">●</div><div class="settings-row-info"><h4>Ollama Pro</h4><p>API key configured · Max Plan · Proxy tracking only</p></div></div>
+      <div class="settings-row-actions"><button class="btn-sm">Configure</button><button class="btn-sm danger">Disconnect</button></div>
     </div>
     <div class="settings-row">
-      <div class="settings-row-left">
-        <div class="provider-mini-icon" data-provider="lmstudio">L</div>
-        <div class="settings-row-info">
-          <h4>LM Studio</h4>
-          <p>localhost:1234 · 100% local · No API key needed</p>
-        </div>
-      </div>
-      <div class="settings-row-actions">
-        <button class="btn-sm" onclick="showToast('Settings for LM Studio')">Configure</button>
-        <button class="btn-sm danger" onclick="showToast('Removed LM Studio')">Disconnect</button>
-      </div>
+      <div class="settings-row-left"><div class="provider-mini-icon" data-provider="lmstudio">L</div><div class="settings-row-info"><h4>LM Studio</h4><p>localhost:1234 · 100% local · No API key needed</p></div></div>
+      <div class="settings-row-actions"><button class="btn-sm">Configure</button><button class="btn-sm danger">Disconnect</button></div>
     </div>
   </div>
 
-  <!-- Add Provider -->
   <div class="settings-section">
     <h3>➕ Add New Provider</h3>
     <div class="provider-pick">
-      <div class="provider-pick-item selected">
-        <div class="provider-mini-icon" data-provider="anthropic">A</div>
-        <span>Anthropic</span>
-      </div>
-      <div class="provider-pick-item">
-        <div class="provider-mini-icon" data-provider="minimax">M</div>
-        <span>MiniMax</span>
-      </div>
-      <div class="provider-pick-item">
-        <div class="provider-mini-icon" data-provider="zai">Z</div>
-        <span>Z.AI</span>
-      </div>
-      <div class="provider-pick-item">
-        <div class="provider-mini-icon" data-provider="ollama">●</div>
-        <span>Ollama</span>
-      </div>
-      <div class="provider-pick-item">
-        <div class="provider-mini-icon" data-provider="lmstudio">L</div>
-        <span>LM Studio</span>
-      </div>
+      <div class="provider-pick-item selected"><div class="provider-mini-icon" data-provider="anthropic">A</div><span>Anthropic</span></div>
+      <div class="provider-pick-item"><div class="provider-mini-icon" data-provider="minimax">M</div><span>MiniMax</span></div>
+      <div class="provider-pick-item"><div class="provider-mini-icon" data-provider="zai">Z</div><span>Z.AI</span></div>
+      <div class="provider-pick-item"><div class="provider-mini-icon" data-provider="ollama">●</div><span>Ollama</span></div>
+      <div class="provider-pick-item"><div class="provider-mini-icon" data-provider="lmstudio">L</div><span>LM Studio</span></div>
     </div>
     <div style="margin-top:1rem">
-      <div class="form-group">
-        <label>Display Name</label>
-        <input class="form-input" type="text" placeholder="Anthropic Work" value="Anthropic Work">
-      </div>
-      <div class="form-group">
-        <label>API Key</label>
-        <input class="form-input" type="password" placeholder="sk-ant-admin01-..." value="••••••••••••">
-      </div>
-      <div class="form-group">
-        <label>Organization ID (Anthropic Admin API only)</label>
-        <input class="form-input" type="text" placeholder="org-xxxxx" value="">
-      </div>
+      <div class="form-group"><label>Display Name</label><input class="form-input" type="text" value="Anthropic Work"></div>
+      <div class="form-group"><label>API Key</label><input class="form-input" type="password" value="••••••••••••"></div>
+      <div class="form-group"><label>Organization ID (Anthropic Admin API only)</label><input class="form-input" type="text" placeholder="org-xxxxx"></div>
       <button class="btn-primary" onclick="showToast('Provider connected! ⛽')">Connect Provider</button>
     </div>
   </div>
 
-  <!-- Proxy Settings -->
   <div class="settings-section">
     <h3>⚙️ Proxy Configuration</h3>
-    <div class="settings-row">
-      <div class="settings-row-info">
-        <h4>Proxy Address</h4>
-        <p>Point your AI tools to this address</p>
-      </div>
-      <code style="background:var(--bg-deep);padding:0.4rem 0.8rem;border-radius:6px;font-family:var(--mono);font-size:0.85rem;color:var(--amber)">localhost:8848</code>
-    </div>
-    <div class="settings-row">
-      <div class="settings-row-info">
-        <h4>Auto-start proxy</h4>
-        <p>Start proxy on app launch</p>
-      </div>
-      <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-    </div>
-    <div class="settings-row">
-      <div class="settings-row-info">
-        <h4>Data retention</h4>
-        <p>How long to keep usage records</p>
-      </div>
-      <code style="background:var(--bg-deep);padding:0.4rem 0.8rem;border-radius:6px;font-family:var(--mono);font-size:0.85rem">90 days</code>
-    </div>
-    <div class="settings-row">
-      <div class="settings-row-info">
-        <h4>Billing poll interval</h4>
-        <p>How often to check provider billing APIs</p>
-      </div>
-      <code style="background:var(--bg-deep);padding:0.4rem 0.8rem;border-radius:6px;font-family:var(--mono);font-size:0.85rem">5 min</code>
-    </div>
+    <div class="settings-row"><div class="settings-row-info"><h4>Proxy Address</h4><p>Point your AI tools to this address</p></div><code style="background:var(--bg-deep);padding:0.4rem 0.8rem;border-radius:6px;font-family:var(--mono);font-size:0.85rem;color:var(--amber)">localhost:8848</code></div>
+    <div class="settings-row"><div class="settings-row-info"><h4>Auto-start proxy</h4><p>Start proxy on app launch</p></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="settings-row"><div class="settings-row-info"><h4>Data retention</h4><p>How long to keep usage records</p></div><code style="background:var(--bg-deep);padding:0.4rem 0.8rem;border-radius:6px;font-family:var(--mono);font-size:0.85rem">90 days</code></div>
+    <div class="settings-row"><div class="settings-row-info"><h4>Billing poll interval</h4><p>How often to check provider billing APIs</p></div><code style="background:var(--bg-deep);padding:0.4rem 0.8rem;border-radius:6px;font-family:var(--mono);font-size:0.85rem">5 min</code></div>
   </div>
 
-  <!-- Privacy -->
   <div class="settings-section">
     <h3>🔒 Privacy & Security</h3>
-    <div class="settings-row">
-      <div class="settings-row-info">
-        <h4>API Key Encryption</h4>
-        <p>Keys encrypted at rest with Fernet (AES-128)</p>
-      </div>
-      <span class="card-badge" style="color:var(--green)">✓ Enabled</span>
-    </div>
-    <div class="settings-row">
-      <div class="settings-row-info">
-        <h4>Log request content</h4>
-        <p>Store prompt/response content in logs (off by default)</p>
-      </div>
-      <div class="toggle" onclick="this.classList.toggle('on')"></div>
-    </div>
-    <div class="settings-row">
-      <div class="settings-row-info">
-        <h4>Telemetry</h4>
-        <p>Anonymous usage data to improve Token Tank</p>
-      </div>
-      <div class="toggle" onclick="this.classList.toggle('on')"></div>
-    </div>
+    <div class="settings-row"><div class="settings-row-info"><h4>API Key Encryption</h4><p>Keys encrypted at rest with Fernet (AES-128)</p></div><span class="card-badge" style="color:var(--green)">✓ Enabled</span></div>
+    <div class="settings-row"><div class="settings-row-info"><h4>Log request content</h4><p>Store prompt/response content in logs (off by default)</p></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    <div class="settings-row"><div class="settings-row-info"><h4>Telemetry</h4><p>Anonymous usage data to improve Token Tank</p></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
   </div>
 </div>
 
 <!-- ═══ WIREFRAME TAG ═══ -->
 <div class="wireframe-tag">
   <div class="dot"></div>
-  <span>WIREFRAME — Token Tank v1</span>
+  <span>WIREFRAME v5 — Token Tank</span>
 </div>
 
 <!-- ═══ TOAST ═══ -->
-<div id="toast" style="
-  position:fixed;bottom:4rem;left:50%;transform:translateX(-50%);
-  background:var(--bg-panel);border:1px solid var(--amber);
-  border-radius:8px;padding:0.75rem 1.5rem;color:var(--text);
-  font-size:0.85rem;z-index:1000;display:none;
-  box-shadow:0 4px 20px rgba(0,0,0,0.5);
-"></div>
+<div id="toast" style="position:fixed;bottom:4rem;left:50%;transform:translateX(-50%);background:rgba(14,18,22,0.95);border:1px solid var(--amber);border-radius:8px;padding:0.75rem 1.5rem;color:var(--text);font-size:0.85rem;z-index:1000;display:none;box-shadow:0 4px 20px rgba(0,0,0,0.5);backdrop-filter:blur(10px)"></div>
 
 <script>
-// ── Navigation ─────────────────────────────
 function navigate(viewName) {
-  // Handle detail views (not built yet — just show dashboard)
-  if (viewName.startsWith('detail-')) {
-    showToast('Provider detail view coming in Phase 2');
-    return;
-  }
-  
-  // Hide all views
+  if (viewName.startsWith('detail-')) { showToast('Provider detail view coming soon'); return; }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  // Show target
   const target = document.getElementById('view-' + viewName);
   if (target) target.classList.add('active');
-  
-  // Update nav buttons
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const navBtn = document.querySelector(`.nav-btn[data-view="${viewName}"]`);
   if (navBtn) navBtn.classList.add('active');
@@ -1416,7 +1288,6 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => navigate(btn.dataset.view));
 });
 
-// ── Provider Picker ────────────────────────
 document.querySelectorAll('.provider-pick-item').forEach(item => {
   item.addEventListener('click', () => {
     document.querySelectorAll('.provider-pick-item').forEach(i => i.classList.remove('selected'));
@@ -1424,7 +1295,6 @@ document.querySelectorAll('.provider-pick-item').forEach(item => {
   });
 });
 
-// ── Toast ──────────────────────────────────
 function showToast(msg) {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
@@ -1432,6 +1302,5 @@ function showToast(msg) {
   setTimeout(() => toast.style.display = 'none', 2500);
 }
 </script>
-
 </body>
 </html>
