@@ -35,6 +35,7 @@ export function FuelGauge({ level, label }: FuelGaugeProps) {
         />
         {/* Arc fill */}
         <path
+          className="gauge-arc-fill"
           d="M 15 50 A 35 35 0 0 1 85 50"
           fill="none"
           stroke={color}
@@ -63,6 +64,7 @@ export function FuelGauge({ level, label }: FuelGaugeProps) {
         })}
         {/* Needle */}
         <line
+          className="gauge-needle"
           x1="50"
           y1="50"
           x2={needleX}

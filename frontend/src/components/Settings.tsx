@@ -159,8 +159,8 @@ export function Settings() {
             <span className="config-value">http://localhost:8848</span>
           </div>
           <div className="config-item">
-            <span className="config-label">Auto-start</span>
-            <span className="config-value">Manual (run scripts/run_proxy.sh)</span>
+            <span className="config-label">Launch</span>
+            <span className="config-value">token-tank start</span>
           </div>
           <div className="config-item">
             <span className="config-label">Data retention</span>
