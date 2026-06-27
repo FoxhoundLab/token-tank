@@ -2,6 +2,7 @@
 
 import os
 import base64
+import hashlib
 from cryptography.fernet import Fernet
 
 from .config import get_settings, ensure_data_dir
@@ -23,10 +24,15 @@ def get_fernet() -> Fernet:
             key_file.chmod(0o600)  # Owner read/write only
         return Fernet(key)
 
-    # Use configured key (pad to 32 bytes, base64 encode)
+    # Use the configured key. Accept a raw Fernet key verbatim; otherwise
+    # derive a deterministic 32-byte key via SHA-256 so any-length secret
+    # (including the 44-char output of Fernet.generate_key()) is valid.
     raw = settings.secret_key.encode()
-    key = base64.urlsafe_b64encode(raw.ljust(32, b"\0"))
-    return Fernet(key)
+    try:
+        return Fernet(raw)
+    except (ValueError, TypeError):
+        derived = base64.urlsafe_b64encode(hashlib.sha256(raw).digest())
+        return Fernet(derived)
 
 
 def encrypt(plaintext: str) -> str:

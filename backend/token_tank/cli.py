@@ -18,6 +18,7 @@ Examples::
 """
 
 import argparse
+import logging
 import os
 import sys
 
@@ -30,7 +31,6 @@ def _cmd_start(args: argparse.Namespace) -> None:
     """Start proxy + FastAPI (same process)."""
     from .runner import run_all
     import asyncio
-    import logging
 
     _setup_logging()
     settings = get_settings()

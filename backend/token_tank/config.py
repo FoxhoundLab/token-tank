@@ -36,11 +36,9 @@ class Settings(BaseSettings):
     data_dir: Path = Path.home() / ".token-tank"
     db_path: Path = data_dir / "usage.db"
 
-    # Crypto
-    secret_key: str = os.environ.get(
-        "TOKEN_TANK_SECRET",
-        default="",  # Generated on first run if empty
-    )
+    # Crypto — binds to TOKEN_TANK_SECRET_KEY (env_prefix + field name).
+    # Empty by default; a key is generated and persisted on first run.
+    secret_key: str = ""
 
     # Polling
     billing_poll_interval: int = 300  # seconds (5 min)

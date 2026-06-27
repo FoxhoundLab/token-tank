@@ -37,6 +37,8 @@ class UsageRecordResponse(BaseModel):
     estimated_cost: float
     timestamp: datetime
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class DashboardData(BaseModel):
     """Aggregated dashboard response — one entry per provider."""
