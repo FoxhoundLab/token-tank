@@ -50,3 +50,7 @@ test-results/
 # OS
 Thumbs.db
 .DS_Store
+loop-state.md
+stress-test/
+stress_test_functions.py
+campbell-qa-prompt.md
