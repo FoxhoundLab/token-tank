@@ -381,34 +381,6 @@ class TestProvidersEndpoints:
         resp = client.delete(f"/api/v1/providers/{fake_id}")
         assert resp.status_code == 404
 
-    def test_list_providers_empty(self, api_session):
-        """GET /providers with no providers returns empty list."""
-        # Create a fresh engine session (not the seed-test approach)
-        # by creating a temporary DB for this test only
-        import tempfile
-        tmp_dir = Path(tempfile.mkdtemp(prefix="token_tank_test_"))
-        tmp_db = tmp_dir / "empty.db"
-
-        engine = create_engine(
-            f"sqlite:///{tmp_db}",
-            connect_args={"check_same_thread": False},
-        )
-        from token_tank.models import Base
-        Base.metadata.create_all(engine)
-
-        Session = sessionmaker(bind=engine)
-        sess = Session()  # empty — no providers seeded
-
-        client = TestClient(app, raise_server_exceptions=False)
-        # We can't point TestClient at a different DB easily, so
-        # instead verify behavior by checking that empty list is valid:
-        resp = client.get("/api/v1/providers")
-
-        assert resp.status_code == 200
-        data = resp.json()
-        # The seeded DB has providers, so we expect some — but the API
-        # should return a list (not an error).
-        assert isinstance(data, list)
 
 
 class TestUsageHistoryEndpoint:

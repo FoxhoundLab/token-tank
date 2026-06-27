@@ -10,14 +10,20 @@ from .lmstudio import LMStudioAdapter
 
 # Registry of all available adapters
 # Order matters: more specific matchers first.
-# MiniMax and OpenAI both match /v1/chat/completions — MiniMax is listed
-# first so that requests with MiniMax-specific headers route correctly.
+# - Anthropic: unique /v1/messages path — always first
+# - ZAI: unique /api/paas/v4 path
+# - MiniMax: has /v1/text/chatcompletion_v2 (unique) + /v1/chat/completions (shared)
+# - OpenAI: /v1/chat/completions + /v1/responses (unique) + /v1/completions
+# - LM Studio: /v1/chat/completions + /v1/completions — SUBSET of OpenAI
+#   Put LM Studio LAST so OpenAI wins for shared paths when both are active.
+#   When LM Studio is the intended target, the request comes from localhost
+#   and OpenAI API key auth will fail upstream, naturally routing back.
 ADAPTERS: list[ProviderAdapter] = [
     AnthropicAdapter(),
     ZAIAdapter(),
-    LMStudioAdapter(),
     MiniMaxAdapter(),
     OpenAIAdapter(),
+    LMStudioAdapter(),
     OllamaAdapter(),
 ]
 
