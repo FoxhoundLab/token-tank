@@ -15,7 +15,7 @@ import logging
 import ssl as ssl_module
 from typing import Optional
 
-from aiohttp import web, ClientSession, TCPConnector
+from aiohttp import web, ClientSession, ClientTimeout, TCPConnector
 
 from ..config import get_settings
 from ..database import SessionLocal
@@ -40,7 +40,10 @@ async def _get_client() -> ClientSession:
             limit_per_host=20,   # max per upstream
             ssl=ssl_module.create_default_context(),
         )
-        _client_session = ClientSession(connector=connector)
+        # No total timeout — streaming/SSE responses can run for minutes.
+        # Bound connect time so a hung upstream can't pin a connection forever.
+        timeout = ClientTimeout(total=None, connect=15, sock_connect=15)
+        _client_session = ClientSession(connector=connector, timeout=timeout)
     return _client_session
 
 
@@ -63,8 +66,15 @@ async def handle(request: web.Request) -> web.StreamResponse:
     if request.query_string:
         target_url += f"?{request.query_string}"
 
-    # Check if this is a streaming request (SSE)
-    is_stream = b'"stream":true' in body or b'"stream": true' in body
+    # Check if this is a streaming request (SSE). Prefer parsing the JSON body
+    # (handles arbitrary whitespace); fall back to a substring scan.
+    is_stream = False
+    if body:
+        try:
+            parsed = json.loads(body)
+            is_stream = isinstance(parsed, dict) and bool(parsed.get("stream"))
+        except (json.JSONDecodeError, ValueError):
+            is_stream = b'"stream":true' in body or b'"stream": true' in body
 
     # Use app-scoped session for connection pooling
     session = await _get_client()
@@ -126,18 +136,6 @@ async def _handle_stream(
     3. Buffer chunks to extract token usage from the final SSE event
     4. Log usage after the stream completes
     """
-    # Prepare the streaming response to the caller
-    stream_response = web.StreamResponse(
-        status=200,
-        headers={
-            "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-        },
-    )
-    await stream_response.prepare(request)
-
-    # Forward to upstream and stream back
     buffered_data = b""
     final_usage = None
 
@@ -147,6 +145,19 @@ async def _handle_stream(
         headers={k: v for k, v in headers.items() if k.lower() != "host"},
         data=body,
     ) as resp:
+        # Build the client response from the REAL upstream status/content-type so
+        # an error (4xx/5xx) to a streaming request isn't masked as a 200 SSE body.
+        passthrough_ct = resp.headers.get("Content-Type") or "text/event-stream"
+        stream_response = web.StreamResponse(
+            status=resp.status,
+            headers={
+                "Content-Type": passthrough_ct,
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+            },
+        )
+        await stream_response.prepare(request)
+
         async for chunk in resp.content.iter_any():
             # Forward chunk to caller immediately (transparent passthrough)
             await stream_response.write(chunk)

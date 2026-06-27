@@ -217,6 +217,7 @@ class TestStreamingPassthrough:
 
         mock_resp = AsyncMock()
         mock_resp.status = 200
+        mock_resp.headers = {"Content-Type": "text/event-stream"}
         mock_resp.content = mock_content
 
         mock_request_cm = AsyncMock()
