@@ -5,12 +5,17 @@ from .anthropic import AnthropicAdapter
 from .openai import OpenAIAdapter
 from .zai import ZAIAdapter
 from .ollama import OllamaAdapter
+from .minimax import MiniMaxAdapter
 
 # Registry of all available adapters
+# Order matters: more specific matchers first.
+# MiniMax and OpenAI both match /v1/chat/completions — MiniMax is listed
+# first so that requests with MiniMax-specific headers route correctly.
 ADAPTERS: list[ProviderAdapter] = [
     AnthropicAdapter(),
-    OpenAIAdapter(),
     ZAIAdapter(),
+    MiniMaxAdapter(),
+    OpenAIAdapter(),
     OllamaAdapter(),
 ]
 
@@ -32,4 +37,5 @@ __all__ = [
     "OpenAIAdapter",
     "ZAIAdapter",
     "OllamaAdapter",
+    "MiniMaxAdapter",
 ]

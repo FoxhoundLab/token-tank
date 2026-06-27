@@ -14,7 +14,7 @@ const PROVIDER_OPTIONS: ProviderOption[] = [
   { id: "minimax", name: "MiniMax", icon: "⚡", needsKey: true },
   { id: "zai", name: "Z.AI", icon: "🔮", needsKey: true },
   { id: "ollama", name: "Ollama Pro", icon: "🦙", needsKey: false },
-  { id: "lmstudio", name: "LM Studio", icon: "💻", needsKey: false },
+  // LM Studio — adapter coming in Sprint 2B
 ];
 
 export function Settings() {
@@ -48,7 +48,7 @@ export function Settings() {
       await addProvider({
         provider: selectedProvider.id,
         display_name: displayName || selectedProvider.name,
-        api_key: apiKey || "not-required",
+        api_key: selectedProvider.needsKey ? apiKey : "",
         org_id: orgId || undefined,
       });
       setApiKey("");
@@ -160,7 +160,7 @@ export function Settings() {
           </div>
           <div className="config-item">
             <span className="config-label">Auto-start</span>
-            <span className="config-value">Enabled</span>
+            <span className="config-value">Manual (run scripts/run_proxy.sh)</span>
           </div>
           <div className="config-item">
             <span className="config-label">Data retention</span>

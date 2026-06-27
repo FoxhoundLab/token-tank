@@ -509,7 +509,7 @@ class TestUsageHistoryEndpoint:
         resp_filtered = client.get(
             f"/api/v1/providers/{p.id}/usage", params={"model": "glm-5.2"}
         )
-        assert resp_filtered.status_code == 200, f"Filter failed: {resp_failed.text if (resp_failed:=None) else resp_filtered.text}"
+        assert resp_filtered.status_code == 200, f"Filter failed: {resp_filtered.text}"
 
         filtered = resp_filtered.json()
         assert len(filtered) == 5, f"Expected 5 glm-5.2 records, got {len(filtered)}: {filtered}"

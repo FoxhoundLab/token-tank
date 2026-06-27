@@ -5,7 +5,7 @@ and /v1/chat/completions.  MiniMax uses the OpenAI-compatible response
 format (prompt_tokens / completion_tokens in usage object).
 """
 
-from backend.token_tank.proxy.adapters.base import ProviderAdapter, TokenUsage
+from .base import ProviderAdapter, TokenUsage
 
 # Pricing per 1M tokens (input, output are the same for each model).
 MINIMAX_PRICING: dict[str, dict[str, float]] = {

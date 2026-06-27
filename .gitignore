@@ -33,6 +33,10 @@ frontend/build/
 .env.local
 .env.*.local
 
+# Secrets (Fernet key)
+.secret
+*.secret
+
 # IDE
 .idea/
 .vscode/
@@ -54,3 +58,4 @@ loop-state.md
 stress-test/
 stress_test_functions.py
 campbell-qa-prompt.md
+*.tsbuildinfo
