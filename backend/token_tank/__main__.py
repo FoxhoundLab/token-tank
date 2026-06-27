@@ -28,65 +28,7 @@ def _setup_logging() -> None:
     )
 
 
-async def _run_proxy_async(proxy_host: str, proxy_port: int) -> None:
-    """Run the aiohttp proxy server in an async task."""
-    from .proxy.server import create_proxy_app, _on_startup, _on_cleanup
-    from aiohttp import web
-
-    app = create_proxy_app()
-    logger.info(f"⛓ Proxy starting on {proxy_host}:{proxy_port}")
-
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, host=proxy_host, port=proxy_port)
-    await site.start()
-
-    # Wait until cancelled (e.g. SIGINT/SIGTERM)
-    stop_event = asyncio.Event()
-
-    def _handle_signal():
-        stop_event.set()
-
-    loop = asyncio.get_running_loop()
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, _handle_signal)
-
-    await stop_event.wait()
-    logger.info("Proxy shutting down…")
-    await runner.cleanup()
-
-
-async def _run_fastapi_async(api_host: str, api_port: int) -> None:
-    """Run the FastAPI (uvicorn) server in an async task."""
-    import uvicorn
-
-    from .main import app
-
-    logger.info(f"🔧 FastAPI starting on {api_host}:{api_port}")
-    config = uvicorn.Config(
-        app,
-        host=api_host,
-        port=api_port,
-        log_level="info",
-        access_log=False,  # We use our own logger
-    )
-    server = uvicorn.Server(config)
-
-    stop_event = asyncio.Event()
-
-    def _handle_signal():
-        stop_event.set()
-        server.should_exit = True  # uvicorn flag
-
-    loop = asyncio.get_running_loop()
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, _handle_signal)
-
-    await server.serve(stop_event)
-    logger.info("FastAPI shutting down…")
-
-
-def _write_pid() -> Path:
+def _write_pid(settings) -> Path:
     """Write our PID to ~/.token-tank/token-tank.pid."""
     from .config import get_settings, ensure_data_dir
 
@@ -97,7 +39,7 @@ def _write_pid() -> Path:
     return pid_file
 
 
-def _read_pid() -> int | None:
+def _read_pid(settings) -> int | None:
     """Read PID from the file, or None if missing/stale."""
     from .config import get_settings
 
@@ -109,7 +51,6 @@ def _read_pid() -> int | None:
         pid = int(pid_file.read_text().strip())
     except (ValueError, OSError):
         return None
-    # Check if process is actually running
     try:
         os.kill(pid, 0)  # signal 0 = existence check
     except OSError:
@@ -127,10 +68,11 @@ if __name__ == "__main__":
         cli_main(sys.argv[1:])
     else:
         from .config import get_settings
+        from .runner import run_all as _run_all
 
         settings = get_settings()
 
-        _write_pid()
+        _write_pid(settings)
 
         async def run_all():
             proxy_host = settings.proxy_host
@@ -138,14 +80,7 @@ if __name__ == "__main__":
             api_host = settings.api_host
             api_port = settings.api_port
 
-            logger.info("╔══════════════════════════════════════╗")
-            logger.info("║   Token Tank — starting services    ║")
-            logger.info(f"╚══════════════════════════════════════╝")
-
-            await asyncio.gather(
-                _run_proxy_async(proxy_host, proxy_port),
-                _run_fastapi_async(api_host, api_port),
-            )
+            await _run_all(proxy_host, proxy_port, api_host, api_port)
 
         try:
             asyncio.run(run_all())

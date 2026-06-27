@@ -28,7 +28,7 @@ from .config import get_settings, ensure_data_dir
 
 def _cmd_start(args: argparse.Namespace) -> None:
     """Start proxy + FastAPI (same process)."""
-    from . import _run_proxy_async, _run_fastapi_async  # noqa: F401
+    from .runner import run_all
     import asyncio
     import logging
 
@@ -49,14 +49,16 @@ def _cmd_start(args: argparse.Namespace) -> None:
 
     print(f"⛽ Starting Token Tank (proxy :{settings.proxy_port}, API :{settings.api_port})…")
 
-    async def run_all():
-        await asyncio.gather(
-            _run_proxy_async(settings.proxy_host, settings.proxy_port),
-            _run_fastapi_async(settings.api_host, settings.api_port),
+    async def run_services():
+        await run_all(
+            settings.proxy_host,
+            settings.proxy_port,
+            settings.api_host,
+            settings.api_port,
         )
 
     try:
-        asyncio.run(run_all())
+        asyncio.run(run_services())
     except (KeyboardInterrupt, asyncio.CancelledError):
         print("\n👋  Stopped by user.")
     finally:
@@ -115,23 +117,20 @@ def _cmd_status(args: argparse.Namespace) -> None:
 
 def _cmd_init(args: argparse.Namespace) -> None:
     """Initialize ~/.token-tank/ directory and default config."""
+    from pathlib import Path
+
     settings = get_settings()
     ensure_data_dir(settings)
 
-    # Write a minimal default config if it doesn't exist.
-    config_file = settings.data_dir / "config.json"
-    if not config_file.exists():
-        import json
+    # FIX: Write a proper TOML config (every other module reads config.toml, not .json)
+    config_path = Path.home() / ".token-tank" / "config.toml"
 
-        default_config = {
-            "api_host": settings.api_host,
-            "api_port": settings.api_port,
-            "proxy_host": settings.proxy_host,
-            "proxy_port": settings.proxy_port,
-        }
-        config_file.write_text(json.dumps(default_config, indent=2))
+    from .config import save_config_file
 
-    print(f"✅  Initialized Token Tank directory at {settings.data_dir}")
+    if not config_path.exists():
+        save_config_file(settings, config_path)
+
+    print(f"✅  Initialized Token Tank at {config_path}")
 
 
 # ── Helpers ───────────────────────────────────────────────────────
