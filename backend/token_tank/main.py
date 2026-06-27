@@ -12,13 +12,26 @@ from .database import Base, engine, init_db
 from .routers import dashboard, providers, alerts, extension
 from .config import get_settings
 
-# Absolute path to the project root (parent of backend/)
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+# Locate the production dashboard build. Prefer the copy bundled inside the
+# installed package (token_tank/webui/), falling back to the repo's
+# frontend/dist/ for local development from a source checkout.
+_PKG_DIR = Path(__file__).resolve().parent
+_BUNDLED_UI = _PKG_DIR / "webui"
+_REPO_UI = _PKG_DIR.parent.parent / "frontend" / "dist"
+
+
+def _frontend_dist() -> Path | None:
+    """Return the directory holding the built SPA, or None if not present."""
+    if _BUNDLED_UI.is_dir():
+        return _BUNDLED_UI
+    if _REPO_UI.is_dir():
+        return _REPO_UI
+    return None
 
 
 def _frontend_dist_exists() -> bool:
     """Return True when a production frontend build exists."""
-    return (_PROJECT_ROOT / "frontend" / "dist").is_dir()
+    return _frontend_dist() is not None
 
 
 @asynccontextmanager
@@ -82,18 +95,18 @@ async def health():
     return {"status": "ok"}
 
 # ── Production frontend serving (Sprint 4A) ───────────────────────
-_frontend_dist = _PROJECT_ROOT / "frontend" / "dist"
-if _frontend_dist_exists():
+_ui_dir = _frontend_dist()
+if _ui_dir is not None:
     from fastapi.staticfiles import StaticFiles
 
     # Serve static assets (JS/CSS/images under /assets/)
-    app.mount("/assets", StaticFiles(directory=str(_frontend_dist / "assets")), name="assets")
+    app.mount("/assets", StaticFiles(directory=str(_ui_dir / "assets")), name="assets")
     # Serve the built SPA (index.html at root, all other paths fallback)
-    app.mount("/", StaticFiles(directory=str(_frontend_dist), html=True), name="spa")
+    app.mount("/", StaticFiles(directory=str(_ui_dir), html=True), name="spa")
 
     async def spa_catch_all(path: str = "/"):
         """Serve index.html for any unmatched SPA route."""
-        return FileResponse(str(_frontend_dist / "index.html"))
+        return FileResponse(str(_ui_dir / "index.html"))
 
     app.add_api_route("/{path:path}", spa_catch_all, methods=["GET"], include_in_schema=False)
 else:

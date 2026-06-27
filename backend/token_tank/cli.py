@@ -34,6 +34,7 @@ def _cmd_start(args: argparse.Namespace) -> None:
 
     _setup_logging()
     settings = get_settings()
+    ensure_data_dir(settings)  # create data dir so PID file + DB writes succeed
 
     pid_file = settings.data_dir / "token-tank.pid"
     existing_pid = _read_existing_pid()

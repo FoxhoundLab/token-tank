@@ -68,3 +68,8 @@ token-tank = "token_tank.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["backend"]
+
+[tool.setuptools.package-data]
+# Bundle the built dashboard (copied into token_tank/webui by the build step)
+# so `pip install token-tank` serves the UI without a source checkout.
+token_tank = ["webui/**/*"]

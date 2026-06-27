@@ -64,6 +64,25 @@ def test_init_writes_toml_into_configured_data_dir(monkeypatch, tmp_path):
     assert {"server", "proxy", "database", "crypto"} <= set(parsed)
 
 
+def test_cli_start_creates_data_dir(monkeypatch, tmp_path):
+    """`token-tank start` must create the data dir before writing the PID file."""
+    import asyncio
+
+    from token_tank import cli
+
+    data_dir = tmp_path / "fresh-tank"  # does not exist yet
+    monkeypatch.setenv("TOKEN_TANK_DATA_DIR", str(data_dir))
+    monkeypatch.setenv("TOKEN_TANK_DB_PATH", str(data_dir / "usage.db"))
+    monkeypatch.setattr(cli, "_read_existing_pid", lambda: None)
+    # Don't actually start servers — just exercise the pre-flight setup.
+    monkeypatch.setattr(asyncio, "run", lambda coro: coro.close())
+
+    cli._cmd_start(None)
+
+    assert data_dir.is_dir()
+    assert not (data_dir / "token-tank.pid").exists()  # cleaned up in finally
+
+
 def test_cli_version_flag(capsys):
     """`token-tank --version` prints the package version and exits 0."""
     import pytest

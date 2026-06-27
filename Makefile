@@ -34,8 +34,8 @@ run: ## Start proxy (8848) + FastAPI (8000)
 init: ## Initialize ~/.token-tank/ with default config
 	$(PY) -m token_tank init
 
-dist: ## Build sdist + wheel
-	$(PY) -m build
+dist: ## Build frontend, bundle UI, build sdist + wheel (self-contained)
+	PYTHON=$(PY) bash scripts/build_dist.sh
 
 clean: ## Remove build artifacts and caches
 	rm -rf build dist *.egg-info backend/*.egg-info
