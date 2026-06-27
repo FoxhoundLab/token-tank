@@ -64,6 +64,32 @@ def test_init_writes_toml_into_configured_data_dir(monkeypatch, tmp_path):
     assert {"server", "proxy", "database", "crypto"} <= set(parsed)
 
 
+def test_cli_version_flag(capsys):
+    """`token-tank --version` prints the package version and exits 0."""
+    import pytest
+
+    from token_tank import __version__, cli
+
+    with pytest.raises(SystemExit) as exc:
+        cli.main(["--version"])
+    assert exc.value.code == 0
+    assert __version__ in capsys.readouterr().out
+
+
+def test_cli_config_flag_targets_explicit_file(monkeypatch, tmp_path):
+    """`--config PATH init` writes the config to the given file."""
+    from token_tank import cli
+
+    target = tmp_path / "custom.toml"
+    monkeypatch.delenv("TOKEN_TANK_CONFIG_FILE", raising=False)
+    try:
+        cli.main(["--config", str(target), "init"])
+        assert target.exists()
+    finally:
+        # cli.main writes the env var directly; don't leak it to other tests.
+        os.environ.pop("TOKEN_TANK_CONFIG_FILE", None)
+
+
 def test_usage_record_response_serializes_orm_object():
     """UsageRecordResponse has from_attributes for ORM serialization."""
     from token_tank.schemas import UsageRecordResponse

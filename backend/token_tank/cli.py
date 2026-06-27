@@ -170,9 +170,22 @@ def _setup_logging() -> None:
 
 def main(argv: list[str] | None = None) -> None:
     """CLI entry point."""
+    from . import __version__
+
     parser = argparse.ArgumentParser(
-        prog="token_tank",
-        description="⛽ Token Tank — local AI usage monitor (v0.2.0)",
+        prog="token-tank",
+        description="⛽ Token Tank — local AI usage monitor",
+    )
+    parser.add_argument(
+        "-V", "--version",
+        action="version",
+        version=f"token-tank {__version__}",
+    )
+    parser.add_argument(
+        "--config",
+        metavar="PATH",
+        default=None,
+        help="Path to a config.toml file (overrides the default location).",
     )
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
@@ -189,6 +202,10 @@ def main(argv: list[str] | None = None) -> None:
     subparsers.add_parser("init", help="Create ~/.token-tank/ with default config")
 
     args = parser.parse_args(argv)
+
+    # --config points the loader (and init) at an explicit config file.
+    if getattr(args, "config", None):
+        os.environ["TOKEN_TANK_CONFIG_FILE"] = args.config
 
     if args.command is None:
         # No subcommand — default to 'start' (like `python -m token_tank`)

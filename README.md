@@ -1,5 +1,10 @@
 # ⛽ Token Tank
 
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-121%20passing-brightgreen.svg)](backend/tests)
+[![Providers](https://img.shields.io/badge/providers-6-orange.svg)](#-supported-providers)
+
 > **Check the Tank.** One dashboard for all your AI usage.
 
 Token Tank is a local-first AI usage monitor that tracks token consumption, API spend, and burn rate across multiple AI providers — all displayed as fuel gauges on a single dashboard.
@@ -56,42 +61,49 @@ Billing APIs ──▶ Poller (every 5 min) ─┘
 
 ---
 
-## 🚀 Quick Start (3 Commands)
+## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.11+
-- Node.js 20+
+- Node.js 20+ (only needed if you build the dashboard from source)
 
-### Step 1 — Install & Init
-
-```bash
-cd backend
-pip install -r requirements.txt
-# Creates ~/.token-tank/ directory with SQLite DB and config
-python -m token_tank.main --init
-```
-
-### Step 2 — Start the Proxy
+### Step 1 — Install
 
 ```bash
-uvicorn token_tank.proxy.server:app --reload --port 8000 &
-# Proxy listens on localhost:8848 (not port 8000 — that's the API)
+pip install token-tank
 ```
 
-### Step 3 — Start the Dashboard
+> From source: `pip install -e ".[dev]"` from the repo root.
+
+### Step 2 — Initialize
 
 ```bash
-cd frontend
-npm install && npm run dev
-# Dashboard at http://localhost:5173
+token-tank init
+# Creates ~/.token-tank/ with config.toml and the SQLite DB.
+# A Fernet encryption key is generated on first run; set TOKEN_TANK_SECRET_KEY
+# to pin your own (see .env.example).
 ```
 
-### Connect a Provider (in 4 sub-steps)
-1. Open `http://localhost:5173`
-2. Go to **Settings → Add Provider**
-3. Enter your API key (encrypted locally with Fernet)
-4. Point an AI tool's `OPENAI_API_BASE_URL` (or equivalent) to `http://localhost:8848`
-5. Watch the gauge move
+### Step 3 — Start
+
+```bash
+token-tank start
+# Proxy on localhost:8848, API + dashboard on localhost:8000.
+# Stop it any time with: token-tank stop   (check with: token-tank status)
+```
+
+Open **http://localhost:8000** for the dashboard (a production frontend build is
+served automatically when `frontend/dist/` exists). For live frontend
+development, run `cd frontend && npm install && npm run dev` and use
+`http://localhost:5173`.
+
+### Connect a Provider
+1. Open the dashboard and go to **Settings → Add Provider**.
+2. Enter your API key (encrypted locally at rest with Fernet).
+3. Point an AI tool's base URL (e.g. `OPENAI_API_BASE_URL`) at `http://localhost:8848`.
+4. Watch the gauge move.
+
+See [docs/provider-setup.md](docs/provider-setup.md) for per-provider details.
 
 ---
 
@@ -205,7 +217,10 @@ token-tank/
 │       │   └── ...
 ├── docs/
 │   ├── provider-setup.md      # Step-by-step for each provider
-│   └── pricing-reference.md   # Per-provider pricing tables
+│   ├── provider-pricing.md    # Per-provider pricing tables
+│   └── architecture.md        # System design + data flow
+├── extension/                 # Browser extension (MV3) — subscription caps
+├── CHANGELOG.md               # Release notes
 └── CONTRIBUTING.md            # How to add a new provider adapter
 ```
 
@@ -230,7 +245,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full step-by-step guide.
 
 ## 📜 License
 
-MIT — see [LICENSE](LICENSE)
+MIT — see [LICENSE](LICENSE). Release notes live in [CHANGELOG.md](CHANGELOG.md).
 
 <div align="center">
 
