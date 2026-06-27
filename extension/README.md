@@ -2,6 +2,15 @@
 
 MV3 extension that captures subscription usage caps from **claude.ai** and **chatgpt.com** and syncs them to your local Token Tank backend.
 
+## Prerequisites
+
+**Token Tank backend must be running on `localhost:8000`** before the extension can sync captured data. If the backend is down, captures are still saved locally in `chrome.storage.local` but won't appear in your dashboard.
+
+```bash
+pip install token-tank
+token-tank          # starts proxy on 8848 + backend on 8000
+```
+
 ## Install (load unpacked)
 
 1. Open `chrome://extensions` (or `edge://extensions`)

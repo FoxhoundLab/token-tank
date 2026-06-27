@@ -102,7 +102,7 @@ npm install && npm run dev
 | **Anthropic** | ✅ All Claude models | ✅ Admin API (org-level reports) | ✅ Sonnet 4, Opus 4, Haiku 3.5 | `localhost:8848` | claude-sonnet-4, claude-opus-4, claude-haiku-3.5 |
 | **OpenAI** | ✅ All models (GPT, o1, o3) | ✅ Billing API | ✅ GPT-4o, GPT-4-turbo, o1, o3 | `localhost:8848` | gpt-4o, gpt-4o-mini, o1, o3 |
 | **Z.AI** | ✅ GLM models (proxy only) | ❌ No public billing API | ✅ GLM-5.2, GLM-4-plus, GLM-4-air | `localhost:8848` | glm-5.2, glm-4-plus, glm-4-air |
-| **MiniMax** | ✅ MiniMax-M3 (proxy only) | ❌ No public billing API | ✅ abab6.5, abab5.5 (flat rate) | `localhost:8848` | abab6.5-chat, abab5.5-chat |
+| **MiniMax** | ✅ abab6.5-chat, abab5.5-chat, abab6.5s-chat | ❌ No public billing API | ✅ Flat-rate per model | `localhost:8848` | All abab models |
 | **Ollama (Cloud/Pro)** | ✅ llama, Qwen, DeepSeek (proxy only) | ❌ No public billing API | ✅ GPU-time pricing (L1-L4 tiers) | `localhost:8848` | llama3.3, qwen2.5, deepseek-r1 |
 | **LM Studio** | ✅ Any local model (proxy only) | ❌ N/A — runs locally free | ✅ Free (zero cost, local GPU/CPU) | `localhost:1234` | Any Ollama/llama.cpp model |
 

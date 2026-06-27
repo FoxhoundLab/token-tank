@@ -49,9 +49,9 @@ How to connect each provider to Token Tank.
    export MINIMAX_API_BASE=http://localhost:8848
    export MINIMAX_API_KEY=...
    ```
-4. **Verify**: Send a test message. MiniMax-M3 model.
+4. **Verify**: Send a test message. abab6.5-chat, abab5.5-chat, or abab6.5s-chat models.
 
-**Supported models**: abab6.5-chat, abab5.5-chat, abab6.5s-chat
+**Supported models**: abab6.5-chat ($0.70/$0.70), abab5.5-chat ($0.20/$0.20), abab6.5s-chat ($0.35/$0.35)
 
 ---
 

@@ -207,8 +207,6 @@ def save_config_file(
 
     config_path.parent.mkdir(parents=True, exist_ok=True)
     with open(config_path, "w", encoding="utf-8") as f:
-        import tomli_w  # lightweight writer (stdlib alternative: manual).
-
         # Use a simple manual serializer to avoid an extra dependency.
         _write_toml(f, d)
 
