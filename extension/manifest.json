@@ -1,0 +1,38 @@
+{
+    "manifest_version": 3,
+    "name": "Token Tank — Subscription Caps",
+    "short_name": "Token Tank",
+    "version": "0.1.0",
+    "description": "Captures subscription usage caps from claude.ai and chatgpt.com and syncs to your local Token Tank instance.",
+    "minimum_chrome_version": "114",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage"
+    ],
+    "host_permissions": [
+        "https://claude.ai/*",
+        "https://chatgpt.com/*",
+        "http://localhost:8000/*"
+    ],
+    "action": {
+        "default_title": "Token Tank",
+        "default_popup": "popup.html",
+        "default_icon": "icon-48.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://claude.ai/*"],
+            "js": ["content-claude.js"],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": ["https://chatgpt.com/*"],
+            "js": ["content-chatgpt.js"],
+            "run_at": "document_idle"
+        }
+    ]
+}

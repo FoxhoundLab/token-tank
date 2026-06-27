@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Token Tank</title>
+    <style>
+        body {
+            width: 320px;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+        }
+        h1 { font-size: 1.1rem; margin: 0 0 8px 0; }
+        .status { padding: 8px; background: #1a1a1a; border-radius: 6px; margin: 8px 0; }
+        .label { font-size: 0.75rem; color: #888; text-transform: uppercase; }
+        .value { font-size: 1rem; font-weight: 600; margin: 4px 0; }
+        .footer { font-size: 0.75rem; color: #888; margin-top: 12px; }
+        a { color: #f59e0b; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>⛽ Token Tank</h1>
+    <p>Subscription cap tracker.</p>
+
+    <div class="status">
+        <div class="label">Claude.ai</div>
+        <div class="value" id="claude-status">Loading...</div>
+    </div>
+
+    <div class="status">
+        <div class="label">ChatGPT</div>
+        <div class="value" id="chatgpt-status">Loading...</div>
+    </div>
+
+    <div class="footer">
+        Requires Token Tank backend running on <code>localhost:8000</code>.
+        <br><a href="http://localhost:8000" target="_blank">Open Dashboard →</a>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
