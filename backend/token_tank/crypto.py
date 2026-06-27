@@ -31,9 +31,13 @@ def get_fernet() -> Fernet:
 
 def encrypt(plaintext: str) -> str:
     """Encrypt a string."""
+    if not plaintext:
+        return ""
     return get_fernet().encrypt(plaintext.encode()).decode()
 
 
 def decrypt(ciphertext: str) -> str:
     """Decrypt a string."""
+    if not ciphertext:
+        return ""
     return get_fernet().decrypt(ciphertext.encode()).decode()

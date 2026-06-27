@@ -6,6 +6,7 @@ from .openai import OpenAIAdapter
 from .zai import ZAIAdapter
 from .ollama import OllamaAdapter
 from .minimax import MiniMaxAdapter
+from .lmstudio import LMStudioAdapter
 
 # Registry of all available adapters
 # Order matters: more specific matchers first.
@@ -14,6 +15,7 @@ from .minimax import MiniMaxAdapter
 ADAPTERS: list[ProviderAdapter] = [
     AnthropicAdapter(),
     ZAIAdapter(),
+    LMStudioAdapter(),
     MiniMaxAdapter(),
     OpenAIAdapter(),
     OllamaAdapter(),
@@ -38,4 +40,5 @@ __all__ = [
     "ZAIAdapter",
     "OllamaAdapter",
     "MiniMaxAdapter",
+    "LMStudioAdapter",
 ]

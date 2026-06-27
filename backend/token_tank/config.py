@@ -30,13 +30,16 @@ class Settings(BaseSettings):
     # Data retention
     retention_days: int = 90
 
+    # CORS origins (frontend dev server)
+    cors_origins: list[str] = ["http://localhost:5173"]
+
     class Config:
         env_prefix = "TOKEN_TANK_"
         env_file = ".env"
 
 
 def get_settings() -> Settings:
-    """Get application settings (cached)."""
+    """Get application settings (creates new instance each call)."""
     return Settings()
 
 

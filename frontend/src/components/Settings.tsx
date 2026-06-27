@@ -14,7 +14,7 @@ const PROVIDER_OPTIONS: ProviderOption[] = [
   { id: "minimax", name: "MiniMax", icon: "⚡", needsKey: true },
   { id: "zai", name: "Z.AI", icon: "🔮", needsKey: true },
   { id: "ollama", name: "Ollama Pro", icon: "🦙", needsKey: false },
-  // LM Studio — adapter coming in Sprint 2B
+  { id: "lmstudio", name: "LM Studio", icon: "💻", needsKey: false },
 ];
 
 export function Settings() {
