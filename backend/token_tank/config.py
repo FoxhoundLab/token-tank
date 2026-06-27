@@ -15,8 +15,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 def _toml_path() -> Path:
-    """Return the canonical config file path."""
-    return Path.home() / ".token-tank" / "config.toml"
+    """Return the canonical config file path.
+
+    Honors the ``TOKEN_TANK_DATA_DIR`` env override (read directly to avoid a
+    circular dependency on Settings) so init and load agree on the location.
+    """
+    data_dir = os.environ.get("TOKEN_TANK_DATA_DIR")
+    base = Path(data_dir) if data_dir else Path.home() / ".token-tank"
+    return base / "config.toml"
 
 
 # ---------------------------------------------------------------------------

@@ -75,6 +75,12 @@ app.include_router(providers.router, prefix="/api/v1", tags=["providers"])
 app.include_router(alerts.router, prefix="/api/v1", tags=["alerts"])
 app.include_router(extension.router, prefix="/api/v1", tags=["extension"])
 
+
+@app.get("/health")
+async def health():
+    """Liveness probe. Defined before the SPA mount so it isn't shadowed."""
+    return {"status": "ok"}
+
 # ── Production frontend serving (Sprint 4A) ───────────────────────
 _frontend_dist = _PROJECT_ROOT / "frontend" / "dist"
 if _frontend_dist_exists():
@@ -95,8 +101,3 @@ else:
     @app.get("/")
     async def root():
         return {"name": "Token Tank", "version": "0.2.0", "status": "running"}
-
-
-@app.get("/health")
-async def health():
-    return {"status": "ok"}

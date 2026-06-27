@@ -3,10 +3,16 @@
 These functions are shared between ``python -m token_tank`` (direct invocation)
 and the CLI ``start`` subcommand.
 
+Shutdown is coordinated through a single :class:`asyncio.Event`: ``run_all``
+installs one set of SIGINT/SIGTERM handlers and passes the event to both
+services, so a single signal cleanly stops the proxy *and* FastAPI. (Letting
+each service register its own ``loop.add_signal_handler`` does not work — only
+the last registration per signal survives, leaving one service hung.)
+
 Usage::
 
-    from .runner import run_all, run_proxy, run_fastapi
-    await run_all()
+    from .runner import run_all
+    await run_all(proxy_host, proxy_port, api_host, api_port)
 
 """
 
@@ -19,9 +25,17 @@ from pathlib import Path
 logger = logging.getLogger("token_tank")
 
 
-async def run_proxy(proxy_host: str, proxy_port: int) -> None:
-    """Run the aiohttp proxy server on *proxy_host*:*proxy_port*."""
-    from .proxy.server import create_proxy_app, _on_startup, _on_cleanup
+async def run_proxy(
+    proxy_host: str,
+    proxy_port: int,
+    stop_event: "asyncio.Event | None" = None,
+) -> None:
+    """Run the aiohttp proxy server until *stop_event* is set.
+
+    When called standalone (no *stop_event*), it installs its own SIGINT/SIGTERM
+    handlers so the proxy can be run on its own.
+    """
+    from .proxy.server import create_proxy_app
     from aiohttp import web
 
     app = create_proxy_app()
@@ -32,22 +46,31 @@ async def run_proxy(proxy_host: str, proxy_port: int) -> None:
     site = web.TCPSite(runner, host=proxy_host, port=proxy_port)
     await site.start()
 
-    stop_event = asyncio.Event()
+    owns_signals = stop_event is None
+    if stop_event is None:
+        stop_event = asyncio.Event()
+        loop = asyncio.get_running_loop()
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, stop_event.set)
 
-    def _handle_signal():
-        stop_event.set()
-
-    loop = asyncio.get_running_loop()
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, _handle_signal)
-
-    await stop_event.wait()
-    logger.info("Proxy shutting down…")
-    await runner.cleanup()
+    try:
+        await stop_event.wait()
+    finally:
+        logger.info("Proxy shutting down…")
+        await runner.cleanup()
 
 
-async def run_fastapi(api_host: str, api_port: int) -> None:
-    """Run the FastAPI (uvicorn) server on *api_host*:*api_port*."""
+async def run_fastapi(
+    api_host: str,
+    api_port: int,
+    stop_event: "asyncio.Event | None" = None,
+) -> None:
+    """Run the FastAPI (uvicorn) server until *stop_event* is set.
+
+    uvicorn's own signal handlers are disabled so they don't clobber the
+    shared handlers installed by :func:`run_all`; shutdown is driven by
+    ``server.should_exit``.
+    """
     import uvicorn
 
     from .main import app
@@ -61,20 +84,23 @@ async def run_fastapi(api_host: str, api_port: int) -> None:
         access_log=False,  # We use our own logger
     )
     server = uvicorn.Server(config)
+    # Don't let uvicorn install signal handlers — run_all owns them.
+    server.install_signal_handlers = lambda: None
 
-    stop_event = asyncio.Event()
+    owns_signals = stop_event is None
+    if stop_event is None:
+        stop_event = asyncio.Event()
+        loop = asyncio.get_running_loop()
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, stop_event.set)
 
-    def _handle_signal():
-        stop_event.set()
-        server.should_exit = True  # uvicorn flag
-
-    loop = asyncio.get_running_loop()
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, _handle_signal)
-
-    # FIX: server.serve() takes no args — it already handles SIGINT/SIGTERM
-    await server.serve()
-    logger.info("FastAPI shutting down…")
+    serve_task = asyncio.create_task(server.serve())
+    try:
+        await stop_event.wait()
+    finally:
+        logger.info("FastAPI shutting down…")
+        server.should_exit = True
+        await serve_task
 
 
 def _write_pid(settings) -> Path:
@@ -108,12 +134,21 @@ def _read_pid(settings) -> int | None:
 
 
 async def run_all(proxy_host: str, proxy_port: int, api_host: str, api_port: int) -> None:
-    """Run both proxy and FastAPI services concurrently."""
+    """Run both proxy and FastAPI services concurrently with one shutdown path."""
     logger.info("╔══════════════════════════════════════╗")
     logger.info("║   Token Tank — starting services    ║")
-    logger.info(f"╚══════════════════════════════════════╝")
+    logger.info("╚══════════════════════════════════════╝")
+
+    stop_event = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        try:
+            loop.add_signal_handler(sig, stop_event.set)
+        except NotImplementedError:
+            # Signal handlers may be unavailable (e.g. non-main thread / Windows).
+            pass
 
     await asyncio.gather(
-        run_proxy(proxy_host, proxy_port),
-        run_fastapi(api_host, api_port),
+        run_proxy(proxy_host, proxy_port, stop_event),
+        run_fastapi(api_host, api_port, stop_event),
     )

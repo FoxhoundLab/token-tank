@@ -116,16 +116,17 @@ def _cmd_status(args: argparse.Namespace) -> None:
 
 
 def _cmd_init(args: argparse.Namespace) -> None:
-    """Initialize ~/.token-tank/ directory and default config."""
-    from pathlib import Path
+    """Initialize the data directory and default config.
+
+    Writes ``config.toml`` into the configured data dir (honoring
+    ``TOKEN_TANK_DATA_DIR``), so init and the loader agree on the path.
+    """
+    from .config import save_config_file, _toml_path
 
     settings = get_settings()
     ensure_data_dir(settings)
 
-    # FIX: Write a proper TOML config (every other module reads config.toml, not .json)
-    config_path = Path.home() / ".token-tank" / "config.toml"
-
-    from .config import save_config_file
+    config_path = _toml_path()
 
     if not config_path.exists():
         save_config_file(settings, config_path)
