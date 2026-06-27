@@ -107,7 +107,8 @@ class AnthropicBillingPoller(BillingPoller):
             "anthropic-version": "2023-06-01",
         }
 
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=30)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
             async with session.get(url, params=params, headers=headers) as resp:
                 if resp.status == 401:
                     logger.warning(f"Anthropic billing API returned 401 — check API key permissions")
@@ -147,6 +148,7 @@ class AnthropicBillingPoller(BillingPoller):
 
         return BillingSnapshot(
             provider=self.provider_id,
+            provider_id=provider.id,
             period_start=now - timedelta(days=30),
             period_end=now,
             total_cost=round(total_cost, 6),

@@ -223,3 +223,45 @@ class TestBillingPollCycle:
 
         with patch("token_tank.proxy.billing_poller.SessionLocal", return_value=db_session):
             await run_billing_poll_cycle()
+
+
+class TestDecryptFailure:
+    """Test the decrypt-failure path in AnthropicBillingPoller."""
+
+    @pytest.mark.asyncio
+    async def test_decrypt_failure_returns_none(self, db_session):
+        """Poller should return None when API key decryption fails."""
+        provider = Provider(
+            provider="anthropic",
+            display_name="Anthropic",
+            api_key_encrypted="invalid-encrypted-garbage",
+            org_id="org-123",
+        )
+        db_session.add(provider)
+        db_session.commit()
+
+        poller = AnthropicBillingPoller()
+        # The real decrypt() will raise on garbage input — caught by the try/except
+        result = await poller.fetch(provider)
+        assert result is None
+
+
+class TestSchedulerStartup:
+    """Test start_billing_pollers() / scheduler integration."""
+
+    @pytest.mark.asyncio
+    async def test_start_billing_pollers_returns_scheduler(self):
+        """start_billing_pollers should return an AsyncIOScheduler on success."""
+        from token_tank.proxy.billing_poller import start_billing_pollers
+        scheduler = start_billing_pollers()
+        assert scheduler is not None
+        # Clean up
+        if scheduler.running:
+            scheduler.shutdown(wait=False)
+
+    def test_start_billing_pollers_survives_failure(self):
+        """start_billing_pollers should return None on failure, not crash."""
+        from token_tank.proxy.billing_poller import start_billing_pollers
+        with patch("token_tank.proxy.billing_poller.get_settings", side_effect=Exception("Settings broken")):
+            result = start_billing_pollers()
+            assert result is None

@@ -22,7 +22,7 @@ class Provider(Base):
     __tablename__ = "providers"
 
     id = Column(String, primary_key=True, default=_uuid)
-    provider = Column(String, nullable=False)  # 'anthropic', 'openai', 'zai', 'ollama'
+    provider = Column(String, nullable=False)  # 'anthropic', 'minimax', 'zai', 'ollama', 'lmstudio'
     display_name = Column(String, nullable=False)
     api_key_encrypted = Column(Text)  # Fernet-encrypted
     org_id = Column(String)  # For admin APIs (Anthropic)
@@ -54,7 +54,8 @@ class BillingSnapshot(Base):
     __tablename__ = "billing_snapshots"
 
     id = Column(String, primary_key=True, default=_uuid)
-    provider = Column(String, nullable=False)
+    provider = Column(String, nullable=False)  # Provider name string (e.g. 'anthropic')
+    provider_id = Column(String, ForeignKey("providers.id"), nullable=True)  # Optional FK
     period_start = Column(DateTime, nullable=False)
     period_end = Column(DateTime, nullable=False)
     total_cost = Column(Float, nullable=False)
