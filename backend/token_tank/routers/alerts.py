@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import SessionLocal
-from ..models import Alert
-from ..schemas import AlertCreate, AlertResponse
+from ..models import Alert, AlertHistory
+from ..schemas import AlertCreate, AlertResponse, AlertHistoryResponse
 
 router = APIRouter()
 
@@ -48,3 +48,25 @@ async def delete_alert(alert_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Alert not found")
     db.delete(alert)
     db.commit()
+
+
+@router.get("/alerts/history", response_model=list[AlertHistoryResponse])
+async def list_alert_history(db: Session = Depends(get_db)):
+    """Get alert history — all triggered alerts with details."""
+    return (
+        db.query(AlertHistory)
+        .order_by(AlertHistory.triggered_at.desc())
+        .all()
+    )
+
+
+@router.put("/alerts/{alert_id}/toggle", response_model=AlertResponse)
+async def toggle_alert(alert_id: str, db: Session = Depends(get_db)):
+    """Toggle the enabled/disabled state of an alert."""
+    alert = db.query(Alert).filter(Alert.id == alert_id).first()
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    alert.enabled = not alert.enabled
+    db.commit()
+    db.refresh(alert)
+    return alert

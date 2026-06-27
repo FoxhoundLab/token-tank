@@ -6,7 +6,11 @@ from sqlalchemy.orm import Session
 
 from ..database import SessionLocal
 from ..models import UsageRecord, BillingSnapshot, Provider
-from ..schemas import DashboardData, ProviderSummary
+from ..schemas import (
+    DashboardData,
+    ProviderComparison,
+    ProviderSummary,
+)
 
 router = APIRouter()
 
@@ -79,3 +83,45 @@ async def get_dashboard(db: Session = Depends(get_db)):
         )
 
     return DashboardData(providers=summaries)
+
+
+# ── Cross-provider comparison (Sprint 3C) ───────────────────────────────
+
+
+@router.get("/compare", response_model=list[ProviderComparison])
+async def compare_providers(db: Session = Depends(get_db)):
+    """Cross-provider comparison for the last 30 days.
+
+    Returns aggregated usage metrics for all providers, sorted by
+    total_tokens_30d descending.
+    """
+    now = datetime.now(timezone.utc)
+    thirty_days_ago = now - timedelta(days=30)
+
+    providers = db.query(Provider).filter(Provider.enabled == True).all()
+    comparisons: list[dict] = []
+
+    for p in providers:
+        records = (
+            db.query(UsageRecord)
+            .filter(UsageRecord.provider == p.provider)
+            .filter(UsageRecord.timestamp >= thirty_days_ago)
+            .all()
+        )
+
+        comparisons.append(
+            {
+                "provider": p.provider,
+                "display_name": p.display_name,
+                "total_tokens_30d": sum(r.total_tokens for r in records),
+                "total_cost_30d": round(
+                    sum(r.estimated_cost for r in records), 6
+                ),
+                "request_count_30d": len(records),
+            }
+        )
+
+    # Sort by total_tokens_30d descending (highest usage first)
+    comparisons.sort(key=lambda x: x["total_tokens_30d"], reverse=True)
+
+    return [ProviderComparison(**c) for c in comparisons]

@@ -79,3 +79,18 @@ class Alert(Base):
     created_at = Column(DateTime, default=_now)
 
     provider_ref = relationship("Provider", back_populates="alerts")
+
+
+class AlertHistory(Base):
+    """Record of a triggered alert for history/audit."""
+
+    __tablename__ = "alert_history"
+
+    id = Column(String, primary_key=True, default=_uuid)
+    alert_id = Column(String, ForeignKey("alerts.id"), nullable=False)
+    provider_name = Column(String)  # Human-readable provider name
+    threshold_type = Column(String, nullable=False)  # 'percentage', 'absolute', 'cost'
+    threshold_value = Column(Float, nullable=False)
+    message = Column(Text, nullable=False)  # Human-readable alert message
+    triggered_at = Column(DateTime, default=_now)
+    created_at = Column(DateTime, default=_now)

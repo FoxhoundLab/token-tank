@@ -75,3 +75,48 @@ class AlertResponse(BaseModel):
     enabled: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class AlertHistoryResponse(BaseModel):
+    id: str
+    alert_id: str
+    provider_name: str | None
+    threshold_type: str
+    threshold_value: float
+    message: str
+    triggered_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# --- History (Sprint 3C) ---
+
+class DailyTotalResponse(BaseModel):
+    date: str          # YYYY-MM-DD
+    total_tokens: int
+    total_cost: float
+    request_count: int
+
+
+class ModelBreakdownItem(BaseModel):
+    model: str
+    total_tokens: int
+    total_cost: float
+    percentage: float  # 0.0 - 100.0
+
+
+class ProviderHistoryResponse(BaseModel):
+    provider: str
+    range: str                       # '7d', '30d', '90d', 'all'
+    daily_totals: list[DailyTotalResponse]
+    model_breakdown: list[ModelBreakdownItem]
+
+
+# --- Comparison (Sprint 3C) ---
+
+class ProviderComparison(BaseModel):
+    provider: str
+    display_name: str
+    total_tokens_30d: int
+    total_cost_30d: float
+    request_count_30d: int

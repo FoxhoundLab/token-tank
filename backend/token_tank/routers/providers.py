@@ -1,14 +1,25 @@
 """Providers router — CRUD for provider connections."""
 
+import csv
+import io
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from ..database import SessionLocal
 from ..models import Provider, UsageRecord
-from ..schemas import ProviderCreate, ProviderResponse, UsageRecordResponse
+from ..schemas import (
+    DailyTotalResponse,
+    ModelBreakdownItem,
+    ProviderHistoryResponse,
+    ProviderCreate,
+    ProviderResponse,
+    UsageRecordResponse,
+)
 from ..crypto import encrypt
 
 router = APIRouter()
@@ -91,3 +102,190 @@ async def get_provider_usage(
         query.order_by(UsageRecord.timestamp.desc()).all()
     )
     return records
+
+
+# ── History drill-down endpoint (Sprint 3C) ─────────────────────────────
+
+
+@router.get(
+    "/providers/{provider_id}/history",
+    response_model=ProviderHistoryResponse,
+)
+async def get_provider_history(
+    provider_id: str,
+    range: Annotated[
+        str, Query(pattern="^(7d|30d|90d|all)$", description="Time range")
+    ] = "30d",
+    db: Session = Depends(get_db),
+):
+    """Get aggregated daily history for a provider.
+
+    Args:
+        provider_id: The provider's UUID.
+        range: Time window — '7d', '30d', '90d', or 'all' (default 30d).
+
+    Returns:
+        Provider history with daily totals and model breakdown.
+    """
+    provider = db.query(Provider).filter(Provider.id == provider_id).first()
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+
+    now = datetime.now(timezone.utc)
+    if range == "all":
+        cutoff = datetime(now.year - 10, now.month, now.day, tzinfo=timezone.utc)
+    else:
+        days = int(range[:-1])  # strip trailing 'd'
+        cutoff = now - timedelta(days=days)
+
+    records = (
+        db.query(UsageRecord)
+        .filter(UsageRecord.provider == provider.provider)
+        .filter(UsageRecord.timestamp >= cutoff)
+        .order_by(UsageRecord.timestamp)
+        .all()
+    )
+
+    # Build daily totals
+    day_map: dict[str, dict] = {}  # date_str -> {total_tokens, total_cost, request_count}
+    for r in records:
+        date_key = r.timestamp.strftime("%Y-%m-%d")
+        if date_key not in day_map:
+            day_map[date_key] = {
+                "total_tokens": 0,
+                "total_cost": 0.0,
+                "request_count": 0,
+            }
+        day_map[date_key]["total_tokens"] += r.total_tokens
+        day_map[date_key]["total_cost"] = round(
+            day_map[date_key]["total_cost"] + r.estimated_cost, 6
+        )
+        day_map[date_key]["request_count"] += 1
+
+    daily_totals = [
+        DailyTotalResponse(
+            date=date_key,
+            total_tokens=day["total_tokens"],
+            total_cost=round(day["total_cost"], 6),
+            request_count=day["request_count"],
+        )
+        for date_key, day in sorted(day_map.items())
+    ]
+
+    # Build model breakdown (across the entire range)
+    model_map: dict[str, dict] = {}  # model -> {total_tokens, total_cost}
+    for r in records:
+        if r.model not in model_map:
+            model_map[r.model] = {"total_tokens": 0, "total_cost": 0.0}
+        model_map[r.model]["total_tokens"] += r.total_tokens
+        model_map[r.model]["total_cost"] = round(
+            model_map[r.model]["total_cost"] + r.estimated_cost, 6
+        )
+
+    total_tokens_all = sum(m["total_tokens"] for m in model_map.values())
+    model_breakdown = [
+        ModelBreakdownItem(
+            model=model,
+            total_tokens=data["total_tokens"],
+            total_cost=round(data["total_cost"], 6),
+            percentage=(data["total_tokens"] / total_tokens_all * 100)
+            if total_tokens_all > 0
+            else 0.0,
+        )
+        for model, data in sorted(
+            model_map.items(), key=lambda x: x[1]["total_tokens"], reverse=True
+        )
+    ]
+
+    return ProviderHistoryResponse(
+        provider=provider.provider,
+        range=range,
+        daily_totals=daily_totals,
+        model_breakdown=model_breakdown,
+    )
+
+
+# ── Export endpoint (Sprint 3C) ─────────────────────────────────────────
+
+
+@router.get("/providers/{provider_id}/export")
+async def export_provider_data(
+    provider_id: str,
+    format: Annotated[str, Query(pattern="^(csv|json)$")] = "csv",
+    range: Annotated[str, Query(pattern="^(7d|30d|90d|all)$")] = "30d",
+    db: Session = Depends(get_db),
+):
+    """Export raw usage records for a provider.
+
+    Args:
+        provider_id: The provider's UUID.
+        format: Output format — 'csv' or 'json' (default csv).
+        range: Time window — '7d', '30d', '90d', or 'all'.
+
+    Returns:
+        CSV file via StreamingResponse (default) or JSON array.
+    """
+    provider = db.query(Provider).filter(Provider.id == provider_id).first()
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+
+    now = datetime.now(timezone.utc)
+    if range == "all":
+        cutoff = datetime(now.year - 10, now.month, now.day, tzinfo=timezone.utc)
+    else:
+        days = int(range[:-1])  # strip trailing 'd'
+        cutoff = now - timedelta(days=days)
+
+    records = (
+        db.query(UsageRecord)
+        .filter(UsageRecord.provider == provider.provider)
+        .filter(UsageRecord.timestamp >= cutoff)
+        .order_by(UsageRecord.timestamp)
+        .all()
+    )
+
+    if format == "json":
+        from ..schemas import UsageRecordResponse as _URR
+
+        return [
+            {"provider": r.provider, "model": r.model}
+            | {k: getattr(r, k) for k in ("input_tokens", "output_tokens", "total_tokens", "estimated_cost", "timestamp")}
+            for r in records
+        ]
+
+    # CSV via StreamingResponse
+    def generate_csv():
+        output = io.StringIO()
+        writer = csv.writer(output)
+        # Header
+        writer.writerow([
+            "timestamp",
+            "provider",
+            "model",
+            "input_tokens",
+            "output_tokens",
+            "total_tokens",
+            "estimated_cost",
+        ])
+        # Rows
+        for r in records:
+            writer.writerow([
+                r.timestamp.isoformat(),
+                r.provider,
+                r.model,
+                r.input_tokens,
+                r.output_tokens,
+                r.total_tokens,
+                r.estimated_cost,
+            ])
+        yield output.getvalue()
+
+    return StreamingResponse(
+        generate_csv(),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="export_{provider.provider}_{range}.csv"'
+            )
+        },
+    )
