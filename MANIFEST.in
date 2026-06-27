@@ -1,0 +1,26 @@
+# Source distribution contents for Token Tank.
+
+include README.md
+include CHANGELOG.md
+include LICENSE
+include CONTRIBUTING.md
+include pyproject.toml
+include .env.example
+
+# Documentation
+recursive-include docs *.md
+
+# Browser extension (MV3)
+recursive-include extension *.json *.js *.html *.png *.md
+
+# Backend requirements + tests
+include backend/requirements.txt
+include backend/pytest.ini
+
+# Exclude build/runtime cruft
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude .DS_Store
+prune frontend/node_modules
+prune frontend/dist
