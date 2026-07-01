@@ -17,6 +17,9 @@ recursive-include extension *.json *.js *.html *.png *.md
 include backend/requirements.txt
 include backend/pytest.ini
 
+# Fonts (Hermes-style display + mono stack)
+recursive-include frontend/public/assets/fonts *.woff2
+
 # Exclude build/runtime cruft
 global-exclude __pycache__
 global-exclude *.py[cod]

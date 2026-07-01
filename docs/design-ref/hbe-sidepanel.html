@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hermes Browser Extension</title>
+    <link rel="icon" href="assets/icons/icon-32.png" />
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar" aria-label="Hermes Browser Extension header">
+        <div class="brand-mini" aria-label="Hermes Agent">
+          <strong>HERMES<br />AGENT</strong>
+        </div>
+        <button id="sessionMenuButton" class="session-menu-button" type="button" aria-haspopup="dialog" aria-expanded="false">
+          <span id="currentSessionName">Hermes Browser Extension</span>
+          <span aria-hidden="true">⌄</span>
+        </button>
+        <button id="newSessionButton" class="settings-button icon-button" type="button" title="New Hermes Browser Extension session" aria-label="New session">+</button>
+        <div class="topbar-status">
+          <span id="connectionPill" class="connection-pill" role="status" aria-label="Hermes connection status" title="Hermes connection status">●</span>
+        </div>
+        <button id="settingsButton" class="settings-button icon-button" type="button" title="Settings" aria-label="Open settings">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16">
+            <path d="M12 8.3a3.7 3.7 0 1 1 0 7.4 3.7 3.7 0 0 1 0-7.4Zm7.3 3.7c0-.5-.1-1-.2-1.5l2-1.5-2-3.5-2.4 1a8.5 8.5 0 0 0-2.6-1.5L13.8 2H10l-.4 3a8.5 8.5 0 0 0-2.6 1.5l-2.4-1-2 3.5 2 1.5a8.5 8.5 0 0 0 0 3l-2 1.5 2 3.5 2.4-1a8.5 8.5 0 0 0 2.6 1.5l.4 3h3.8l.4-3a8.5 8.5 0 0 0 2.6-1.5l2.4 1 2-3.5-2-1.5c.1-.5.2-1 .2-1.5Z" fill="currentColor"/>
+          </svg>
+          <span class="sr-only">Settings</span>
+        </button>
+      </header>
+
+      <section id="sessionMenu" class="session-menu" role="dialog" aria-label="Open Hermes session" hidden>
+        <input id="sessionSearchInput" type="search" placeholder="Search sessions" autocomplete="off" />
+        <div id="sessionMenuList" class="session-menu-list"></div>
+        <footer>
+          <button id="createSessionButton" class="secondary" type="button">＋ New Hermes Browser Extension Session</button>
+          <button id="refreshSessionsButton" class="secondary" type="button">↻ Refresh Sessions</button>
+        </footer>
+      </section>
+
+      <section id="appScroll" class="app-scroll" aria-label="Hermes Browser Extension conversation">
+        <section id="connectPanel" class="connect-panel" hidden>
+          <p class="eyebrow">PUBLIC SETUP</p>
+          <h2>Connect to Hermes</h2>
+          <ol>
+            <li>Start the Hermes API server locally or on a reachable remote machine.</li>
+            <li>Clone this repo, build it, and load the <code>dist/</code> folder unpacked.</li>
+            <li>Open the Hermes extension side panel from your browser toolbar.</li>
+            <li>Click Connect to Hermes, or use Manual setup with a local/remote Gateway URL and token.</li>
+            <li>Approve pairing when available, or paste <code>API_SERVER_KEY</code> for manual setup.</li>
+            <li>Ask Hermes about the active page context.</li>
+          </ol>
+          <div class="connect-actions">
+            <button id="connectButton" type="button">Connect to Hermes</button>
+            <button id="manualSettingsButton" class="secondary" type="button">Manual setup</button>
+          </div>
+          <p id="connectStatus" class="hint">Public alpha: load unpacked, local or remote Hermes API server, read-only browser context.</p>
+        </section>
+
+        <section class="hero-card" aria-label="Hermes Browser intro">
+          <div class="hero-copy">
+            <p class="eyebrow">LOCAL SIDECAR / CHROME PANEL</p>
+            <h1>HERMES<br />BROWSER</h1>
+            <p class="intro">Ask about any page. Hermes sees the active tab, selected text, page context, and open tabs.</p>
+          </div>
+          <img class="hero-badge" src="assets/img/hermes-badge.webp" alt="Hermes Agent badge" />
+        </section>
+
+        <section id="statusCard" class="status-card" aria-live="polite">
+          <div class="status-label">
+            <span class="status-dot" id="statusDot"></span>
+            <span>ACTIVE TAB</span>
+          </div>
+          <div class="status-copy">
+            <strong id="activeTitle">No tab detected</strong>
+            <span id="activeUrl">Open a normal http/https tab, then refresh context.</span>
+          </div>
+        </section>
+
+        <section id="messages" class="messages" aria-live="polite"></section>
+      </section>
+
+      <footer class="bottom-dock" aria-label="Hermes Browser Extension controls">
+        <form id="composer" class="composer">
+          <div class="composer-header">
+            <label class="composer-label" for="promptInput">ASK HERMES</label>
+            <button id="contextScopeButton" class="context-scope-button" type="button" aria-haspopup="dialog" aria-expanded="false" title="Choose which tab Hermes reads and which open tabs appear in the prompt">
+              <span id="contextScopeLabel">Follow active tab</span>
+            </button>
+          </div>
+          <button id="contextChip" class="context-chip" type="button" aria-expanded="false">
+            <span id="contextChipLabel">📎 Loading...</span>
+            <strong>preview</strong>
+          </button>
+          <div id="contextPreview" class="context-preview" hidden></div>
+          <div id="contextScopeMenu" class="context-scope-menu" hidden></div>
+          <div class="composer-input-wrap" id="composerDropZone">
+            <textarea id="promptInput" rows="3" placeholder="Ask Hermes about this page..."></textarea>
+            <div id="dropOverlay" class="drop-overlay" hidden>Drop files to attach</div>
+            <button id="attachMenuButton" class="attach-menu-button composer-plus" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Attach context" title="Attach context">+</button>
+            <button id="commandMenuButton" class="composer-command" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="quickMoreMenu" aria-label="Open quick commands" title="Open quick commands">
+              <span aria-hidden="true">/</span><strong>commands</strong>
+            </button>
+            <button id="voiceButton" class="composer-icon composer-mic" type="button" aria-label="Start voice dictation" title="Start voice dictation">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21H8v2h8v-2h-3v-3.08A7 7 0 0 0 19 11h-2Z"/></svg>
+            </button>
+            <button id="inlineSendButton" class="composer-icon composer-send" type="submit" aria-label="Send message" title="Send message">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 4 5.5 10.5l1.4 1.4L11 7.82V20h2V7.82l4.1 4.08 1.4-1.4L12 4Z"/></svg>
+            </button>
+            <button id="stopButton" class="composer-icon composer-stop" type="button" aria-label="Stop Hermes" title="Stop Hermes" hidden>■</button>
+            <button id="queueButton" class="composer-icon composer-queue" type="button" aria-label="Queue message" title="Queue message" hidden>
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M7 4h10a2 2 0 0 1 2 2v8h-2V6H7v12h6v2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm3 4h4v2h-4V8Zm0 4h4v2h-4v-2Zm6 4v-3h2v3h3v2h-3v3h-2v-3h-3v-2h3Z"/></svg>
+            </button>
+            <button id="steerButton" class="composer-icon composer-steer" type="button" aria-label="Steer the current run" title="Steer the current run" hidden>
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 4 6 10h4v4a4 4 0 0 0 4 4h4v-2h-4a2 2 0 0 1-2-2v-4h4L12 4Z"/></svg>
+            </button>
+            <section id="quickMoreMenu" class="quick-more-menu" hidden role="menu" aria-label="Quick commands"></section>
+            <section id="skillMenu" class="skill-menu" role="listbox" aria-label="Hermes skill suggestions" hidden></section>
+            <section id="attachMenu" class="attach-menu" role="dialog" aria-label="Attach context" hidden>
+              <p class="attach-menu-heading">Attach</p>
+              <button type="button" data-attach="files">▧ Files...</button>
+              <button type="button" data-attach="folder">▰ Folder...</button>
+              <button type="button" data-attach="images">▧ Images...</button>
+              <button type="button" data-attach="paste-image">▣ Paste image</button>
+              <button type="button" data-attach="url">↗ URL...</button>
+              <hr />
+              <button type="button" data-snippet="Summarize the attached context and call out the important takeaways.">▤ Prompt snippets...</button>
+            </section>
+          </div>
+          <div id="attachmentList" class="attachment-list" hidden></div>
+          <input id="fileInput" type="file" multiple hidden />
+          <input id="imageInput" type="file" accept="image/*" multiple hidden />
+          <input id="folderInput" type="file" webkitdirectory directory multiple hidden />
+          <p class="composer-help">Enter sends. Shift+Enter adds a new line. Ctrl+V, drag/drop, or + attaches files.</p>
+          <section id="queueNotice" class="queue-notice" aria-live="polite" hidden></section>
+          <div class="composer-actions">
+            <button id="refreshButton" class="secondary icon-refresh" type="button" title="Refresh page context" aria-label="Refresh page context"><span class="refresh-glyph" aria-hidden="true">↻</span></button>
+            <button id="sendButton" type="submit">Ask Hermes</button>
+          </div>
+        </form>
+
+        <div class="desktop-bar">
+          <button id="modelMenuButton" class="model-menu-button" type="button" aria-haspopup="dialog" aria-expanded="false">
+            <span class="model-button-copy"><span id="currentModelName">Select model</span><strong id="currentModelEffort">Med</strong></span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          <button id="contextBarButton" class="context-bar" type="button" aria-expanded="false" aria-controls="contextPopover">
+            <span id="contextCompactLabel">0/∞</span>
+            <span class="context-track" aria-hidden="true"><span id="contextMeterFill"></span></span>
+            <strong id="contextPercentLabel">—</strong>
+          </button>
+        </div>
+
+        <section id="modelMenu" class="model-menu" role="dialog" aria-label="Choose Hermes model" hidden>
+          <input id="modelSearchInput" type="search" placeholder="Search all models" autocomplete="off" />
+          <div id="modelProviderList" class="model-provider-list" aria-label="Model providers"></div>
+          <div id="modelMenuList" class="model-menu-list"></div>
+          <section id="modelOptionsList" class="model-options-list" aria-label="Model runtime options"></section>
+          <footer>
+            <button id="refreshModelsButton" class="secondary" type="button" title="Refresh model catalog" aria-busy="false">↻ Refresh Models</button>
+            <button id="editModelsButton" class="secondary" type="button">⚙ Edit Models...</button>
+          </footer>
+          <p id="modelRefreshStatus" class="model-refresh-status" role="status" aria-live="polite" hidden></p>
+        </section>
+
+        <section id="contextPopover" class="context-popover" role="dialog" aria-label="Context window details" hidden>
+          <header>
+            <span>CONTEXT WINDOW</span>
+            <strong id="contextUsageDetail">Refresh context to calculate the next prompt payload.</strong>
+          </header>
+          <dl id="contextBreakdown"></dl>
+        </section>
+      </footer>
+    </main>
+
+    <section id="settingsDialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+      <form id="settingsForm">
+        <header>
+          <div>
+            <p class="eyebrow">HERMES BROWSER</p>
+            <h2 id="settingsTitle">Settings</h2>
+          </div>
+          <button id="closeSettingsButton" class="settings-button" type="button">CLOSE</button>
+        </header>
+
+        <section class="settings-section release-settings" aria-labelledby="releaseTitle">
+          <div class="release-row">
+            <div>
+              <h3 id="releaseTitle">Extension</h3>
+              <p><span id="versionLabel">version loading…</span> · public alpha / load unpacked</p>
+            </div>
+            <button id="checkUpdatesButton" class="secondary" type="button">Check updates</button>
+          </div>
+          <p id="updateStatus" class="hint">Updates are checked against the public GitHub repo.</p>
+        </section>
+        <section class="settings-section profile-settings" aria-labelledby="profileTitle">
+          <div class="settings-section-head">
+            <div>
+              <h3 id="profileTitle">Agent Profile</h3>
+              <p>Choose which Hermes agent profile the Browser should use when the local gateway exposes profiles.</p>
+            </div>
+          </div>
+          <section class="settings-section">
+            <h3>Active profile</h3>
+            <div class="settings-row">
+              <label>
+                Active profile
+                <select id="profileSelect" name="profileSelect">
+                  <option value="">Detect from Hermes gateway</option>
+                </select>
+              </label>
+              <button id="refreshProfilesButton" class="secondary" type="button">↻ Profiles</button>
+            </div>
+            <p id="profileStatus" class="hint">Profiles sync after connecting to Hermes.</p>
+          </section>
+          <section class="settings-section">
+            <h3>Connected agent</h3>
+            <p class="hint">
+              Scans a trusted Hermes API host for running gateways. Use localhost for
+              same-machine agents, or a Tailscale host/IP for private remote agents.
+            </p>
+            <div id="agentList" class="agent-list" role="list" aria-label="Discovered Hermes agents"></div>
+            <div class="settings-row">
+              <button id="refreshAgentsButton" class="secondary" type="button">↻ Scan agents</button>
+            </div>
+            <label>
+              Agent host
+              <input id="agentHostInput" type="text" autocomplete="off" placeholder="127.0.0.1 or macbook.tailnet.ts.net" />
+            </label>
+            <label>
+              Agent scheme
+              <select id="agentSchemeInput">
+                <option value="http">http</option>
+                <option value="https">https</option>
+              </select>
+            </label>
+            <label>
+              Agent ports (comma-separated, default 8642-8646)
+              <input id="agentPortsInput" type="text" inputmode="numeric" placeholder="8642,8643,8644,8645,8646" />
+            </label>
+            <p id="agentPickerStatus" class="hint">Agent discovery has not run yet.</p>
+          </section>
+        </section>
+
+        <section class="settings-section appearance-settings" aria-labelledby="appearanceTitle">
+          <div class="settings-section-head">
+            <div>
+              <h3 id="appearanceTitle">Appearance</h3>
+              <p>Mode controls brightness. Theme controls the accent palette and chat surface styling.</p>
+            </div>
+          </div>
+
+          <div class="appearance-row">
+            <div>
+              <strong>Color Mode</strong>
+              <span>Pick a fixed mode or follow your system setting.</span>
+            </div>
+            <div class="segmented-control" role="radiogroup" aria-label="Color mode">
+              <button class="mode-choice" type="button" data-color-mode="light" role="radio" aria-checked="false">☼ Light</button>
+              <button class="mode-choice" type="button" data-color-mode="dark" role="radio" aria-checked="false">☾ Dark</button>
+              <button class="mode-choice" type="button" data-color-mode="system" role="radio" aria-checked="false">▱ System</button>
+            </div>
+          </div>
+
+          <div class="theme-setting">
+            <strong>Theme</strong>
+            <span>Same Desktop palettes, minus window transparency.</span>
+            <div id="themeGrid" class="theme-grid" role="radiogroup" aria-label="Theme"></div>
+          </div>
+        </section>
+
+        <section class="settings-section connection-settings" aria-labelledby="connectionTitle">
+          <div class="settings-section-head">
+            <div>
+              <h3 id="connectionTitle">Gateway Connection</h3>
+              <p>Connect Hermes Browser Extension to a local or remote Hermes API server.</p>
+            </div>
+          </div>
+
+        <div class="gateway-mode" role="radiogroup" aria-label="Gateway location">
+          <button class="conn-mode-card" type="button" data-gateway-location="local" role="radio" aria-checked="true">
+            <span class="conn-mode-head"><span class="conn-mode-title">Local gateway</span><span class="conn-mode-check" aria-hidden="true"></span></span>
+            <span class="conn-mode-desc">Hermes on this machine. The default, works offline.</span>
+          </button>
+          <button class="conn-mode-card" type="button" data-gateway-location="remote" role="radio" aria-checked="false">
+            <span class="conn-mode-head"><span class="conn-mode-title">Remote gateway</span><span class="conn-mode-check" aria-hidden="true"></span></span>
+            <span class="conn-mode-desc">Hermes on another machine. API can use trusted LAN http; dashboard uses https.</span>
+          </button>
+          <select id="gatewayModeInput" name="gatewayMode" hidden>
+            <option value="local-api">Local API server</option>
+            <option value="remote-api">Remote API server</option>
+            <option value="remote-dashboard">Remote dashboard (WebSocket)</option>
+          </select>
+        </div>
+
+        <label>
+          Gateway URL
+          <input id="gatewayUrlInput" name="gatewayUrl" type="url" placeholder="http://127.0.0.1:8642" />
+        </label>
+        <p id="gatewayHelp" class="hint">Local setup: keep Hermes Gateway/API Server running on this machine.</p>
+
+        <label>
+          API key / browser token
+          <input id="apiKeyInput" name="apiKey" type="password" autocomplete="off" placeholder="API key (blank = dashboard)" />
+        </label>
+
+        <label>
+          Session ID
+          <input id="sessionIdInput" name="sessionId" type="text" placeholder="hermes-browser-extension" />
+        </label>
+
+        <label>
+          Session title
+          <input id="sessionTitleInput" name="sessionTitle" type="text" placeholder="Hermes Browser Extension" />
+        </label>
+
+        <section class="settings-subsection browser-behavior-settings" aria-labelledby="browserBehaviorTitle">
+          <div class="settings-section-head compact">
+            <div>
+              <h4 id="browserBehaviorTitle">Browser Behavior</h4>
+              <p>Session naming, prompt context, and side-panel residency live together.</p>
+            </div>
+          </div>
+
+          <label class="settings-toggle-card auto-name-toggle">
+            <span class="settings-toggle-copy">
+              <strong>Auto-name browser sessions</strong>
+              <small>Rename a fresh browser session from the first real message.</small>
+            </span>
+            <input id="autoNameSessionsInput" class="settings-switch-input" type="checkbox" />
+            <span class="settings-switch" aria-hidden="true"></span>
+          </label>
+
+          <div class="settings-control-group" aria-label="Prompt context settings">
+            <div class="settings-control-group-head">
+              <strong>Prompt context</strong>
+              <small>Choose what browser context is allowed into each prompt.</small>
+            </div>
+            <div class="settings-toggle-grid settings-toggle-grid-three">
+              <label class="settings-toggle-card compact-toggle">
+                <span class="settings-toggle-copy"><strong>Open tabs</strong><small>Window tab list</small></span>
+                <input id="includeTabsInput" class="settings-switch-input" type="checkbox" />
+                <span class="settings-switch" aria-hidden="true"></span>
+              </label>
+              <label class="settings-toggle-card compact-toggle">
+                <span class="settings-toggle-copy"><strong>Page text</strong><small>Readable DOM text</small></span>
+                <input id="includePageTextInput" class="settings-switch-input" type="checkbox" />
+                <span class="settings-switch" aria-hidden="true"></span>
+              </label>
+              <label class="settings-toggle-card compact-toggle">
+                <span class="settings-toggle-copy"><strong>Selection</strong><small>Highlighted text</small></span>
+                <input id="includeSelectedTextInput" class="settings-switch-input" type="checkbox" />
+                <span class="settings-switch" aria-hidden="true"></span>
+              </label>
+            </div>
+          </div>
+
+          <fieldset class="panel-residency-options settings-choice-group">
+            <legend>Panel opening</legend>
+            <div class="settings-choice-grid">
+              <label class="settings-choice-card">
+                <input type="radio" name="panelResidencyMode" value="tab-attached" />
+                <span class="settings-choice-copy">
+                  <strong>Attach to current tab</strong>
+                  <small>Hermes appears only on tabs where you open it.</small>
+                </span>
+                <span class="settings-choice-mark" aria-hidden="true"></span>
+              </label>
+              <label class="settings-choice-card">
+                <input type="radio" name="panelResidencyMode" value="global" />
+                <span class="settings-choice-copy">
+                  <strong>Keep open across tabs</strong>
+                  <small>Use one global panel that follows the browser window.</small>
+                </span>
+                <span class="settings-choice-mark" aria-hidden="true"></span>
+              </label>
+            </div>
+          </fieldset>
+        </section>
+
+        <label>
+          Page context depth
+          <select id="contextDepthInput" name="contextDepth">
+            <option value="minimal">Minimal - selected text + short page text</option>
+            <option value="normal">Normal - good default</option>
+            <option value="full">Full - largest payload</option>
+          </select>
+        </label>
+
+        <label>
+          YouTube transcript provider
+          <input id="transcriptProviderInput" name="transcriptProvider" type="text" placeholder="default, off, or https://provider.example/transcript?video_id={video_id}" />
+        </label>
+
+        <p class="hint">Public flow: Connect to Hermes creates a scoped browser token when the API server supports pairing. For remote hosts, set API_SERVER_CORS_ORIGINS to this extension origin and use a strong API_SERVER_KEY or scoped token.</p>
+
+        <div class="compatibility-panel" aria-labelledby="compatibilityTitle">
+          <div>
+            <h4 id="compatibilityTitle">Hermes compatibility</h4>
+            <p id="compatibilityStatus" class="hint">Connect or test your Gateway to see supported features.</p>
+          </div>
+          <ul id="compatibilityList" class="compatibility-list"></ul>
+        </div>
+
+        <div class="connection-security" aria-labelledby="connectionSecurityTitle">
+          <div class="settings-section-head">
+            <div>
+              <h4 id="connectionSecurityTitle">Connection security</h4>
+              <p>Tokens are stored in chrome.storage.local and never displayed after save.</p>
+            </div>
+          </div>
+          <div id="connectionSecuritySummary" class="connection-security-summary"></div>
+          <button id="clearTokenButton" class="secondary" type="button">Clear stored token</button>
+        </div>
+        </section>
+
+        <footer>
+          <button id="testConnectionButton" class="secondary" type="button">Test connection</button>
+          <button id="saveSettingsButton" type="submit">Save settings</button>
+        </footer>
+      </form>
+    </section>
+
+    <template id="messageTemplate">
+      <article class="message">
+        <div class="message-role"></div>
+        <div class="message-content"></div>
+      </article>
+    </template>
+
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>

@@ -12,6 +12,9 @@ license = { text = "MIT" }
 authors = [
     { name = "Oshi Naka", email = "repetitionrevenue@gmail.com" },
 ]
+maintainers = [
+    { name = "Oshi Naka", email = "repetitionrevenue@gmail.com" },
+]
 keywords = [
     "ai",
     "llm",
