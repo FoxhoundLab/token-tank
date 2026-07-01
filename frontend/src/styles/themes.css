@@ -1,0 +1,110 @@
+/* Token Tank — Theme System Skeleton
+   Fable 5: Fill in the color values per DESIGN_SPEC.md §2-3.
+   Activate themes via: document.documentElement.setAttribute('data-theme', 'tank')
+   Persist via: localStorage.setItem('token-tank-theme', themeName)
+
+   Pattern: --tank-* CSS custom properties drive everything.
+   No hardcoded colors outside this file. Zero border-radius (--radius: 0px). */
+
+/* ============================================
+   DEFAULT THEME: tank (amber fuel-pump on midnight)
+   ============================================ */
+:root,
+[data-theme="tank"] {
+  --tank-bg: #0a0f1a;
+  --tank-panel: #11192a;
+  --tank-panel-rgb: 17, 25, 42;
+  --tank-paper: #fbfcff;
+  --tank-ink: #0a0f1a;
+  --tank-fg: #e8eef7;
+  --tank-fg-rgb: 232, 238, 247;
+  --tank-accent: #f59e0b;
+  --tank-accent-rgb: 245, 158, 11;
+  --tank-accent-deep: #b45309;
+  --tank-muted: rgba(232, 238, 247, 0.56);
+  --tank-line: rgba(245, 158, 11, 0.18);
+  --tank-line-strong: rgba(245, 158, 11, 0.62);
+  --tank-ok: #10b981;
+  --tank-warn: #f59e0b;
+  --tank-danger: #ef4444;
+
+  /* Typography */
+  --font-display: "Sigurd Variable", "Inter", system-ui, sans-serif;
+  --font-ui: "Collapse", "Inter", system-ui, sans-serif;
+  --font-mono: "Courier Prime", "JetBrains Mono", ui-monospace, monospace;
+
+  /* Sacrosanct */
+  --radius: 0px;
+}
+
+/* ============================================
+   MIDNIGHT (deep violet on near-black)
+   ============================================ */
+[data-theme="midnight"] {
+  --tank-bg: #07061a;
+  --tank-panel: #0d0b25;
+  --tank-panel-rgb: 13, 11, 37;
+  --tank-paper: #121029;
+  --tank-ink: #d9d2ff;
+  --tank-fg: #eeeaff;
+  --tank-fg-rgb: 238, 234, 255;
+  --tank-accent: #b7a8ff;
+  --tank-accent-rgb: 183, 168, 255;
+  --tank-accent-deep: #6557c4;
+  --tank-muted: rgba(238, 234, 255, 0.56);
+  --tank-line: rgba(183, 168, 255, 0.18);
+  --tank-line-strong: rgba(183, 168, 255, 0.62);
+  --tank-ok: #10b981;
+  --tank-warn: #b7a8ff;
+  --tank-danger: #ef4444;
+
+  /* Typography inherited from :root */
+}
+
+/* ============================================
+   MONO (pure grayscale terminal)
+   ============================================ */
+[data-theme="mono"] {
+  --tank-bg: #0d0d0d;
+  --tank-panel: #171717;
+  --tank-panel-rgb: 23, 23, 23;
+  --tank-paper: #232323;
+  --tank-ink: #e5e5e5;
+  --tank-fg: #f1f1f1;
+  --tank-fg-rgb: 241, 241, 241;
+  --tank-accent: #c9c9c9;
+  --tank-accent-rgb: 201, 201, 201;
+  --tank-accent-deep: #7a7a7a;
+  --tank-muted: rgba(241, 241, 241, 0.56);
+  --tank-line: rgba(201, 201, 201, 0.18);
+  --tank-line-strong: rgba(201, 201, 201, 0.62);
+  --tank-ok: #6b6b6b;
+  --tank-warn: #999999;
+  --tank-danger: #cc4444;
+}
+
+/* ============================================
+   CYBERPUNK (neon green CRT phosphor)
+   ============================================ */
+[data-theme="cyberpunk"] {
+  --tank-bg: #001004;
+  --tank-panel: #001b08;
+  --tank-panel-rgb: 0, 27, 8;
+  --tank-paper: #00240c;
+  --tank-ink: #12ff68;
+  --tank-fg: #36ff7a;
+  --tank-fg-rgb: 54, 255, 122;
+  --tank-accent: #00ff5f;
+  --tank-accent-rgb: 0, 255, 95;
+  --tank-accent-deep: #008833;
+  --tank-muted: rgba(54, 255, 122, 0.56);
+  --tank-line: rgba(0, 255, 95, 0.18);
+  --tank-line-strong: rgba(0, 255, 95, 0.62);
+  --tank-ok: #00ff5f;
+  --tank-warn: #ffcc00;
+  --tank-danger: #ff3366;
+
+  /* Cyberpunk uses mono font for everything */
+  --font-ui: "JetBrains Mono", "Courier Prime", ui-monospace, monospace;
+  --font-display: "JetBrains Mono", ui-monospace, monospace;
+}
