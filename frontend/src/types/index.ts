@@ -3,6 +3,7 @@
 export interface ProviderSummary {
   provider: string;
   display_name: string;
+  provider_type: "subscription" | "api" | "local";
   today_tokens: number;
   today_cost: number;
   month_tokens: number;
@@ -20,6 +21,7 @@ export interface ProviderResponse {
   id: string;
   provider: string;
   display_name: string;
+  provider_type: "subscription" | "api" | "local";
   org_id: string | null;
   enabled: boolean;
   created_at: string;
