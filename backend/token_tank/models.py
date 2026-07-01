@@ -32,6 +32,26 @@ class Provider(Base):
     alerts = relationship("Alert", back_populates="provider_ref")
 
 
+# ── Provider type classification ────────────────────────────────────
+# Maps provider name → card model for dashboard rendering.
+# 'subscription' = usage windows + countdowns (e.g. Claude Pro, ChatGPT Plus)
+# 'api'          = pay-per-token spend tiles + balance
+# 'local'        = free, infinite gauge, token count only
+PROVIDER_TYPES: dict[str, str] = {
+    "anthropic": "subscription",
+    "openai": "subscription",
+    "zai": "api",
+    "minimax": "api",
+    "ollama": "local",
+    "lmstudio": "local",
+}
+
+
+def get_provider_type(provider_name: str) -> str:
+    """Return the card model type for a provider name. Defaults to 'api'."""
+    return PROVIDER_TYPES.get(provider_name, "api")
+
+
 class UsageRecord(Base):
     """Per-request usage log from proxy."""
 

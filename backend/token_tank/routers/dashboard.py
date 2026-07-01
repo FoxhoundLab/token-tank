@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from ..database import SessionLocal
-from ..models import UsageRecord, BillingSnapshot, Provider
+from ..models import UsageRecord, BillingSnapshot, Provider, get_provider_type
 from ..schemas import (
     DashboardData,
     ProviderComparison,
@@ -72,6 +72,7 @@ async def get_dashboard(db: Session = Depends(get_db)):
             ProviderSummary(
                 provider=p.provider,
                 display_name=p.display_name,
+                provider_type=get_provider_type(p.provider),
                 today_tokens=today_tokens,
                 today_cost=round(today_cost, 4),
                 month_tokens=month_tokens,

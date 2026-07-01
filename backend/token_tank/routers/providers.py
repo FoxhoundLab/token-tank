@@ -36,12 +36,28 @@ def get_db():
 @router.get("/providers", response_model=list[ProviderResponse])
 async def list_providers(db: Session = Depends(get_db)):
     """List all configured providers."""
-    return db.query(Provider).all()
+    from ..models import get_provider_type
+
+    providers = db.query(Provider).all()
+    return [
+        ProviderResponse(
+            id=p.id,
+            provider=p.provider,
+            display_name=p.display_name,
+            org_id=p.org_id,
+            enabled=p.enabled,
+            created_at=p.created_at,
+            provider_type=get_provider_type(p.provider),
+        )
+        for p in providers
+    ]
 
 
 @router.post("/providers", response_model=ProviderResponse, status_code=201)
 async def create_provider(payload: ProviderCreate, db: Session = Depends(get_db)):
     """Add a new provider connection."""
+    from ..models import get_provider_type
+
     provider = Provider(
         provider=payload.provider,
         display_name=payload.display_name,
@@ -51,7 +67,15 @@ async def create_provider(payload: ProviderCreate, db: Session = Depends(get_db)
     db.add(provider)
     db.commit()
     db.refresh(provider)
-    return provider
+    return ProviderResponse(
+        id=provider.id,
+        provider=provider.provider,
+        display_name=provider.display_name,
+        org_id=provider.org_id,
+        enabled=provider.enabled,
+        created_at=provider.created_at,
+        provider_type=get_provider_type(provider.provider),
+    )
 
 
 @router.delete("/providers/{provider_id}", status_code=204)

@@ -22,6 +22,7 @@ class ProviderResponse(BaseModel):
     org_id: str | None
     enabled: bool
     created_at: datetime
+    provider_type: str = "api"  # 'subscription', 'api', 'local'
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -48,6 +49,7 @@ class DashboardData(BaseModel):
 class ProviderSummary(BaseModel):
     provider: str
     display_name: str
+    provider_type: str = "api"  # 'subscription', 'api', 'local'
     today_tokens: int
     today_cost: float
     month_tokens: int

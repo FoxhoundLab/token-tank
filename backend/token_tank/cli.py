@@ -135,6 +135,13 @@ def _cmd_init(args: argparse.Namespace) -> None:
     print(f"✅  Initialized Token Tank at {config_path}")
 
 
+def _cmd_seed(args: argparse.Namespace) -> None:
+    """Populate the database with demo providers and usage data."""
+    from .seed import seed_database
+
+    seed_database()
+
+
 # ── Helpers ───────────────────────────────────────────────────────
 
 def _read_existing_pid() -> int | None:
@@ -202,6 +209,9 @@ def main(argv: list[str] | None = None) -> None:
     # init
     subparsers.add_parser("init", help="Create ~/.token-tank/ with default config")
 
+    # seed
+    subparsers.add_parser("seed", help="Populate demo data (6 providers, 7 days of usage)")
+
     args = parser.parse_args(argv)
 
     # --config points the loader (and init) at an explicit config file.
@@ -218,6 +228,7 @@ def main(argv: list[str] | None = None) -> None:
         "stop": _cmd_stop,
         "status": _cmd_status,
         "init": _cmd_init,
+        "seed": _cmd_seed,
     }
 
     handler = handlers.get(args.command)
