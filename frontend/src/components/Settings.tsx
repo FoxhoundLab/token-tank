@@ -1,23 +1,29 @@
 import { useState, useEffect } from "react";
 import { getProviders, addProvider, removeProvider } from "../api/client";
 import type { ProviderResponse } from "../types";
+import { THEMES, THEME_META } from "../theme";
+import type { ThemeName } from "../theme";
 
 interface ProviderOption {
   id: string;
   name: string;
-  icon: string;
   needsKey: boolean;
 }
 
 const PROVIDER_OPTIONS: ProviderOption[] = [
-  { id: "anthropic", name: "Anthropic", icon: "🤖", needsKey: true },
-  { id: "minimax", name: "MiniMax", icon: "⚡", needsKey: true },
-  { id: "zai", name: "Z.AI", icon: "🔮", needsKey: true },
-  { id: "ollama", name: "Ollama Pro", icon: "🦙", needsKey: false },
-  { id: "lmstudio", name: "LM Studio", icon: "💻", needsKey: false },
+  { id: "anthropic", name: "Anthropic", needsKey: true },
+  { id: "minimax", name: "MiniMax", needsKey: true },
+  { id: "zai", name: "Z.AI", needsKey: true },
+  { id: "ollama", name: "Ollama", needsKey: false },
+  { id: "lmstudio", name: "LM Studio", needsKey: false },
 ];
 
-export function Settings() {
+interface SettingsProps {
+  theme: ThemeName;
+  onThemeChange: (theme: ThemeName) => void;
+}
+
+export function Settings({ theme, onThemeChange }: SettingsProps) {
   const [providers, setProviders] = useState<ProviderResponse[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<ProviderOption | null>(null);
   const [displayName, setDisplayName] = useState("");
@@ -56,7 +62,7 @@ export function Settings() {
       setOrgId("");
       setSelectedProvider(null);
       setError(null);
-      setSuccess(`${selectedProvider.name} connected!`);
+      setSuccess(`${selectedProvider.name} connected`);
       setTimeout(() => setSuccess(null), 3000);
       fetchProviders();
     } catch (e) {
@@ -75,11 +81,37 @@ export function Settings() {
 
   return (
     <div className="settings">
+      {/* Theme */}
+      <section className="settings-section">
+        <h2 className="section-head">Theme</h2>
+        <div className="theme-grid">
+          {THEMES.map((t) => (
+            <button
+              key={t}
+              className={`theme-card ${theme === t ? "selected" : ""}`}
+              data-theme={t}
+              onClick={() => onThemeChange(t)}
+              aria-pressed={theme === t}
+            >
+              <span className="theme-preview">
+                <span className="theme-preview-panel">
+                  <span className="theme-preview-accent" />
+                  <span className="theme-preview-line" />
+                  <span className="theme-preview-line short" />
+                </span>
+              </span>
+              <span className="theme-card-name">{THEME_META[t].label}</span>
+              <span className="theme-card-tag">{THEME_META[t].tagline}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* Provider Picker */}
       <section className="settings-section">
-        <h2>Connect a Provider</h2>
-        {error && <p className="error">⚠️ {error}</p>}
-        {success && <p style={{ color: "var(--accent-green)", marginBottom: "0.5rem" }}>✅ {success}</p>}
+        <h2 className="section-head">Connect a provider</h2>
+        {error && <p className="form-msg form-error">{error}</p>}
+        {success && <p className="form-msg form-ok">{success}</p>}
 
         {!selectedProvider ? (
           <div className="provider-picker">
@@ -89,16 +121,15 @@ export function Settings() {
                 className="provider-tile"
                 onClick={() => setSelectedProvider(opt)}
               >
-                <span className="provider-tile-icon">{opt.icon}</span>
                 <span className="provider-tile-name">{opt.name}</span>
+                <span className="provider-tile-sub">{opt.needsKey ? "API key" : "No key"}</span>
               </button>
             ))}
           </div>
         ) : (
           <div className="form">
             <div className="form-header">
-              <span className="provider-tile-icon">{selectedProvider.icon}</span>
-              <span>{selectedProvider.name}</span>
+              <span className="form-header-name">{selectedProvider.name}</span>
               <button
                 className="btn-text"
                 onClick={() => setSelectedProvider(null)}
@@ -112,7 +143,7 @@ export function Settings() {
             {selectedProvider.needsKey && (
               <input
                 type="password"
-                placeholder="API Key (encrypted at rest)"
+                placeholder="API key (encrypted at rest)"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
               />
@@ -133,17 +164,18 @@ export function Settings() {
 
       {/* Connected Providers */}
       <section className="settings-section">
-        <h2>Connected Providers</h2>
+        <h2 className="section-head">Connected providers</h2>
         {providers.length === 0 ? (
-          <p className="muted">No providers connected yet.</p>
+          <p className="muted">None connected.</p>
         ) : (
           <ul className="provider-list">
             {providers.map((p) => (
               <li key={p.id}>
                 <span className="provider-name">{p.display_name}</span>
-                <span className="muted">({p.provider})</span>
-                {p.org_id && <span className="muted">· Org: {p.org_id}</span>}
-                <button onClick={() => handleRemove(p.id)}>Disconnect</button>
+                <span className="type-badge">{p.provider_type}</span>
+                <span className="muted mono">{p.provider}</span>
+                {p.org_id && <span className="muted mono">org:{p.org_id}</span>}
+                <button className="btn-danger" onClick={() => handleRemove(p.id)}>Disconnect</button>
               </li>
             ))}
           </ul>
@@ -152,7 +184,7 @@ export function Settings() {
 
       {/* Proxy Config */}
       <section className="settings-section">
-        <h2>Proxy Configuration</h2>
+        <h2 className="section-head">Proxy</h2>
         <div className="config-grid">
           <div className="config-item">
             <span className="config-label">Proxy URL</span>
@@ -175,17 +207,15 @@ export function Settings() {
 
       {/* Privacy */}
       <section className="settings-section">
-        <h2>🔒 Privacy & Security</h2>
+        <h2 className="section-head">Privacy &amp; security</h2>
         <div className="config-grid">
           <div className="config-item">
             <span className="config-label">API key encryption</span>
-            <span className="config-value" style={{ color: "var(--accent-green)" }}>
-              ✅ Fernet AES-128 at rest
-            </span>
+            <span className="config-value ok">Fernet AES-128 at rest</span>
           </div>
           <div className="config-item">
             <span className="config-label">Content logging</span>
-            <span className="config-value">Token counts only — no prompts/responses stored</span>
+            <span className="config-value">Token counts only</span>
           </div>
           <div className="config-item">
             <span className="config-label">Telemetry</span>

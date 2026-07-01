@@ -3,7 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛽</text></svg>" />
     <title>⛽ Token Tank — AI Usage Monitor</title>
+    <script>
+      // Apply the saved theme before first paint to avoid a flash.
+      (function () {
+        try {
+          var t = localStorage.getItem("token-tank-theme");
+          var themes = ["tank", "midnight", "mono", "cyberpunk"];
+          document.documentElement.setAttribute(
+            "data-theme",
+            themes.indexOf(t) >= 0 ? t : "tank"
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "tank");
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

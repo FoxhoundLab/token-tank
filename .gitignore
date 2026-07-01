@@ -62,3 +62,4 @@ stress-test/
 stress_test_functions.py
 campbell-qa-prompt.md
 *.tsbuildinfo
+.claude/
