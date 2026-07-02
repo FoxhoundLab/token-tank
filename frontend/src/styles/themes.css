@@ -1,108 +1,150 @@
-/* Token Tank — Theme System Skeleton
-   Fable 5: Fill in the color values per DESIGN_SPEC.md §2-3.
-   Activate themes via: document.documentElement.setAttribute('data-theme', 'tank')
-   Persist via: localStorage.setItem('token-tank-theme', themeName)
+/* Token Tank — Theme System
+   Round 2: shared tonal-elevation system, per-theme accent hues only.
 
-   Pattern: --tank-* CSS custom properties drive everything.
-   No hardcoded colors outside this file. Zero border-radius (--radius: 0px). */
+   Elevation model (same across all four themes):
+     --tank-bg      near-black canvas
+     --tank-panel   surface, +4–6% lift over canvas (tonal depth, not borders)
+     --tank-panel-2 raised surface (tiles inside cards)
+     --tank-line    neutral hairline — functional separators only
+   Color model:
+     --tank-accent  the ONE brand accent (a state highlight, not a category)
+     --tank-ok / --tank-warn / --tank-danger / --tank-info  state hues
+   Sidebar:
+     --tank-side-top → --tank-side-bottom  vertical gradient, the single
+     "branded" element. --tank-side-fg is its foreground.
 
-/* ============================================
-   DEFAULT THEME: tank (amber fuel-pump on midnight)
-   ============================================ */
+   Activate via data-theme on <html>; persist via localStorage. */
+
 :root,
 [data-theme="tank"] {
-  --tank-bg: #05070d;
-  --tank-panel: #0a101c;
-  --tank-panel-rgb: 10, 16, 28;
+  --tank-bg: #08090c;
+  --tank-panel: #10121a;
+  --tank-panel-rgb: 16, 18, 26;
+  --tank-panel-2: #171a24;
   --tank-paper: #fbfcff;
-  --tank-ink: #05070d;
-  --tank-fg: #e9eefb;
-  --tank-fg-rgb: 233, 238, 251;
-  --tank-accent: #ff9a1f;
-  --tank-accent-rgb: 255, 154, 31;
+  --tank-ink: #08090c;
+  --tank-fg: #e9edf6;
+  --tank-fg-rgb: 233, 237, 246;
+  --tank-accent: #ffa028;
+  --tank-accent-rgb: 255, 160, 40;
   --tank-accent-deep: #b35e00;
-  --tank-muted: rgba(233, 238, 251, 0.52);
-  --tank-line: rgba(255, 154, 31, 0.16);
-  --tank-line-strong: rgba(255, 154, 31, 0.6);
-  --tank-ok: #17cf85;
-  --tank-warn: #ffb020;
+  --tank-muted: rgba(233, 237, 246, 0.5);
+  --tank-line: rgba(233, 237, 246, 0.07);
+  --tank-line-strong: rgba(233, 237, 246, 0.22);
+  --tank-ok: #22c98a;
+  --tank-warn: #ffa028;
   --tank-danger: #ff4538;
+  --tank-info: #4d7fff;
+
+  /* Sidebar gradient: deep navy → electric cobalt */
+  --tank-side-top: #0a1128;
+  --tank-side-bottom: #1e4fd8;
+  --tank-side-fg: #eef2ff;
+  --tank-side-fg-rgb: 238, 242, 255;
 
   /* Typography */
   --font-display: "Sigurd Variable", "Inter", system-ui, sans-serif;
   --font-ui: "Collapse", "Inter", system-ui, sans-serif;
-  --font-mono: "Courier Prime", "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", "Courier Prime", ui-monospace, monospace;
 
-  /* Sacrosanct */
+  /* Type scale — three levels, no more */
+  --type-label: 11px;
+  --type-body: 14px;
+  --type-value: 40px;
+
+  /* Radii: primary surfaces stay sharp; chips/badges may soften */
   --radius: 0px;
+  --radius-sm: 3px;
 }
 
 /* ============================================
-   MIDNIGHT (deep violet on near-black)
+   MIDNIGHT (electric violet ink)
    ============================================ */
 [data-theme="midnight"] {
-  --tank-bg: #040310;
-  --tank-panel: #0a081f;
-  --tank-panel-rgb: 10, 8, 31;
-  --tank-paper: #100d2b;
-  --tank-ink: #04030f;
-  --tank-fg: #ece8ff;
-  --tank-fg-rgb: 236, 232, 255;
+  --tank-bg: #07060f;
+  --tank-panel: #100e1d;
+  --tank-panel-rgb: 16, 14, 29;
+  --tank-panel-2: #171429;
+  --tank-paper: #fbfcff;
+  --tank-ink: #07060f;
+  --tank-fg: #ece9fb;
+  --tank-fg-rgb: 236, 233, 251;
   --tank-accent: #9d88ff;
   --tank-accent-rgb: 157, 136, 255;
   --tank-accent-deep: #5b48d4;
-  --tank-muted: rgba(236, 232, 255, 0.52);
-  --tank-line: rgba(157, 136, 255, 0.16);
-  --tank-line-strong: rgba(157, 136, 255, 0.6);
+  --tank-muted: rgba(236, 233, 251, 0.5);
+  --tank-line: rgba(236, 233, 251, 0.07);
+  --tank-line-strong: rgba(236, 233, 251, 0.22);
   --tank-ok: #2fd4a4;
   --tank-warn: #e6a63c;
   --tank-danger: #ff4d6d;
+  --tank-info: #7aa2ff;
 
-  /* Typography inherited from :root */
+  /* Sidebar: black-violet → electric violet */
+  --tank-side-top: #0c081f;
+  --tank-side-bottom: #5b3ae8;
+  --tank-side-fg: #f1edff;
+  --tank-side-fg-rgb: 241, 237, 255;
 }
 
 /* ============================================
    MONO (pure grayscale terminal)
    ============================================ */
 [data-theme="mono"] {
-  --tank-bg: #050505;
+  --tank-bg: #060606;
   --tank-panel: #101010;
   --tank-panel-rgb: 16, 16, 16;
-  --tank-paper: #1a1a1a;
-  --tank-ink: #050505;
+  --tank-panel-2: #181818;
+  --tank-paper: #fbfbfb;
+  --tank-ink: #060606;
   --tank-fg: #f2f2f2;
   --tank-fg-rgb: 242, 242, 242;
   --tank-accent: #e6e6e6;
   --tank-accent-rgb: 230, 230, 230;
   --tank-accent-deep: #808080;
-  --tank-muted: rgba(242, 242, 242, 0.5);
-  --tank-line: rgba(230, 230, 230, 0.14);
-  --tank-line-strong: rgba(230, 230, 230, 0.55);
-  --tank-ok: #8f8f8f;
+  --tank-muted: rgba(242, 242, 242, 0.48);
+  --tank-line: rgba(242, 242, 242, 0.07);
+  --tank-line-strong: rgba(242, 242, 242, 0.22);
+  --tank-ok: #9e9e9e;
   --tank-warn: #f0f0f0;
   --tank-danger: #ff5040;
+  --tank-info: #bdbdbd;
+
+  /* Sidebar: charcoal → graphite */
+  --tank-side-top: #0a0a0a;
+  --tank-side-bottom: #303030;
+  --tank-side-fg: #f5f5f5;
+  --tank-side-fg-rgb: 245, 245, 245;
 }
 
 /* ============================================
    CYBERPUNK (neon green CRT phosphor)
    ============================================ */
 [data-theme="cyberpunk"] {
-  --tank-bg: #010802;
-  --tank-panel: #031407;
-  --tank-panel-rgb: 3, 20, 7;
-  --tank-paper: #041d0a;
-  --tank-ink: #010802;
-  --tank-fg: #45ff8b;
-  --tank-fg-rgb: 69, 255, 139;
+  --tank-bg: #020803;
+  --tank-panel: #07130a;
+  --tank-panel-rgb: 7, 19, 10;
+  --tank-panel-2: #0b1c10;
+  --tank-paper: #f4fff8;
+  --tank-ink: #020803;
+  --tank-fg: #52ff94;
+  --tank-fg-rgb: 82, 255, 148;
   --tank-accent: #00ff66;
   --tank-accent-rgb: 0, 255, 102;
   --tank-accent-deep: #00992e;
-  --tank-muted: rgba(69, 255, 139, 0.5);
-  --tank-line: rgba(0, 255, 102, 0.16);
-  --tank-line-strong: rgba(0, 255, 102, 0.6);
+  --tank-muted: rgba(82, 255, 148, 0.48);
+  --tank-line: rgba(82, 255, 148, 0.09);
+  --tank-line-strong: rgba(82, 255, 148, 0.25);
   --tank-ok: #00ff66;
   --tank-warn: #f7e04b;
   --tank-danger: #ff2e55;
+  --tank-info: #35d6c2;
+
+  /* Sidebar: void green → phosphor */
+  --tank-side-top: #021206;
+  --tank-side-bottom: #00892f;
+  --tank-side-fg: #d9ffe8;
+  --tank-side-fg-rgb: 217, 255, 232;
 
   /* Cyberpunk uses mono font for everything */
   --font-ui: "JetBrains Mono", "Courier Prime", ui-monospace, monospace;

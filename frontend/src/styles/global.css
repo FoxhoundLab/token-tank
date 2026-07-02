@@ -19,6 +19,7 @@ html {
 
 body {
   font-family: var(--font-ui);
+  font-size: var(--type-body);
   background: var(--tank-bg);
   color: var(--tank-fg);
   transition: background 120ms ease, color 120ms ease;
@@ -41,10 +42,10 @@ body::after {
   mix-blend-mode: overlay;
 }
 
-.app {
+/* ── Shell: gradient sidebar + main column ────────────────────── */
+.shell {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
 }
 
 /* Keyboard focus — a hard 2px ring, no blur, on everything interactive */
@@ -56,7 +57,109 @@ a:focus-visible {
   outline-offset: 1px;
 }
 
-/* ── Topbar ───────────────────────────────────────────────────── */
+/* Sidebar — the one branded element. Vertical gradient, nothing else
+   in the UI competes with it. */
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  width: 224px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--tank-side-top) 0%, var(--tank-side-bottom) 100%);
+  color: var(--tank-side-fg);
+  padding: 1.1rem 0.9rem;
+  gap: 1.4rem;
+}
+
+.side-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.2rem 0.5rem 1.1rem;
+  border-bottom: 1px solid rgba(var(--tank-side-fg-rgb), 0.22);
+}
+
+.side-logo {
+  display: flex;
+  color: var(--tank-side-fg);
+}
+
+.side-wordmark {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.side-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.7rem;
+  background: transparent;
+  border: none;
+  color: rgba(var(--tank-side-fg-rgb), 0.72);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: var(--type-label);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  text-align: left;
+  transition: color 120ms ease, background 120ms ease;
+}
+
+.side-link:hover {
+  color: var(--tank-side-fg);
+  background: rgba(var(--tank-side-fg-rgb), 0.08);
+}
+
+.side-link.active {
+  color: var(--tank-side-fg);
+  background: rgba(var(--tank-side-fg-rgb), 0.14);
+}
+
+.side-link svg {
+  flex: none;
+  opacity: 0.9;
+}
+
+.side-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.5rem;
+}
+
+.side-status {
+  font-family: var(--font-mono);
+  font-size: var(--type-label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(var(--tank-side-fg-rgb), 0.8);
+}
+
+/* Main column */
+.main-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Topbar: slim, neutral, informational ─────────────────────── */
 .topbar {
   position: sticky;
   top: 0;
@@ -65,68 +168,26 @@ a:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.5rem 1.25rem;
+  padding: 0.55rem 1.5rem;
   background: rgba(var(--tank-panel-rgb), 0.72);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--tank-line);
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.brand-mark {
-  display: flex;
-  align-items: center;
-  color: var(--tank-accent);
-  line-height: 1;
-}
-
-.brand-name {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(1.05rem, 2.5vw, 1.35rem);
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-}
-
-.topnav {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.nav-btn {
+.topbar-title {
   font-family: var(--font-ui);
   font-weight: 700;
-  font-size: 0.72rem;
+  font-size: var(--type-label);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  padding: 0.45rem 0.9rem;
-  background: transparent;
-  color: var(--tank-muted);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
-}
-
-.nav-btn:hover {
+  letter-spacing: 0.16em;
   color: var(--tank-fg);
-  border-color: var(--tank-line);
 }
 
-.nav-btn.active {
-  color: var(--tank-accent);
-  border-color: var(--tank-line-strong);
-}
-
-.theme-cycle {
+.topbar-meta {
   font-family: var(--font-mono);
-  border-color: var(--tank-line);
-  color: var(--tank-accent);
+  font-size: var(--type-label);
+  color: var(--tank-muted);
 }
 
 /* ── Connection pill ──────────────────────────────────────────── */
@@ -177,29 +238,32 @@ a:focus-visible {
   width: 100%;
 }
 
-/* ── Hero panel: system telemetry strip ───────────────────────── */
+/* ── Hero panel: the first read. Dominates the viewport. ──────── */
 .hero-panel {
   display: flex;
-  align-items: stretch;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 2rem;
   background: var(--tank-panel);
-  border: 1px solid var(--tank-line);
-  padding: 0.9rem 1.25rem;
+  padding: 1.4rem 1.6rem;
   margin-bottom: 12px;
+  border-left: 3px solid var(--tank-ok);
 }
+
+.hero-warn { border-left-color: var(--tank-warn); }
+.hero-error { border-left-color: var(--tank-danger); }
 
 .hero-status {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding-right: 1.5rem;
+  gap: 0.9rem;
+  padding-right: 2rem;
   border-right: 1px solid var(--tank-line);
   min-width: 0;
 }
 
 .hero-status-block {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   flex: none;
 }
 
@@ -210,8 +274,9 @@ a:focus-visible {
 .hero-status-word {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(1.1rem, 2.4vw, 1.55rem);
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
   letter-spacing: -0.01em;
+  line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -238,7 +303,7 @@ a:focus-visible {
 .hero-metric-label {
   font-family: var(--font-ui);
   font-weight: 700;
-  font-size: 0.58rem;
+  font-size: var(--type-label);
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--tank-muted);
@@ -248,17 +313,18 @@ a:focus-visible {
 .hero-metric-value {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 1.35rem;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.6vw, 2.3rem);
   line-height: 1;
   color: var(--tank-fg);
   display: flex;
   align-items: baseline;
-  gap: 0.35rem;
+  gap: 0.4rem;
   white-space: nowrap;
 }
 
 .hero-metric-unit {
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--tank-muted);
@@ -296,20 +362,18 @@ a:focus-visible {
   .provider-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ── Provider card ────────────────────────────────────────────── */
+/* ── Provider card — tonal lift, no outline ───────────────────── */
 .provider-card {
   background: var(--tank-panel);
-  border: 1px solid var(--tank-line);
   padding: 1rem 1.1rem 1.1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  transition: border-color 120ms ease, background 120ms ease;
+  transition: background 120ms ease;
 }
 
 .provider-card:hover {
-  border-color: var(--tank-line-strong);
-  background: rgba(var(--tank-panel-rgb), 0.82);
+  background: var(--tank-panel-2);
 }
 
 .card-header {
@@ -324,7 +388,7 @@ a:focus-visible {
 .card-title {
   font-family: var(--font-ui);
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: var(--type-label);
   text-transform: uppercase;
   letter-spacing: 0.14em;
 }
@@ -341,7 +405,8 @@ a:focus-visible {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--tank-muted);
-  border: 1px solid var(--tank-line);
+  border: 1px solid var(--tank-line-strong);
+  border-radius: var(--radius-sm);
   padding: 0.15rem 0.4rem;
 }
 
@@ -372,9 +437,9 @@ a:focus-visible {
   transition: transform 140ms cubic-bezier(0.6, 0.04, 0.15, 1);
 }
 
-.gauge-needle polygon,
-.gauge-hub {
-  transition: fill 140ms cubic-bezier(0.6, 0.04, 0.15, 1);
+/* State color rides on currentColor — transition the color itself */
+.fuel-gauge {
+  transition: color 140ms cubic-bezier(0.6, 0.04, 0.15, 1);
 }
 
 .gauge-ef {
@@ -412,7 +477,7 @@ a:focus-visible {
 .stat-label {
   font-family: var(--font-ui);
   font-weight: 700;
-  font-size: 0.6rem;
+  font-size: var(--type-label);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--tank-muted);
@@ -436,23 +501,22 @@ a:focus-visible {
 .spend-tiles {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--tank-line);
-  border: 1px solid var(--tank-line);
+  gap: 6px;
 }
 
 .spend-tile {
-  background: var(--tank-panel);
-  padding: 0.7rem 0.8rem;
+  background: var(--tank-panel-2);
+  padding: 0.75rem 0.85rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
 
 .spend-value {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 1.7rem;
+  font-weight: 400;
+  font-size: 1.8rem;
   line-height: 1;
   color: var(--tank-fg);
 }
@@ -512,14 +576,13 @@ a:focus-visible {
 
 .settings-section {
   background: var(--tank-panel);
-  border: 1px solid var(--tank-line);
   padding: 1.25rem;
 }
 
 .section-head {
   font-family: var(--font-ui);
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: var(--type-label);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--tank-fg);
@@ -814,7 +877,7 @@ a:focus-visible {
 .config-label {
   font-family: var(--font-ui);
   font-weight: 700;
-  font-size: 0.65rem;
+  font-size: var(--type-label);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--tank-muted);
@@ -851,7 +914,7 @@ a:focus-visible {
   gap: 0.5rem;
   padding: 5rem 2rem;
   text-align: center;
-  border: 1px solid var(--tank-line);
+  background: var(--tank-panel);
   overflow: hidden;
 }
 
@@ -924,9 +987,13 @@ a:focus-visible {
 
 /* ── Loading skeletons ────────────────────────────────────────── */
 .skeleton {
-  background: rgba(var(--tank-fg-rgb), 0.08);
-  border: 1px solid var(--tank-line);
-  animation: pulse-line 1.2s steps(2, jump-none) infinite;
+  background: rgba(var(--tank-fg-rgb), 0.07);
+  animation: pulse-skeleton 1.2s steps(2, jump-none) infinite;
+}
+
+@keyframes pulse-skeleton {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
 }
 
 .skeleton-card {
@@ -1001,12 +1068,6 @@ a:focus-visible {
 
 /* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .topbar {
-    flex-direction: column;
-    gap: 0.6rem;
-    padding: 0.75rem 1rem;
-  }
-
   .app-main {
     padding: 1rem;
   }
@@ -1018,6 +1079,54 @@ a:focus-visible {
   .card-stats {
     flex-wrap: wrap;
     gap: 0.75rem;
+  }
+}
+
+/* Sidebar collapses to a horizontal strip when space is tight —
+   quarter-screen keeps every panel visible. */
+@media (max-width: 860px), (max-height: 540px) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    background: linear-gradient(90deg, var(--tank-side-top) 0%, var(--tank-side-bottom) 100%);
+  }
+
+  .side-brand {
+    border-bottom: none;
+    padding: 0 0.6rem 0 0;
+    border-right: 1px solid rgba(var(--tank-side-fg-rgb), 0.22);
+  }
+
+  .side-wordmark {
+    font-size: 0.85rem;
+  }
+
+  .side-nav {
+    flex-direction: row;
+    gap: 0.2rem;
+  }
+
+  .side-link {
+    padding: 0.4rem 0.55rem;
+  }
+
+  .side-foot {
+    margin-top: 0;
+    margin-left: auto;
+    padding: 0;
+  }
+
+  .side-status {
+    display: none;
   }
 }
 
@@ -1215,7 +1324,7 @@ a:focus-visible {
 
 .quota-label {
   font-family: var(--font-ui);
-  font-size: 0.65rem;
+  font-size: var(--type-label);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -1235,10 +1344,11 @@ a:focus-visible {
 .quota-segments {
   display: grid;
   grid-template-columns: repeat(20, 1fr);
-  gap: 1px;
+  gap: 2px;
   height: 8px;
-  background: rgba(var(--tank-fg-rgb), 0.08);
-  border: 1px solid var(--tank-line);
+  padding: 1px;
+  background: rgba(var(--tank-fg-rgb), 0.05);
+  border: 1px solid var(--tank-line-strong);
 }
 
 .quota-segment {
@@ -1248,11 +1358,6 @@ a:focus-visible {
 .quota-ok .quota-segment.lit { background: var(--tank-ok); }
 .quota-warn .quota-segment.lit { background: var(--tank-warn); }
 .quota-error .quota-segment.lit { background: var(--tank-danger); }
-
-.quota-segment.lit {
-  animation: seg-in 120ms steps(1, end) both;
-  animation-delay: calc(var(--seg-i, 0) * 14ms);
-}
 
 .quota-bar-footer {
   display: flex;
@@ -1280,6 +1385,7 @@ a:focus-visible {
   letter-spacing: 0.1em;
   padding: 2px 5px;
   border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
   color: var(--tank-accent);
   background: rgba(var(--tank-accent-rgb), 0.1);
 }

@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { TokenTankLogo } from "./TokenTankLogo";
 
 interface Props {
   children: ReactNode;
@@ -34,7 +35,9 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="boundary-fallback">
-          <div className="boundary-icon">⛽💥</div>
+          <div className="boundary-icon" aria-hidden="true">
+            <TokenTankLogo size={48} />
+          </div>
           <h2>Something went wrong.</h2>
           <p className="muted">{this.state.message || "An unexpected error occurred."}</p>
           <button className="btn-primary" onClick={this.handleReload}>
