@@ -26,10 +26,12 @@ class Provider(Base):
     display_name = Column(String, nullable=False)
     api_key_encrypted = Column(Text)  # Fernet-encrypted
     org_id = Column(String)  # For admin APIs (Anthropic)
+    api_tier = Column(String, default="plan")  # 'plan' (subscription) | 'pay_as_you_go'
     enabled = Column(Boolean, default=True)
     created_at = Column(DateTime, default=_now)
 
     alerts = relationship("Alert", back_populates="provider_ref")
+    quota_windows = relationship("QuotaWindow", back_populates="provider_ref", cascade="all, delete-orphan")
 
 
 # ── Provider type classification ────────────────────────────────────
@@ -114,3 +116,33 @@ class AlertHistory(Base):
     message = Column(Text, nullable=False)  # Human-readable alert message
     triggered_at = Column(DateTime, default=_now)
     created_at = Column(DateTime, default=_now)
+
+
+class QuotaWindow(Base):
+    """Provider subscription quota window.
+
+    Tracks usage caps per provider per window type:
+    - '5h'         (5-hour rolling window)
+    - 'weekly'     (weekly reset)
+    - 'monthly'    (monthly reset, for some providers)
+    - 'model:{id}' (model-specific limit, e.g. 'model:fable-5')
+
+    Data source: Anthropic admin API (real) or browser extension (DOM scrapes
+    claude.ai, chatgpt.com, etc.). Updated by the QuotaPoller system.
+    """
+
+    __tablename__ = "quota_windows"
+
+    id = Column(String, primary_key=True, default=_uuid)
+    provider_id = Column(String, ForeignKey("providers.id", ondelete="CASCADE"), nullable=False)
+    window_type = Column(String, nullable=False)  # '5h' | 'weekly' | 'monthly' | 'model:*'
+    label = Column(String)  # Human-readable: "5h Session", "Weekly Cap", "Fable 5 model"
+    used = Column(Float, nullable=False, default=0.0)  # Tokens or units consumed
+    limit = Column(Float, nullable=False, default=0.0)  # Cap
+    unit = Column(String, default="tokens")  # 'tokens' | 'requests' | 'credits' | 'usd'
+    reset_at = Column(DateTime)  # When this window resets
+    source = Column(String, default="api")  # 'api' | 'extension' | 'manual'
+    raw_data = Column(Text)  # JSON string of source response for audit
+    updated_at = Column(DateTime, default=_now, onupdate=_now)
+
+    provider_ref = relationship("Provider", back_populates="quota_windows")

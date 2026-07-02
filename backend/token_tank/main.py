@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from .database import Base, engine, init_db
-from .routers import dashboard, providers, alerts, extension
+from .routers import dashboard, providers, alerts, extension, quota
 from .config import get_settings
 
 # Locate the production dashboard build. Prefer the copy bundled inside the
@@ -56,12 +56,27 @@ async def lifespan(app: FastAPI):
             f"Billing poller startup failed (non-fatal): {e}"
         )
 
+    # Start quota poller (subscription cap tracking, every 5 min)
+    try:
+        from .quota_poller import start_quota_poller
+        quota_scheduler = start_quota_poller()
+        if quota_scheduler:
+            app.state.quota_scheduler = quota_scheduler
+    except Exception as e:
+        import logging
+        logging.getLogger("token_tank").warning(
+            f"Quota poller startup failed (non-fatal): {e}"
+        )
+
     yield
 
-    # Shutdown: stop scheduler if running
+    # Shutdown: stop schedulers if running
     scheduler = getattr(app.state, "billing_scheduler", None)
     if scheduler:
         scheduler.shutdown(wait=False)
+    quota_scheduler = getattr(app.state, "quota_scheduler", None)
+    if quota_scheduler:
+        quota_scheduler.shutdown(wait=False)
 
 
 settings = get_settings()
@@ -87,6 +102,7 @@ app.include_router(dashboard.router, prefix="/api/v1", tags=["dashboard"])
 app.include_router(providers.router, prefix="/api/v1", tags=["providers"])
 app.include_router(alerts.router, prefix="/api/v1", tags=["alerts"])
 app.include_router(extension.router, prefix="/api/v1", tags=["extension"])
+app.include_router(quota.router, prefix="/api/v1", tags=["quota"])
 
 
 @app.get("/health")

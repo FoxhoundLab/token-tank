@@ -991,3 +991,94 @@ body::after {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Quota bars (subscription cap tracking) ─────────────────── */
+.quota-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--tank-line);
+}
+
+.quota-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quota-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.quota-label {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--tank-muted);
+}
+
+.quota-pct {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.quota-ok .quota-pct { color: var(--tank-ok); }
+.quota-warn .quota-pct { color: var(--tank-warn); }
+.quota-error .quota-pct { color: var(--tank-danger); }
+
+.quota-segments {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 1px;
+  height: 8px;
+  background: rgba(var(--tank-fg-rgb), 0.08);
+  border: 1px solid var(--tank-line);
+}
+
+.quota-segment {
+  background: transparent;
+  transition: background 120ms ease;
+}
+.quota-ok .quota-segment.lit { background: var(--tank-ok); }
+.quota-warn .quota-segment.lit { background: var(--tank-warn); }
+.quota-error .quota-segment.lit { background: var(--tank-danger); }
+
+.quota-bar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--tank-muted);
+}
+
+.quota-value {
+  font-variant-numeric: tabular-nums;
+}
+.quota-reset {
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+}
+
+/* ── API tier badge (PAYG indicator) ────────────────────────── */
+.tier-badge {
+  font-family: var(--font-ui);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 2px 5px;
+  border: 1px solid currentColor;
+  color: var(--tank-accent);
+  background: rgba(var(--tank-accent-rgb), 0.1);
+}
+.tier-badge[data-tier="pay_as_you_go"] {
+  color: var(--tank-warn);
+  background: rgba(var(--tank-accent-rgb), 0.12);
+}

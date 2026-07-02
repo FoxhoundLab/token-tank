@@ -39,6 +39,21 @@ Base = declarative_base()
 
 
 def init_db():
-    """Create all tables. Called on app startup."""
+    """Create all tables and apply lightweight schema migrations.
+
+    Called on app startup. create_all() is idempotent for tables, but won't
+    add new columns to existing tables — that's what the migration block
+    below handles for additive changes only.
+    """
     import token_tank.models  # noqa: F401 — register models
     Base.metadata.create_all(bind=engine)
+
+    # Additive migrations: add missing columns to existing tables.
+    # For real production, use Alembic. For local-first, this is enough.
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        # Provider.api_tier
+        cols = {row[1] for row in conn.execute(text("PRAGMA table_info(providers)")).fetchall()}
+        if "api_tier" not in cols:
+            conn.execute(text("ALTER TABLE providers ADD COLUMN api_tier VARCHAR DEFAULT 'plan'"))
+            conn.commit()

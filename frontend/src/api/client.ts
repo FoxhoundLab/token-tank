@@ -1,6 +1,6 @@
 /** API client for Token Tank backend. */
 
-import type { DashboardData, ProviderResponse } from "../types";
+import type { DashboardData, ProviderResponse, QuotaWindowsResponse } from "../types";
 
 const BASE_URL = "/api/v1";
 
@@ -21,6 +21,7 @@ export async function addProvider(payload: {
   display_name: string;
   api_key: string;
   org_id?: string;
+  api_tier?: string;
 }): Promise<ProviderResponse> {
   const resp = await fetch(`${BASE_URL}/providers`, {
     method: "POST",
@@ -34,4 +35,10 @@ export async function addProvider(payload: {
 export async function removeProvider(id: string): Promise<void> {
   const resp = await fetch(`${BASE_URL}/providers/${id}`, { method: "DELETE" });
   if (!resp.ok) throw new Error(`Delete provider failed: ${resp.status}`);
+}
+
+export async function getAllQuotas(): Promise<QuotaWindowsResponse[]> {
+  const resp = await fetch(`${BASE_URL}/quota`);
+  if (!resp.ok) throw new Error(`Quota fetch failed: ${resp.status}`);
+  return resp.json();
 }

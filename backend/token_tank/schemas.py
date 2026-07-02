@@ -13,6 +13,7 @@ class ProviderCreate(BaseModel):
     display_name: str
     api_key: str
     org_id: str | None = None
+    api_tier: str = "plan"  # 'plan' | 'pay_as_you_go'
 
 
 class ProviderResponse(BaseModel):
@@ -20,6 +21,7 @@ class ProviderResponse(BaseModel):
     provider: str
     display_name: str
     org_id: str | None
+    api_tier: str = "plan"
     enabled: bool
     created_at: datetime
     provider_type: str = "api"  # 'subscription', 'api', 'local'
@@ -50,6 +52,7 @@ class ProviderSummary(BaseModel):
     provider: str
     display_name: str
     provider_type: str = "api"  # 'subscription', 'api', 'local'
+    api_tier: str = "plan"  # 'plan' | 'pay_as_you_go'
     today_tokens: int
     today_cost: float
     month_tokens: int
@@ -124,3 +127,29 @@ class ProviderComparison(BaseModel):
     total_tokens_30d: int
     total_cost_30d: float
     request_count_30d: int
+
+
+# --- Quota Windows (Subscription cap tracking) ---
+
+class QuotaWindowResponse(BaseModel):
+    id: str
+    provider_id: str
+    window_type: str  # '5h' | 'weekly' | 'monthly' | 'model:{id}'
+    label: str | None
+    used: float
+    limit: float
+    unit: str  # 'tokens' | 'requests' | 'credits' | 'usd'
+    reset_at: datetime | None
+    source: str  # 'api' | 'extension' | 'manual'
+    updated_at: datetime
+    percentage: float  # Computed: (used / limit) * 100
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class QuotaWindowsResponse(BaseModel):
+    """All quota windows for a single provider, grouped by type."""
+    provider_id: str
+    provider: str
+    display_name: str
+    windows: list[QuotaWindowResponse]

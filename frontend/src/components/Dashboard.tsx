@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ProviderCard } from "./ProviderCard";
-import { getDashboard } from "../api/client";
-import type { DashboardData } from "../types";
+import { getDashboard, getAllQuotas } from "../api/client";
+import type { DashboardData, QuotaWindowsResponse } from "../types";
 
 /** Fuel-pump glyph (Material "local gas station" path) used as watermark. */
 function PumpMark() {
@@ -35,10 +35,11 @@ function SkeletonGrid() {
 
 export function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [quotas, setQuotas] = useState<QuotaWindowsResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchDashboard = async () => {
       try {
         const d = await getDashboard();
         setData(d);
@@ -47,10 +48,29 @@ export function Dashboard() {
         setError(e instanceof Error ? e.message : "Failed to load dashboard");
       }
     };
-    fetch();
-    const interval = setInterval(fetch, 5000);
+    fetchDashboard();
+    const interval = setInterval(fetchDashboard, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  // Quotas refresh less often (30s) — they change slower than per-request usage
+  useEffect(() => {
+    const fetchQuotas = async () => {
+      try {
+        const q = await getAllQuotas();
+        setQuotas(q);
+      } catch {
+        // Silent failure — quotas are optional enhancement
+      }
+    };
+    fetchQuotas();
+    const interval = setInterval(fetchQuotas, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Build a quick lookup map
+  const quotaByProviderId = new Map(quotas.map((q) => [q.provider_id, q]));
+  const quotaByProviderName = new Map(quotas.map((q) => [q.provider, q]));
 
   // Only show the full error panel before the first successful load; once we
   // have data, a transient poll failure shouldn't blow away the dashboard.
@@ -84,7 +104,14 @@ export function Dashboard() {
     <div className="dashboard fade-in">
       <div className="provider-grid">
         {data.providers.map((p) => (
-          <ProviderCard key={p.provider} data={p} />
+          <ProviderCard
+            key={p.provider}
+            data={p}
+            quota={quotaByProviderId.get(
+              // Try id first, fall back to name-based lookup
+              (p as any).id || ""
+            ) || quotaByProviderName.get(p.provider)}
+          />
         ))}
       </div>
     </div>

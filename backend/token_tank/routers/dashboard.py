@@ -73,6 +73,7 @@ async def get_dashboard(db: Session = Depends(get_db)):
                 provider=p.provider,
                 display_name=p.display_name,
                 provider_type=get_provider_type(p.provider),
+                api_tier=p.api_tier or "plan",
                 today_tokens=today_tokens,
                 today_cost=round(today_cost, 4),
                 month_tokens=month_tokens,

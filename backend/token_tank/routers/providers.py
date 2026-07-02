@@ -45,6 +45,7 @@ async def list_providers(db: Session = Depends(get_db)):
             provider=p.provider,
             display_name=p.display_name,
             org_id=p.org_id,
+            api_tier=p.api_tier or "plan",
             enabled=p.enabled,
             created_at=p.created_at,
             provider_type=get_provider_type(p.provider),
@@ -63,6 +64,7 @@ async def create_provider(payload: ProviderCreate, db: Session = Depends(get_db)
         display_name=payload.display_name,
         api_key_encrypted=encrypt(payload.api_key),
         org_id=payload.org_id,
+        api_tier=payload.api_tier,
     )
     db.add(provider)
     db.commit()
@@ -72,6 +74,7 @@ async def create_provider(payload: ProviderCreate, db: Session = Depends(get_db)
         provider=provider.provider,
         display_name=provider.display_name,
         org_id=provider.org_id,
+        api_tier=provider.api_tier or "plan",
         enabled=provider.enabled,
         created_at=provider.created_at,
         provider_type=get_provider_type(provider.provider),

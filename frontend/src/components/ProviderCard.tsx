@@ -1,8 +1,10 @@
 import { FuelGauge } from "./FuelGauge";
-import type { ProviderSummary } from "../types";
+import { QuotaBar } from "./QuotaBar";
+import type { ProviderSummary, QuotaWindowsResponse } from "../types";
 
 interface ProviderCardProps {
   data: ProviderSummary;
+  quota?: QuotaWindowsResponse;
 }
 
 function formatTokens(n: number): string {
@@ -17,12 +19,15 @@ function fuelState(fuel: number): "ok" | "warn" | "error" {
   return "error";
 }
 
-function CardHeader({ data, pill }: { data: ProviderSummary; pill: "ok" | "warn" | "error" | "idle" }) {
+function CardHeader({ data, pill, apiTier }: { data: ProviderSummary; pill: "ok" | "warn" | "error" | "idle"; apiTier?: string }) {
   return (
     <div className="card-header">
       <span className="card-title">{data.display_name}</span>
       <span className="card-header-right">
         <span className="type-badge">{data.provider_type}</span>
+        {apiTier && apiTier !== "plan" && (
+          <span className="tier-badge" data-tier={apiTier}>{apiTier}</span>
+        )}
         <span className={`conn-pill conn-${pill}`} aria-label={`Status: ${pill}`}>
           <span className="conn-dot" />
         </span>
@@ -42,12 +47,13 @@ function StatCell({ label, value, sub }: { label: string; value: string; sub?: s
 }
 
 /** Subscription (Anthropic, OpenAI): usage window is the tank. Gauge is hero. */
-function SubscriptionCard({ data }: ProviderCardProps) {
+function SubscriptionCard({ data, quota }: ProviderCardProps) {
   const pct = Math.round(data.fuel_level * 100);
   const state = fuelState(data.fuel_level);
+  const quotaWindows = quota?.windows || [];
   return (
     <div className={`provider-card card-subscription fuel-${state}`}>
-      <CardHeader data={data} pill={state} />
+      <CardHeader data={data} pill={state} apiTier={data.api_tier} />
       {/* Compact readout — visible at small viewport only */}
       <div className="compact-readout">
         <span className={`compact-pct compact-${state}`}>{pct}%</span>
@@ -57,6 +63,13 @@ function SubscriptionCard({ data }: ProviderCardProps) {
         level={data.fuel_level}
         label={`${pct}% · ${formatTokens(data.today_tokens)} tok`}
       />
+      {quotaWindows.length > 0 && (
+        <div className="quota-stack">
+          {quotaWindows.map((w) => (
+            <QuotaBar key={w.id} window={w} />
+          ))}
+        </div>
+      )}
       <div className="card-stats">
         <StatCell label="Today" value={`${formatTokens(data.today_tokens)}`} sub={`$${data.today_cost.toFixed(2)}`} />
         <StatCell label="Month" value={`${formatTokens(data.month_tokens)}`} sub={`$${data.month_cost.toFixed(2)}`} />
@@ -67,13 +80,14 @@ function SubscriptionCard({ data }: ProviderCardProps) {
 }
 
 /** API (Z.AI, MiniMax): pay-per-token. Spend is the headline, tank is a strip. */
-function ApiCard({ data }: ProviderCardProps) {
+function ApiCard({ data, quota }: ProviderCardProps) {
   const segments = 20;
   const lit = Math.round(data.fuel_level * segments);
   const state = fuelState(data.fuel_level);
+  const quotaWindows = quota?.windows || [];
   return (
     <div className={`provider-card card-api fuel-${state}`}>
-      <CardHeader data={data} pill={state} />
+      <CardHeader data={data} pill={state} apiTier={data.api_tier} />
       {/* Compact readout — visible at small viewport only */}
       <div className="compact-readout">
         <span className={`compact-pct compact-${state}`}>${data.today_cost.toFixed(2)}</span>
@@ -95,6 +109,13 @@ function ApiCard({ data }: ProviderCardProps) {
         ))}
       </div>
       <div className="segment-readout">{Math.round(data.fuel_level * 100)}% balance</div>
+      {quotaWindows.length > 0 && (
+        <div className="quota-stack">
+          {quotaWindows.map((w) => (
+            <QuotaBar key={w.id} window={w} />
+          ))}
+        </div>
+      )}
       <div className="card-stats">
         <StatCell label="Today" value={`${formatTokens(data.today_tokens)} tok`} />
         <StatCell label="Month" value={`${formatTokens(data.month_tokens)} tok`} />
@@ -125,13 +146,13 @@ function LocalCard({ data }: ProviderCardProps) {
   );
 }
 
-export function ProviderCard({ data }: ProviderCardProps) {
+export function ProviderCard({ data, quota }: ProviderCardProps) {
   switch (data.provider_type) {
     case "subscription":
-      return <SubscriptionCard data={data} />;
+      return <SubscriptionCard data={data} quota={quota} />;
     case "local":
       return <LocalCard data={data} />;
     default:
-      return <ApiCard data={data} />;
+      return <ApiCard data={data} quota={quota} />;
   }
 }
