@@ -120,9 +120,9 @@ Refactor in this order. Don't skip ahead.
 | Changes to DB schema, models, or routers |
 | Adding/removing API endpoints or response fields |
 | Installing backend or system-level dependencies |
-| Adding new font files is allowed (max 2 new families; document the choice) |
-| Subtle rounded corners (≤4px) on secondary elements is allowed |
-| Installing backend or system-level dependencies |
+| More than 2 new font families |
+| Rounded corners >4px or on primary surfaces (cards, panels, dividers) |
+| Drop shadows on any element |
 | Committing secrets or credentials |
 | Running destructive DB commands |
 
