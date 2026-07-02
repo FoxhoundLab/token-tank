@@ -1,19 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type CSSProperties } from "react";
 import { ProviderCard } from "./ProviderCard";
+import { SystemStatus } from "./SystemStatus";
+import { TokenTankLogo } from "./TokenTankLogo";
 import { getDashboard, getAllQuotas } from "../api/client";
 import type { DashboardData, QuotaWindowsResponse } from "../types";
-
-/** Fuel-pump glyph (Material "local gas station" path) used as watermark. */
-function PumpMark() {
-  return (
-    <svg viewBox="0 0 24 24" className="state-watermark" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M19.77 7.23l.01-.01-3.72-3.72L15 4.56l2.11 2.11c-.94.36-1.61 1.26-1.61 2.33 0 1.38 1.12 2.5 2.5 2.5.36 0 .69-.08 1-.21v7.21c0 .55-.45 1-1 1s-1-.45-1-1V14c0-1.1-.9-2-2-2h-1V5c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v16h10v-7.5h1.5v5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V9c0-.69-.28-1.32-.73-1.77zM12 10H6V5h6v5zm6 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"
-      />
-    </svg>
-  );
-}
 
 function SkeletonGrid() {
   return (
@@ -77,10 +67,20 @@ export function Dashboard() {
   if (error && !data) {
     return (
       <div className="state-panel state-error">
-        <PumpMark />
+        <TokenTankLogo size={220} className="state-watermark" />
         <h2 className="state-title">Link down</h2>
-        <p className="state-sub">Backend unreachable — run token-tank start</p>
-        <p className="state-detail">{error}</p>
+        <p className="state-sub">No response from the pump</p>
+        <div className="state-diag">
+          <span className="state-diag-row">
+            <span className="state-diag-key">endpoint</span> /api/v1/dashboard
+          </span>
+          <span className="state-diag-row">
+            <span className="state-diag-key">error</span> {error}
+          </span>
+          <span className="state-diag-row">
+            <span className="state-diag-key">fix</span> token-tank start
+          </span>
+        </div>
       </div>
     );
   }
@@ -92,26 +92,32 @@ export function Dashboard() {
   if (data.providers.length === 0) {
     return (
       <div className="state-panel">
-        <PumpMark />
+        <TokenTankLogo size={220} className="state-watermark" />
         <h2 className="state-title">Tank empty</h2>
-        <p className="state-sub">No providers connected</p>
-        <p className="state-detail">Open Settings to connect your first provider.</p>
+        <p className="state-sub">Nothing on the manifold</p>
+        <p className="state-detail">Connect a provider in Settings — the needle moves on its own after that.</p>
       </div>
     );
   }
 
   return (
-    <div className="dashboard fade-in">
+    <div className="dashboard">
+      <SystemStatus providers={data.providers} />
       <div className="provider-grid">
-        {data.providers.map((p) => (
-          <ProviderCard
+        {data.providers.map((p, i) => (
+          <div
             key={p.provider}
-            data={p}
-            quota={quotaByProviderId.get(
-              // Try id first, fall back to name-based lookup
-              (p as any).id || ""
-            ) || quotaByProviderName.get(p.provider)}
-          />
+            className="card-slot"
+            style={{ "--card-i": i } as CSSProperties}
+          >
+            <ProviderCard
+              data={p}
+              quota={quotaByProviderId.get(
+                // Try id first, fall back to name-based lookup
+                (p as any).id || ""
+              ) || quotaByProviderName.get(p.provider)}
+            />
+          </div>
         ))}
       </div>
     </div>

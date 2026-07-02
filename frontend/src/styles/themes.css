@@ -11,22 +11,22 @@
    ============================================ */
 :root,
 [data-theme="tank"] {
-  --tank-bg: #0a0f1a;
-  --tank-panel: #11192a;
-  --tank-panel-rgb: 17, 25, 42;
+  --tank-bg: #05070d;
+  --tank-panel: #0a101c;
+  --tank-panel-rgb: 10, 16, 28;
   --tank-paper: #fbfcff;
-  --tank-ink: #0a0f1a;
-  --tank-fg: #e8eef7;
-  --tank-fg-rgb: 232, 238, 247;
-  --tank-accent: #f59e0b;
-  --tank-accent-rgb: 245, 158, 11;
-  --tank-accent-deep: #b45309;
-  --tank-muted: rgba(232, 238, 247, 0.56);
-  --tank-line: rgba(245, 158, 11, 0.18);
-  --tank-line-strong: rgba(245, 158, 11, 0.62);
-  --tank-ok: #10b981;
-  --tank-warn: #f59e0b;
-  --tank-danger: #ef4444;
+  --tank-ink: #05070d;
+  --tank-fg: #e9eefb;
+  --tank-fg-rgb: 233, 238, 251;
+  --tank-accent: #ff9a1f;
+  --tank-accent-rgb: 255, 154, 31;
+  --tank-accent-deep: #b35e00;
+  --tank-muted: rgba(233, 238, 251, 0.52);
+  --tank-line: rgba(255, 154, 31, 0.16);
+  --tank-line-strong: rgba(255, 154, 31, 0.6);
+  --tank-ok: #17cf85;
+  --tank-warn: #ffb020;
+  --tank-danger: #ff4538;
 
   /* Typography */
   --font-display: "Sigurd Variable", "Inter", system-ui, sans-serif;
@@ -41,22 +41,22 @@
    MIDNIGHT (deep violet on near-black)
    ============================================ */
 [data-theme="midnight"] {
-  --tank-bg: #07061a;
-  --tank-panel: #0d0b25;
-  --tank-panel-rgb: 13, 11, 37;
-  --tank-paper: #121029;
-  --tank-ink: #d9d2ff;
-  --tank-fg: #eeeaff;
-  --tank-fg-rgb: 238, 234, 255;
-  --tank-accent: #b7a8ff;
-  --tank-accent-rgb: 183, 168, 255;
-  --tank-accent-deep: #6557c4;
-  --tank-muted: rgba(238, 234, 255, 0.56);
-  --tank-line: rgba(183, 168, 255, 0.18);
-  --tank-line-strong: rgba(183, 168, 255, 0.62);
-  --tank-ok: #10b981;
-  --tank-warn: #b7a8ff;
-  --tank-danger: #ef4444;
+  --tank-bg: #040310;
+  --tank-panel: #0a081f;
+  --tank-panel-rgb: 10, 8, 31;
+  --tank-paper: #100d2b;
+  --tank-ink: #04030f;
+  --tank-fg: #ece8ff;
+  --tank-fg-rgb: 236, 232, 255;
+  --tank-accent: #9d88ff;
+  --tank-accent-rgb: 157, 136, 255;
+  --tank-accent-deep: #5b48d4;
+  --tank-muted: rgba(236, 232, 255, 0.52);
+  --tank-line: rgba(157, 136, 255, 0.16);
+  --tank-line-strong: rgba(157, 136, 255, 0.6);
+  --tank-ok: #2fd4a4;
+  --tank-warn: #e6a63c;
+  --tank-danger: #ff4d6d;
 
   /* Typography inherited from :root */
 }
@@ -65,44 +65,44 @@
    MONO (pure grayscale terminal)
    ============================================ */
 [data-theme="mono"] {
-  --tank-bg: #0d0d0d;
-  --tank-panel: #171717;
-  --tank-panel-rgb: 23, 23, 23;
-  --tank-paper: #232323;
-  --tank-ink: #e5e5e5;
-  --tank-fg: #f1f1f1;
-  --tank-fg-rgb: 241, 241, 241;
-  --tank-accent: #c9c9c9;
-  --tank-accent-rgb: 201, 201, 201;
-  --tank-accent-deep: #7a7a7a;
-  --tank-muted: rgba(241, 241, 241, 0.56);
-  --tank-line: rgba(201, 201, 201, 0.18);
-  --tank-line-strong: rgba(201, 201, 201, 0.62);
-  --tank-ok: #6b6b6b;
-  --tank-warn: #999999;
-  --tank-danger: #cc4444;
+  --tank-bg: #050505;
+  --tank-panel: #101010;
+  --tank-panel-rgb: 16, 16, 16;
+  --tank-paper: #1a1a1a;
+  --tank-ink: #050505;
+  --tank-fg: #f2f2f2;
+  --tank-fg-rgb: 242, 242, 242;
+  --tank-accent: #e6e6e6;
+  --tank-accent-rgb: 230, 230, 230;
+  --tank-accent-deep: #808080;
+  --tank-muted: rgba(242, 242, 242, 0.5);
+  --tank-line: rgba(230, 230, 230, 0.14);
+  --tank-line-strong: rgba(230, 230, 230, 0.55);
+  --tank-ok: #8f8f8f;
+  --tank-warn: #f0f0f0;
+  --tank-danger: #ff5040;
 }
 
 /* ============================================
    CYBERPUNK (neon green CRT phosphor)
    ============================================ */
 [data-theme="cyberpunk"] {
-  --tank-bg: #001004;
-  --tank-panel: #001b08;
-  --tank-panel-rgb: 0, 27, 8;
-  --tank-paper: #00240c;
-  --tank-ink: #12ff68;
-  --tank-fg: #36ff7a;
-  --tank-fg-rgb: 54, 255, 122;
-  --tank-accent: #00ff5f;
-  --tank-accent-rgb: 0, 255, 95;
-  --tank-accent-deep: #008833;
-  --tank-muted: rgba(54, 255, 122, 0.56);
-  --tank-line: rgba(0, 255, 95, 0.18);
-  --tank-line-strong: rgba(0, 255, 95, 0.62);
-  --tank-ok: #00ff5f;
-  --tank-warn: #ffcc00;
-  --tank-danger: #ff3366;
+  --tank-bg: #010802;
+  --tank-panel: #031407;
+  --tank-panel-rgb: 3, 20, 7;
+  --tank-paper: #041d0a;
+  --tank-ink: #010802;
+  --tank-fg: #45ff8b;
+  --tank-fg-rgb: 69, 255, 139;
+  --tank-accent: #00ff66;
+  --tank-accent-rgb: 0, 255, 102;
+  --tank-accent-deep: #00992e;
+  --tank-muted: rgba(69, 255, 139, 0.5);
+  --tank-line: rgba(0, 255, 102, 0.16);
+  --tank-line-strong: rgba(0, 255, 102, 0.6);
+  --tank-ok: #00ff66;
+  --tank-warn: #f7e04b;
+  --tank-danger: #ff2e55;
 
   /* Cyberpunk uses mono font for everything */
   --font-ui: "JetBrains Mono", "Courier Prime", ui-monospace, monospace;

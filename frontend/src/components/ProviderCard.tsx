@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { FuelGauge } from "./FuelGauge";
 import { QuotaBar } from "./QuotaBar";
 import type { ProviderSummary, QuotaWindowsResponse } from "../types";
@@ -105,7 +106,11 @@ function ApiCard({ data, quota }: ProviderCardProps) {
       </div>
       <div className="segment-bar" role="img" aria-label={`Balance ${Math.round(data.fuel_level * 100)}%`}>
         {Array.from({ length: segments }, (_, i) => (
-          <span key={i} className={`segment ${i < lit ? "lit" : ""}`} />
+          <span
+            key={i}
+            className={`segment ${i < lit ? "lit" : ""}`}
+            style={{ "--seg-i": i } as CSSProperties}
+          />
         ))}
       </div>
       <div className="segment-readout">{Math.round(data.fuel_level * 100)}% balance</div>

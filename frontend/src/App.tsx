@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Dashboard } from "./components/Dashboard";
 import { Settings } from "./components/Settings";
+import { TokenTankLogo } from "./components/TokenTankLogo";
 import { getInitialTheme, applyTheme, nextTheme, THEME_META } from "./theme";
 import type { ThemeName } from "./theme";
 
@@ -45,7 +46,9 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <span className="brand-mark" aria-hidden="true">⛽</span>
+          <span className="brand-mark" aria-hidden="true">
+            <TokenTankLogo size={20} />
+          </span>
           <span className="brand-name">Token Tank</span>
           <span
             className={`conn-pill conn-${link}`}

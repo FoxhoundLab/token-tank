@@ -5,7 +5,7 @@
  * model-specific: shows model name + percentage
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import type { QuotaWindow } from "../types";
 
 interface QuotaBarProps {
@@ -74,7 +74,11 @@ export function QuotaBar({ window: w }: QuotaBarProps) {
       </div>
       <div className="quota-segments" role="img" aria-label={`Quota ${pct}%`}>
         {Array.from({ length: segments }, (_, i) => (
-          <span key={i} className={`quota-segment ${i < lit ? "lit" : ""}`} />
+          <span
+            key={i}
+            className={`quota-segment ${i < lit ? "lit" : ""}`}
+            style={{ "--seg-i": i } as CSSProperties}
+          />
         ))}
       </div>
       <div className="quota-bar-footer">
