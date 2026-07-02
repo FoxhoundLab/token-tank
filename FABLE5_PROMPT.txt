@@ -1,0 +1,45 @@
+[Goal — full sprint, no stops, full autonomy, make it beautiful]
+
+You are finishing **Token Tank** — a local-first AI usage monitor with a fuel-gauge dashboard. 124 tests pass, frontend builds clean, six providers supported. Otacon pre-staged everything mechanical so you focus purely on design execution. Your usage window is limited — be efficient.
+
+**Access:** `/Users/oshinaka/token-tank/`. GitHub: FoxhoundLab/token-tank (private, commit to `main`). Python: `backend/.venv/bin/python` + `backend/.venv/bin/pytest` (NEVER system python3). Frontend: `cd frontend && npx tsc --noEmit && npm run build`.
+
+**STEP 0 — Read these in one pass, then work from memory:**
+1. `DESIGN_SPEC.md` — design tokens, patterns, texture/motion. Source of truth.
+2. `docs/design-ref/hbe-sidepanel.css` — Hermes CSS (~1700 lines). Pattern reference.
+3. `frontend/src/styles/themes.css` — 4 themes pre-colored. Done.
+4. `frontend/src/styles/fonts.css` — @font-face for 9 woff2 fonts. Done. Just @import it.
+5. `docs/design-ref/BEFORE_STATE.md` — current visual inventory.
+6. `CLAUDE.md` — project context, file map.
+
+**Already wired — don't reinvent:**
+- `provider_type` in dashboard API: `"subscription"`, `"api"`, `"local"`. TypeScript types already have it. Use it to pick card model — no hardcoding.
+- `python -m token_tank seed` populates 6 providers with 7 days demo data. Run it first to see populated gauges.
+- Fonts + themes already installed. Just @import and use.
+
+**STEP 0.5 — Think before coding.** Sketch visual hierarchy and Tailwind patterns. Internalize the aesthetic. Then execute relentlessly.
+
+**DESIGN DIRECTIVE — Brutalist instrument panel:**
+
+Car dashboard meets terminal UI. Fuel gauges, needles, raw mechanical feel. Function over form — the function IS the form.
+
+Principles:
+1. Every card is a gauge. Usage = needle position. Budget = fuel tank. Mechanical and real.
+2. No gradients, no soft shadows, no pill buttons. Sharp edges, monospace data. "This is real data, no bullshit."
+3. Three card models via `provider_type`: Subscription (windows + countdowns), API (spend tiles + balance), Local (infinite gauge, $0.00). Each visually distinct.
+
+Monospace for all numbers — the numbers ARE the UI. Warning states: amber to red.
+
+Guardrails: No rounded corners. No drop shadows. Needle movement is the only motion. Readable at a glance.
+
+**EXECUTE (don't break 124 tests):**
+
+1. @import fonts.css + themes.css. Theme switcher (localStorage). Brutalist Tailwind cards.
+2. Three card models: Subscription (Anthropic/OpenAI), API (Z.AI/MiniMax), Local (Ollama/LM Studio).
+3. FuelGauge.tsx: SVG needle (green→amber→red). 11 ticks. Mono label. 320ms ease-out.
+4. Dashboard.tsx: Backdrop-blur topbar, fuel pump mark, theme switcher, connection pill. Scanline overlay.
+5. Settings.tsx: Theme picker (3-col swatch grid). Sharp controls. UPPERCASE labels.
+6. Empty states: mask-image watermark. UPPERCASE text.
+7. Verify: pytest (124 pass), tsc (clean), build (succeeds), python -m token_tank clean on 8000+8848. Commit + push.
+
+Don't ask questions. Don't stop. Every screen should feel like an instrument cluster. Begin.

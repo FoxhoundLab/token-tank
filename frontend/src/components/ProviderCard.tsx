@@ -44,9 +44,15 @@ function StatCell({ label, value, sub }: { label: string; value: string; sub?: s
 /** Subscription (Anthropic, OpenAI): usage window is the tank. Gauge is hero. */
 function SubscriptionCard({ data }: ProviderCardProps) {
   const pct = Math.round(data.fuel_level * 100);
+  const state = fuelState(data.fuel_level);
   return (
-    <div className={`provider-card card-subscription fuel-${fuelState(data.fuel_level)}`}>
-      <CardHeader data={data} pill={fuelState(data.fuel_level)} />
+    <div className={`provider-card card-subscription fuel-${state}`}>
+      <CardHeader data={data} pill={state} />
+      {/* Compact readout — visible at small viewport only */}
+      <div className="compact-readout">
+        <span className={`compact-pct compact-${state}`}>{pct}%</span>
+        <span className="compact-tokens">{formatTokens(data.today_tokens)} tok</span>
+      </div>
       <FuelGauge
         level={data.fuel_level}
         label={`${pct}% · ${formatTokens(data.today_tokens)} tok`}
@@ -68,6 +74,11 @@ function ApiCard({ data }: ProviderCardProps) {
   return (
     <div className={`provider-card card-api fuel-${state}`}>
       <CardHeader data={data} pill={state} />
+      {/* Compact readout — visible at small viewport only */}
+      <div className="compact-readout">
+        <span className={`compact-pct compact-${state}`}>${data.today_cost.toFixed(2)}</span>
+        <span className="compact-tokens">{formatTokens(data.today_tokens)} tok</span>
+      </div>
       <div className="spend-tiles">
         <div className="spend-tile">
           <span className="stat-label">Spend today</span>
@@ -98,6 +109,11 @@ function LocalCard({ data }: ProviderCardProps) {
   return (
     <div className="provider-card card-local">
       <CardHeader data={data} pill="ok" />
+      {/* Compact readout — visible at small viewport only */}
+      <div className="compact-readout">
+        <span className="compact-pct compact-ok">∞</span>
+        <span className="compact-tokens">{formatTokens(data.today_tokens)} tok</span>
+      </div>
       <FuelGauge level={1} infinite label="∞ · no meter" />
       <div className="local-cost">$0.00</div>
       <div className="card-stats">

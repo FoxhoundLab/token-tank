@@ -863,6 +863,124 @@ body::after {
   }
 }
 
+/* ── Compact mode: quarter-screen quadrant (≤560px wide) ─────── */
+/* All panels visible. Analog gauges hidden, digital readout shown. */
+.compact-readout {
+  display: none; /* Hidden at normal sizes */
+}
+
+@media (max-width: 560px) {
+  /* Squeeze the grid — 2 columns so all 6 panels fit in the quadrant */
+  .provider-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  /* Shrink card padding to minimum */
+  .provider-card {
+    padding: 0.5rem 0.6rem 0.6rem;
+    gap: 0.35rem;
+  }
+
+  /* Compact card header: smaller text, tighter */
+  .card-header {
+    padding-bottom: 0.3rem;
+    gap: 0.25rem;
+  }
+  .card-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+  }
+  .type-badge {
+    display: none; /* Type is implied by card layout, save the space */
+  }
+
+  /* Show the compact digital readout */
+  .compact-readout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0.2rem 0;
+  }
+  .compact-pct {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .compact-ok { color: var(--tank-ok); }
+  .compact-warn { color: var(--tank-warn); }
+  .compact-error { color: var(--tank-danger); }
+  .compact-tokens {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--tank-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Hide the analog gauge, spend tiles, segment bar, local cost */
+  .fuel-gauge,
+  .spend-tiles,
+  .segment-bar,
+  .segment-readout,
+  .local-cost {
+    display: none !important;
+  }
+
+  /* Collapse card stats to a single tight row */
+  .card-stats {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.25rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--tank-line);
+  }
+  .stat {
+    min-width: 0;
+  }
+  .stat-label {
+    font-size: 0.5rem;
+  }
+  .stat-value {
+    font-size: 0.7rem;
+  }
+  .stat-sub {
+    display: none; /* Sub-details dropped in compact */
+  }
+}
+
+/* ── Ultra-compact: tiny quadrant (≤380px) ───────────────────── */
+@media (max-width: 380px) {
+  .provider-grid {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .provider-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.4rem 0.6rem;
+  }
+  /* Inline everything — single row per provider */
+  .card-header {
+    border-bottom: none;
+    padding-bottom: 0;
+    flex: 1;
+    min-width: 0;
+  }
+  .compact-readout {
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0;
+  }
+  .card-stats {
+    display: none; /* In ultra-compact, just header + readout */
+  }
+}
+
 /* ── Respect reduced-motion preferences ───────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
