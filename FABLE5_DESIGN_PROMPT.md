@@ -151,7 +151,18 @@ Read these once, then work from memory:
 9. **No drop shadows.** Tonal elevation only. The header-band system IS the elevation.
 10. **Monochromatic by default.** The default `tank` theme is cyan-on-black as specified. Other themes (midnight, mono, cyberpunk) rotate the hue but keep the system. Do not introduce a second accent in the default.
 11. **No emoji in production UI.** Replace with SVG glyphs.
-12. **No backend changes.** Frontend only. 132 backend tests must still pass; `npx tsc --noEmit` clean; `npm run build` succeeds.
+12. **Backend scope is narrow but real.** The user has not yet verified end-to-end that "I add my API key, I use the provider, the dashboard shows usage." This brief covers UI, but the design must be **honest about live state**. You may:
+   - Touch `frontend/src/components/Settings.tsx` and add a connection-flow UI redesign
+   - Touch the proxy adapter error paths *only* to surface cleaner error states in the UI (no logic changes to forwarding)
+   - Add new tests in `backend/tests/` that exercise the full connect → proxy → log → dashboard path
+   - Write a `CONNECT.md` (or extend `README.md`) with plain-English setup steps
+   - Add a "live signal" indicator in the topbar that pulses when the proxy has received traffic in the last 60s (a heartbeat, not a "loading" spinner)
+   You may **not**:
+   - Change adapter interfaces (public API for contributors)
+   - Change DB schema (additive only)
+   - Add new auth, security, or encryption code
+   - Modify proxy forwarding logic in any way that changes request flow
+13. **The connection-flow must actually work.** This is a precondition, not optional. Before declaring done: add a real (or mocked) test API call through the proxy end-to-end and confirm the dashboard updates. If you cannot test with a real key (you cannot — the user has not given one), add a test in `backend/tests/` that exercises the full path with a stub provider. The test must pass.
 
 ## The technical work
 
@@ -173,8 +184,23 @@ Read these once, then work from memory:
 **Things to consider doing:**
 - Replace the "brutalist instrument panel" vocabulary in `DESIGN_SPEC.md` with "cockpit telemetry" — this round's vocabulary is the new direction
 - A "telemetry diagnostic" detail view for individual provider cards (click into a card → opens a Novean-style module with the full read of that provider's state)
-- A small "signal" indicator in the topbar (pulsing cyan dot) showing "proxy receiving live data" — same vocabulary as the bars
+- A "live signal" indicator in the topbar (pulsing cyan dot) showing "proxy receiving live data" — same vocabulary as the bars
 - A "rate-limited" state for provider cards that shows the warm-cyan pulse from the bar spec
+- A connection-flow redesign in `Settings.tsx`:
+  - Step 1: Pick a provider (icon grid, 6 cells, current state shown: not-connected / connecting / live / error)
+  - Step 2: Enter credentials (one panel at a time, copy-paste ready, "test connection" button as primary action)
+  - Step 3: Live state (segmented bar showing traffic in last 60s, last error, last success)
+  - The flow must read as **equipment**, not as a SaaS signup form
+- A `CONNECT.md` (or appended section in `README.md`) with:
+  - "How to point your AI tool at the proxy" (env var examples for Claude Code, OpenAI SDK, etc.)
+  - "What does the dashboard show when it's working"
+  - "What to do if a provider is rate-limited"
+  - "What the colors mean" (cyan = on, warm-cyan = approaching limit, red = blocked)
+- An end-to-end test in `backend/tests/test_connection_flow.py` that:
+  - Spins up the proxy with a stub adapter
+  - POSTs a fake usage record
+  - Asserts the dashboard endpoint returns the updated state
+  - This is a regression test, not a new feature
 
 **Things to avoid:**
 - Gradients on bars (forbidden)
@@ -201,12 +227,15 @@ The dashboard reads as **a piece of equipment**. The user, on a fresh look, does
 
 A user shrinking to quarter-screen sees all six providers at a glance with no compromise. Tests pass. Build succeeds.
 
+**Connection-flow must also be done.** A new user opening Settings sees a clear path: pick a provider, paste a key, click "test connection," see the segmented bar light up. A `CONNECT.md` (or README section) walks them through pointing their AI tool at the proxy. An end-to-end test in `backend/tests/test_connection_flow.py` exercises the full path and passes. The dashboard's live signal indicator pulses when the proxy has received traffic in the last 60s.
+
 Report back with:
 - Files changed (list)
 - Commit hash(es)
 - A short before/after visual summary
 - Ship verdict (green / yellow / red)
 - One paragraph: what did you change, and why does it land now where the prior rounds didn't
+- One paragraph: connection-flow status — does the test pass, does the live signal work, what's the user experience end-to-end
 
 You don't need to ask permission to start. Verify, commit, push. The brief is your contract.
 
