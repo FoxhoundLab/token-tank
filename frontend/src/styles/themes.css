@@ -33,10 +33,10 @@
   --tank-danger: #ff4b4b;
   --tank-ink: #070a12;
 
-  /* One technical family. Weight + tracking do the differentiation. */
-  --font-display: "Sigurd Variable", "Collapse", system-ui, sans-serif;
-  --font-ui: "Sigurd Variable", "Collapse", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Courier Prime", ui-monospace, monospace;
+  /* Two families only. Sigurd + JetBrains Mono. No system fallback. */
+  --font-display: "Sigurd Variable", sans-serif;
+  --font-ui: "Sigurd Variable", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
   /* Type scale */
   --type-micro: 11px;
@@ -110,7 +110,6 @@
   --tank-danger: #ff3b5c;
   --tank-ink: #040a05;
 
-  /* Cyberpunk runs on the mono family */
-  --font-ui: "JetBrains Mono", "Courier Prime", ui-monospace, monospace;
-  --font-display: "JetBrains Mono", ui-monospace, monospace;
+  /* Cyberpunk keeps the same two-family system; only the hue rotates. */
+  /* (No font-family override here. Sigurd + JetBrains Mono only.) */
 }
