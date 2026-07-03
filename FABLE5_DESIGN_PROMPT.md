@@ -51,21 +51,31 @@ Four themes (tank / midnight / mono / cyberpunk) all share this elevation system
 
 **Typography**
 
-One **technical geometric sans**, wide-set, with letter-spacing. Best free analogs: **Rajdhani**, **Michroma**, **Orbitron**. The existing 9 woff2 fonts in `frontend/public/assets/fonts/` include **Sigurd** and **Collapse** which fit this aesthetic — use them. You may add **Rajdhani** or **Michroma** if you want a stronger match to the reference. If you add a font, document the choice and the woff2 file.
+The current font set in `frontend/public/assets/fonts/` includes Sigurd (variable), Collapse (4 weights), Courier Prime, and JetBrains Mono (3 weights). That is the palette. Do not add new families — using fewer families more confidently is what makes the dashboard read as a designed product rather than a template.
 
-Avoid humanist sans (Inter, SF). They feel "SaaS."
+**Two-family system. No system-stack fallback. Period.**
 
-| Role | Size | Weight | Tracking | Case |
-|---|---|---|---|---|
-| Logo wordmark | 22–26px | 700 | +0.05em | UPPER |
-| Panel header band | 14–16px | 600 | +0.25em | UPPER |
-| Hero data | 56–64px | 500 | -0.02em | mixed (number, lowercase unit) |
-| Body labels | 13–14px | 400 | +0.02em | UPPER |
-| Data values | 14–15px | 500 | 0 | mixed |
-| Captions / micro | 11–12px | 400 | +0.1em | UPPER |
-| IDs / tags | 11px mono | 400 | +0.15em | UPPER |
+| Family | Role | Use for |
+|---|---|---|
+| **Sigurd Variable** | Display + chrome | Logo wordmark, panel header bands, status words, nav labels, body copy, captions. Wide tracking. +0.05 to +0.25em letter-spacing. |
+| **JetBrains Mono** (Regular + Bold) | Data + values | Hero numbers, data values, units, IDs, tags, micro-captions like "SIZE M". The loudest voice goes mono — that's the cockpit tell. |
 
-The wide letter-spacing on panel headers is the single biggest "cockpit vs. SaaS" typography tell. Lean into it.
+**Drop Collapse and Courier Prime from the active font stack.** Both are redundant with Sigurd (display) and JetBrains Mono (mono). Keep the woff2 files on disk in case you change your mind, but do not reference them in `fonts.css` or `global.css`. Two families, used everywhere. That is the constraint.
+
+**No system-stack fallback.** The current `--font-body` and similar tokens fall through to `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, ...` — that is exactly why the dashboard reads as "Claude." Strip the fallback chain. Sigurd for chrome, JetBrains Mono for data, and **if the woff2 fails to load, show a generic sans-serif — never the OS default**. This is a hard line, not a suggestion.
+
+| Role | Family | Size | Weight | Tracking | Case |
+|---|---|---|---|---|---|
+| Logo wordmark | Sigurd | 22–26px | 700 | +0.05em | UPPER |
+| Panel header band | Sigurd | 14–16px | 600 | +0.25em | UPPER |
+| Hero data | JetBrains Mono | 56–64px | 500 | -0.02em | mixed (number, lowercase unit) |
+| Body labels | Sigurd | 13–14px | 400 | +0.02em | UPPER |
+| Data values | JetBrains Mono | 14–15px | 500 | 0 | mixed |
+| Captions / micro | Sigurd | 11–12px | 400 | +0.1em | UPPER |
+| IDs / tags | JetBrains Mono | 11px | 400 | +0.15em | UPPER |
+| Body copy (rare) | Sigurd | 13–14px | 400 | 0 | mixed |
+
+The wide letter-spacing on panel headers is the single biggest "cockpit vs. SaaS" typography tell. Lean into it. Sigurd's stencil construction does the rest.
 
 **Layout**
 
@@ -151,7 +161,8 @@ Read these once, then work from memory:
 9. **No drop shadows.** Tonal elevation only. The header-band system IS the elevation.
 10. **Monochromatic by default.** The default `tank` theme is cyan-on-black as specified. Other themes (midnight, mono, cyberpunk) rotate the hue but keep the system. Do not introduce a second accent in the default.
 11. **No emoji in production UI.** Replace with SVG glyphs.
-12. **Backend scope is narrow but real.** The user has not yet verified end-to-end that "I add my API key, I use the provider, the dashboard shows usage." This brief covers UI, but the design must be **honest about live state**. You may:
+12. **Two font families only: Sigurd Variable and JetBrains Mono.** No other families may be added or referenced in `fonts.css` or `global.css`. The woff2 files for Collapse and Courier Prime stay on disk but are not used. The fallback chain in any `--font-*` token is `Sigurd` or `JetBrains Mono` only, then `sans-serif` (generic) or `monospace` (generic). **No `-apple-system`, no `BlinkMacSystemFont`, no `Segoe UI`, no `Roboto`, no `Inter`, no `SF Pro`, no `SF Mono`.** This is a hard line — it is the single biggest reason the current dashboard reads as "Claude."
+13. **Backend scope is narrow but real.** The user has not yet verified end-to-end that "I add my API key, I use the provider, the dashboard shows usage." This brief covers UI, but the design must be **honest about live state**. You may:
    - Touch `frontend/src/components/Settings.tsx` and add a connection-flow UI redesign
    - Touch the proxy adapter error paths *only* to surface cleaner error states in the UI (no logic changes to forwarding)
    - Add new tests in `backend/tests/` that exercise the full connect → proxy → log → dashboard path
@@ -162,7 +173,7 @@ Read these once, then work from memory:
    - Change DB schema (additive only)
    - Add new auth, security, or encryption code
    - Modify proxy forwarding logic in any way that changes request flow
-13. **The connection-flow must actually work.** This is a precondition, not optional. Before declaring done: add a real (or mocked) test API call through the proxy end-to-end and confirm the dashboard updates. If you cannot test with a real key (you cannot — the user has not given one), add a test in `backend/tests/` that exercises the full path with a stub provider. The test must pass.
+14. **The connection-flow must actually work.** This is a precondition, not optional. Before declaring done: add a real (or mocked) test API call through the proxy end-to-end and confirm the dashboard updates. If you cannot test with a real key (you cannot — the user has not given one), add a test in `backend/tests/` that exercises the full path with a stub provider. The test must pass.
 
 ## The technical work
 
