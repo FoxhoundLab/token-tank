@@ -103,7 +103,9 @@ development, run `cd frontend && npm install && npm run dev` and use
 3. Point an AI tool's base URL (e.g. `OPENAI_API_BASE_URL`) at `http://localhost:8848`.
 4. Watch the gauge move.
 
-See [docs/provider-setup.md](docs/provider-setup.md) for per-provider details.
+See [CONNECT.md](CONNECT.md) for the full walkthrough — env vars per tool,
+what the dashboard shows when it's working, and what the colors mean.
+Per-provider details: [docs/provider-setup.md](docs/provider-setup.md).
 
 ---
 

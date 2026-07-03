@@ -1,5 +1,4 @@
-import type { CSSProperties } from "react";
-import { FuelGauge } from "./FuelGauge";
+import { SegmentRail } from "./SegmentRail";
 import { QuotaBar } from "./QuotaBar";
 import type { ProviderSummary, QuotaWindowsResponse } from "../types";
 
@@ -14,140 +13,135 @@ function formatTokens(n: number): string {
   return Math.round(n).toString();
 }
 
-function fuelState(fuel: number): "ok" | "warn" | "error" {
-  if (fuel >= 0.5) return "ok";
-  if (fuel >= 0.2) return "warn";
-  return "error";
+/** Escalation from fuel remaining: cyan until 15%, warm, then red. */
+function fuelState(fuel: number): "normal" | "low" | "danger" {
+  if (fuel <= 0.05) return "danger";
+  if (fuel <= 0.15) return "low";
+  return "normal";
 }
 
-function CardHeader({ data, pill, apiTier }: { data: ProviderSummary; pill: "ok" | "warn" | "error" | "idle"; apiTier?: string }) {
+function Band({ data, state }: { data: ProviderSummary; state: "normal" | "low" | "danger" }) {
+  const dotCls = state === "danger" ? "state-dot danger" : state === "low" ? "state-dot warn" : "state-dot";
   return (
-    <div className="card-header">
-      <span className="card-title">{data.display_name}</span>
-      <span className="card-header-right">
-        <span className="type-badge">{data.provider_type}</span>
-        {apiTier && apiTier !== "plan" && (
-          <span className="tier-badge" data-tier={apiTier}>{apiTier}</span>
+    <div className="panel-band">
+      <span className="panel-title">{data.display_name}</span>
+      <span className="panel-band-right">
+        <span className="tag">{data.provider_type}</span>
+        {data.api_tier && data.api_tier !== "plan" && (
+          <span className="tag tag-warn">payg</span>
         )}
-        <span className={`conn-pill conn-${pill}`} aria-label={`Status: ${pill}`}>
-          <span className="conn-dot" />
-        </span>
+        <span className={dotCls} aria-label={`state ${state}`} />
       </span>
     </div>
   );
 }
 
-function StatCell({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function Stats({ data, showCost = true }: { data: ProviderSummary; showCost?: boolean }) {
   return (
-    <div className="stat">
-      <span className="stat-label">{label}</span>
-      <span className="stat-value">{value}</span>
-      {sub && <span className="stat-sub">{sub}</span>}
+    <div className="card-stats">
+      <div className="stat">
+        <span className="stat-label">Today</span>
+        <span className="stat-value">{formatTokens(data.today_tokens)} tok</span>
+        {showCost && <span className="stat-sub">${data.today_cost.toFixed(2)}</span>}
+      </div>
+      <div className="stat">
+        <span className="stat-label">Month</span>
+        <span className="stat-value">{formatTokens(data.month_tokens)} tok</span>
+        {showCost && <span className="stat-sub">${data.month_cost.toFixed(2)}</span>}
+      </div>
+      <div className="stat">
+        <span className="stat-label">Burn/hr</span>
+        <span className="stat-value">{formatTokens(data.burn_rate_tokens_per_hour)}</span>
+        {showCost && <span className="stat-sub">${data.burn_rate_cost_per_hour.toFixed(2)}</span>}
+      </div>
     </div>
   );
 }
 
-/** Subscription (Anthropic, OpenAI): usage window is the tank. Gauge is hero. */
+function Quotas({ quota }: { quota?: QuotaWindowsResponse }) {
+  const windows = quota?.windows || [];
+  if (windows.length === 0) return null;
+  return (
+    <div className="quota-stack">
+      {windows.map((w) => (
+        <QuotaBar key={w.id} window={w} />
+      ))}
+    </div>
+  );
+}
+
+/** Subscription: the usage window is the tank. Hero = % remaining. */
 function SubscriptionCard({ data, quota }: ProviderCardProps) {
   const pct = Math.round(data.fuel_level * 100);
   const state = fuelState(data.fuel_level);
-  const quotaWindows = quota?.windows || [];
   return (
-    <div className={`provider-card card-subscription fuel-${state}`}>
-      <CardHeader data={data} pill={state} apiTier={data.api_tier} />
-      {/* Compact readout — visible at small viewport only */}
-      <div className="compact-readout">
-        <span className={`compact-pct compact-${state}`}>{pct}%</span>
-        <span className="compact-tokens">{formatTokens(data.today_tokens)} tok</span>
-      </div>
-      <FuelGauge
-        level={data.fuel_level}
-        label={`${pct}% · ${formatTokens(data.today_tokens)} tok`}
-      />
-      {quotaWindows.length > 0 && (
-        <div className="quota-stack">
-          {quotaWindows.map((w) => (
-            <QuotaBar key={w.id} window={w} />
-          ))}
+    <section className="panel" aria-label={`${data.display_name} status`}>
+      <Band data={data} state={state} />
+      <div className="panel-body">
+        <div className="hero-num card-hero">
+          {pct}
+          <span className="hero-unit">% tank</span>
         </div>
-      )}
-      <div className="card-stats">
-        <StatCell label="Today" value={`${formatTokens(data.today_tokens)}`} sub={`$${data.today_cost.toFixed(2)}`} />
-        <StatCell label="Month" value={`${formatTokens(data.month_tokens)}`} sub={`$${data.month_cost.toFixed(2)}`} />
-        <StatCell label="Burn/hr" value={`${formatTokens(data.burn_rate_tokens_per_hour)}`} sub={`$${data.burn_rate_cost_per_hour.toFixed(2)}`} />
+        <div className="rail-row">
+          <SegmentRail pct={pct} state={state} ariaLabel={`Tank ${pct}%`} />
+          <div className="rail-foot">
+            <span>{formatTokens(data.today_tokens)} tok today</span>
+            <span>window</span>
+          </div>
+        </div>
+        <Quotas quota={quota} />
+        <Stats data={data} />
       </div>
-    </div>
+    </section>
   );
 }
 
-/** API (Z.AI, MiniMax): pay-per-token. Spend is the headline, tank is a strip. */
+/** API: pay-per-token. Hero = spend today. Rail = balance. */
 function ApiCard({ data, quota }: ProviderCardProps) {
-  const segments = 20;
-  const lit = Math.round(data.fuel_level * segments);
+  const pct = Math.round(data.fuel_level * 100);
   const state = fuelState(data.fuel_level);
-  const quotaWindows = quota?.windows || [];
   return (
-    <div className={`provider-card card-api fuel-${state}`}>
-      <CardHeader data={data} pill={state} apiTier={data.api_tier} />
-      {/* Compact readout — visible at small viewport only */}
-      <div className="compact-readout">
-        <span className={`compact-pct compact-${state}`}>${data.today_cost.toFixed(2)}</span>
-        <span className="compact-tokens">{formatTokens(data.today_tokens)} tok</span>
-      </div>
-      <div className="spend-tiles">
-        <div className="spend-tile">
-          <span className="stat-label">Spend today</span>
-          <span className="spend-value">${data.today_cost.toFixed(2)}</span>
+    <section className="panel" aria-label={`${data.display_name} status`}>
+      <Band data={data} state={state} />
+      <div className="panel-body">
+        <div className="hero-num card-hero">
+          ${data.today_cost.toFixed(2)}
+          <span className="hero-unit">today</span>
         </div>
-        <div className="spend-tile">
-          <span className="stat-label">Spend month</span>
-          <span className="spend-value">${data.month_cost.toFixed(2)}</span>
+        <div className="rail-row">
+          <SegmentRail pct={pct} state={state} ariaLabel={`Balance ${pct}%`} />
+          <div className="rail-foot">
+            <span>${data.month_cost.toFixed(2)} month</span>
+            <span>{pct}% balance</span>
+          </div>
         </div>
+        <Quotas quota={quota} />
+        <Stats data={data} showCost={false} />
       </div>
-      <div className="segment-bar" role="img" aria-label={`Balance ${Math.round(data.fuel_level * 100)}%`}>
-        {Array.from({ length: segments }, (_, i) => (
-          <span
-            key={i}
-            className={`segment ${i < lit ? "lit" : ""}`}
-            style={{ "--seg-i": i } as CSSProperties}
-          />
-        ))}
-      </div>
-      <div className="segment-readout">{Math.round(data.fuel_level * 100)}% balance</div>
-      {quotaWindows.length > 0 && (
-        <div className="quota-stack">
-          {quotaWindows.map((w) => (
-            <QuotaBar key={w.id} window={w} />
-          ))}
-        </div>
-      )}
-      <div className="card-stats">
-        <StatCell label="Today" value={`${formatTokens(data.today_tokens)} tok`} />
-        <StatCell label="Month" value={`${formatTokens(data.month_tokens)} tok`} />
-        <StatCell label="Burn/hr" value={`${formatTokens(data.burn_rate_tokens_per_hour)}`} sub={`$${data.burn_rate_cost_per_hour.toFixed(2)}`} />
-      </div>
-    </div>
+    </section>
   );
 }
 
-/** Local (Ollama, LM Studio): no meter, no bill. The tank is bottomless. */
+/** Local: no meter, no bill. Hero = tokens today. */
 function LocalCard({ data }: ProviderCardProps) {
   return (
-    <div className="provider-card card-local">
-      <CardHeader data={data} pill="ok" />
-      {/* Compact readout — visible at small viewport only */}
-      <div className="compact-readout">
-        <span className="compact-pct compact-ok">∞</span>
-        <span className="compact-tokens">{formatTokens(data.today_tokens)} tok</span>
+    <section className="panel" aria-label={`${data.display_name} status`}>
+      <Band data={data} state="normal" />
+      <div className="panel-body">
+        <div className="hero-num card-hero">
+          {formatTokens(data.today_tokens)}
+          <span className="hero-unit">tok today</span>
+        </div>
+        <div className="rail-row">
+          <SegmentRail pct={100} ariaLabel="Unmetered" />
+          <div className="rail-foot">
+            <span>unmetered · $0.00</span>
+            <span>local</span>
+          </div>
+        </div>
+        <Stats data={data} showCost={false} />
       </div>
-      <FuelGauge level={1} infinite label="∞ · no meter" />
-      <div className="local-cost">$0.00</div>
-      <div className="card-stats">
-        <StatCell label="Today" value={`${formatTokens(data.today_tokens)} tok`} />
-        <StatCell label="Month" value={`${formatTokens(data.month_tokens)} tok`} />
-        <StatCell label="Burn/hr" value={`${formatTokens(data.burn_rate_tokens_per_hour)}`} />
-      </div>
-    </div>
+    </section>
   );
 }
 

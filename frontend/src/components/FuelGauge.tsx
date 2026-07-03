@@ -5,8 +5,6 @@
  * Thresholds (fuel remaining): ok ≥50%, warn ≥20%, danger below.
  */
 
-import { useId } from "react";
-
 interface FuelGaugeProps {
   level: number; // 0.0 (empty) to 1.0 (full = fuel remaining)
   label?: string;
@@ -25,14 +23,14 @@ function arcPoint(pct: number, radius: number): [number, number] {
 }
 
 export function FuelGauge({ level, label, infinite = false }: FuelGaugeProps) {
-  const gradId = useId();
   const pct = infinite ? 1 : Math.max(0, Math.min(1, level));
 
+  // Monochrome by default; color escalates only as the tank empties.
   const color = infinite
     ? "var(--tank-accent)"
-    : pct >= 0.5
-      ? "var(--tank-ok)"
-      : pct >= 0.2
+    : pct >= 0.2
+      ? "var(--tank-accent)"
+      : pct >= 0.1
         ? "var(--tank-warn)"
         : "var(--tank-danger)";
 
@@ -52,18 +50,6 @@ export function FuelGauge({ level, label, infinite = false }: FuelGaugeProps) {
   return (
     <div className="fuel-gauge" style={{ color }}>
       <svg viewBox="0 0 200 132" className="gauge-svg" role="img" aria-label={label ?? `Fuel ${Math.round(pct * 100)}%`}>
-        <defs>
-          {/* Glow under the arc: state color fading to nothing */}
-          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="currentColor" stopOpacity="0.18" />
-            <stop offset="1" stopColor="currentColor" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        {/* Gradient fill under the arc region */}
-        <path
-          d={`M ${ax0} ${ay0} A ${R} ${R} 0 0 1 ${ax1} ${ay1} Z`}
-          fill={`url(#${gradId})`}
-        />
         {/* Arc track */}
         <path
           d={`M ${ax0} ${ay0} A ${R} ${R} 0 0 1 ${ax1} ${ay1}`}

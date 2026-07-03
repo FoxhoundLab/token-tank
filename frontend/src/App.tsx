@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dashboard } from "./components/Dashboard";
 import { Settings } from "./components/Settings";
 import { TokenTankLogo } from "./components/TokenTankLogo";
+import { getDashboard } from "./api/client";
 import { getInitialTheme, applyTheme, nextTheme, THEME_META } from "./theme";
 import type { ThemeName } from "./theme";
+import type { DashboardData } from "./types";
 
 type View = "dashboard" | "settings";
 type LinkState = "ok" | "error" | "idle";
 
-/** Poll /health so the status pill reflects backend connectivity. */
+/** Poll /health so the link indicator reflects backend connectivity. */
 function useLinkState(): LinkState {
   const [state, setState] = useState<LinkState>("idle");
 
@@ -33,107 +35,129 @@ function useLinkState(): LinkState {
   return state;
 }
 
-/** Gauge dial glyph — dashboard nav. */
-function GaugeIcon() {
-  return (
-    <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M2 12.5a6.5 6.5 0 0 1 12 0" />
-      <line x1="8" y1="12.5" x2="11" y2="7.5" />
-      <line x1="1.5" y1="12.5" x2="14.5" y2="12.5" />
-    </svg>
-  );
+/**
+ * App owns the dashboard poll so the live signal keeps beating on every
+ * view. Traffic is detected honestly: the signal goes live only when the
+ * observed token total actually increases between polls, and decays 60s
+ * after the last observed increase.
+ */
+function useTelemetry() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [lastTrafficAt, setLastTrafficAt] = useState<number | null>(null);
+  const prevTotal = useRef<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchDashboard = async () => {
+      try {
+        const d = await getDashboard();
+        if (cancelled) return;
+        setData(d);
+        setError(null);
+        const total = d.providers.reduce((s, p) => s + p.today_tokens, 0);
+        if (prevTotal.current !== null && total > prevTotal.current) {
+          setLastTrafficAt(Date.now());
+        }
+        prevTotal.current = total;
+      } catch (e) {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : "Failed to load dashboard");
+        }
+      }
+    };
+    fetchDashboard();
+    const id = setInterval(fetchDashboard, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, []);
+
+  return { data, error, lastTrafficAt };
 }
 
-/** Cog glyph — settings nav. */
-function CogIcon() {
-  return (
-    <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <circle cx="8" cy="8" r="2.4" />
-      <path d="M8 1.5v2.2M8 12.3v2.2M1.5 8h2.2M12.3 8h2.2M3.4 3.4l1.6 1.6M11 11l1.6 1.6M12.6 3.4L11 5M5 11l-1.6 1.6" />
-    </svg>
-  );
-}
-
-/** Swatch glyph — theme cycle. */
-function SwatchIcon() {
-  return (
-    <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <rect x="2" y="2" width="12" height="12" />
-      <path d="M2 10l4-4 3 3 2-2 3 3" />
-    </svg>
-  );
+/** Tick every 5s so the live signal decays without a data change. */
+function useNow(intervalMs: number): number {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
 }
 
 export default function App() {
   const [view, setView] = useState<View>("dashboard");
   const [theme, setTheme] = useState<ThemeName>(getInitialTheme);
   const link = useLinkState();
+  const { data, error, lastTrafficAt } = useTelemetry();
+  const now = useNow(5000);
 
   useEffect(() => {
     applyTheme(theme);
   }, [theme]);
 
+  const live = lastTrafficAt !== null && now - lastTrafficAt < 60_000;
+  const signalText =
+    link === "error" ? "link down" : live ? "live" : "standby";
+
   return (
     <div className="shell">
-      <aside className="sidebar" aria-label="Primary">
-        <div className="side-brand">
-          <span className="side-logo" aria-hidden="true">
-            <TokenTankLogo size={22} />
+      <header className="topbar">
+        <div className="brand-pill">
+          <TokenTankLogo size={18} />
+          <span className="brand-word">
+            Token <span>Tank</span>
           </span>
-          <span className="side-wordmark">Token Tank</span>
         </div>
-
-        <nav className="side-nav">
+        <nav className="topnav" aria-label="Primary">
+          <span
+            className={`live-signal ${live ? "on" : ""}`}
+            title={
+              live
+                ? "Proxy received traffic in the last 60s"
+                : link === "error"
+                  ? "Backend unreachable"
+                  : "No proxy traffic in the last 60s"
+            }
+            role="status"
+          >
+            <span
+              className="live-dot"
+              style={link === "error" ? { background: "var(--tank-danger)" } : undefined}
+            />
+            <span className="live-text">{signalText}</span>
+          </span>
           <button
-            className={`side-link ${view === "dashboard" ? "active" : ""}`}
+            className={`nav-btn ${view === "dashboard" ? "active" : ""}`}
             onClick={() => setView("dashboard")}
           >
-            <GaugeIcon />
-            <span>Dashboard</span>
+            Dashboard
           </button>
           <button
-            className={`side-link ${view === "settings" ? "active" : ""}`}
+            className={`nav-btn ${view === "settings" ? "active" : ""}`}
             onClick={() => setView("settings")}
           >
-            <CogIcon />
-            <span>Settings</span>
+            Settings
           </button>
           <button
-            className="side-link"
+            className="nav-btn"
             onClick={() => setTheme((t) => nextTheme(t))}
             title="Cycle theme"
             aria-label={`Theme: ${THEME_META[theme].label}. Activate to cycle.`}
           >
-            <SwatchIcon />
-            <span>{THEME_META[theme].label}</span>
+            {THEME_META[theme].label}
           </button>
         </nav>
-
-        <div className="side-foot">
-          <span className={`conn-pill conn-${link}`} aria-hidden="true">
-            <span className="conn-dot" />
-          </span>
-          <span className="side-status" role="status">
-            {link === "ok" ? "Link up" : link === "error" ? "Link down" : "Probing"}
-          </span>
-        </div>
-      </aside>
-
-      <div className="main-col">
-        <header className="topbar">
-          <span className="topbar-title">
-            {view === "dashboard" ? "Instruments" : "Settings"}
-          </span>
-          <span className="topbar-meta">proxy :8848 · api :8000</span>
-        </header>
-        <main className="app-main">
-          {view === "dashboard" ? (
-            <Dashboard />
-          ) : (
-            <Settings theme={theme} onThemeChange={setTheme} />
-          )}
-        </main>
-      </div>
+      </header>
+      <main className="app-main">
+        {view === "dashboard" ? (
+          <Dashboard data={data} error={error} />
+        ) : (
+          <Settings theme={theme} onThemeChange={setTheme} usage={data} />
+        )}
+      </main>
     </div>
   );
 }
