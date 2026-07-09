@@ -109,8 +109,8 @@ export function Dashboard({ data, error }: DashboardProps) {
   if (!data) {
     return (
       <div className="loading-strip" aria-label="Acquiring telemetry">
-        <div className="rail">
-          <div className="rail-fill" style={{ width: "40%" }} />
+        <div className="sweep-rail">
+          <div className="sweep-fill" />
         </div>
         <span className="t-micro">Acquiring telemetry</span>
       </div>
