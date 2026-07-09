@@ -601,6 +601,7 @@ a:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .status-cell-value {
@@ -1367,9 +1368,21 @@ a:focus-visible {
   .provider-grid { grid-template-columns: 1fr; }
   .conn-grid { grid-template-columns: repeat(2, 1fr); }
   .theme-grid { grid-template-columns: repeat(2, 1fr); }
-  .status-stats { min-width: 0; }
-  .status-gauge { width: 120px; }
   .live-rate { display: none; }
+
+  /* System status stacks: hero row + gauge, stats grid full width */
+  .status-body { flex-direction: column; align-items: stretch; }
+  .status-hero {
+    border-right: none;
+    padding-right: 0;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .status-gauge { width: 140px; align-self: center; }
+  .status-stats { min-width: 0; width: 100%; }
 }
 
 /* Very narrow: trim the wordmark so the switches never overflow */
