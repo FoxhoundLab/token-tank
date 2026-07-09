@@ -207,6 +207,51 @@ a:focus-visible {
   flex: 1;
 }
 
+/* ── Status shape language — shape + color, never color alone ──── */
+.glyph {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.glyph-shape {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  flex: none;
+}
+
+.glyph-word {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.glyph-live .glyph-shape { color: var(--tank-accent); text-shadow: 0 0 6px rgba(var(--tank-accent-rgb), 0.8); }
+.glyph-live .glyph-word { color: var(--tank-fg); }
+.glyph-standby .glyph-shape { color: var(--tank-dim); }
+.glyph-standby .glyph-word { color: var(--tank-label); }
+.glyph-error .glyph-shape { color: var(--tank-danger); }
+.glyph-error .glyph-word { color: var(--tank-danger); }
+.glyph-info .glyph-shape { color: var(--tank-dim); }
+.glyph-info .glyph-word { color: var(--tank-label); }
+.glyph-warn .glyph-shape { color: var(--tank-warn); }
+.glyph-warn .glyph-word { color: var(--tank-warn); }
+.glyph-critical .glyph-shape {
+  color: var(--tank-danger);
+  animation: rail-pulse 1.1s ease-in-out infinite;
+}
+.glyph-critical .glyph-word { color: var(--tank-danger); }
+
+/* Glyphs riding the inverted band swap their text to ink */
+.panel-band .glyph-live .glyph-word,
+.panel-band .glyph-standby .glyph-word,
+.panel-band .glyph-info .glyph-word { color: var(--tank-ink); }
+.panel-band .glyph-standby .glyph-shape,
+.panel-band .glyph-info .glyph-shape { color: rgba(var(--tank-panel-rgb), 0.6); }
+
 /* Tag chip (type / tier / IDs) — mono, micro, hairline */
 .tag {
   font-family: var(--font-mono);
@@ -421,28 +466,9 @@ a:focus-visible {
   padding: 0 10px;
 }
 
-.live-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--tank-dim);
-  flex: none;
-}
-
-.live-signal.on .live-dot {
-  background: var(--tank-accent);
-  box-shadow: 0 0 6px var(--tank-accent);
+.live-signal.on .glyph-shape {
   animation: rail-pulse 1.6s ease-in-out infinite;
 }
-
-.live-text {
-  font-family: var(--font-mono);
-  font-size: var(--type-micro);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--tank-label);
-}
-
-.live-signal.on .live-text { color: var(--tank-fg); }
 
 /* ── Main layout: 12-col rhythm, 24px gutters ─────────────────── */
 .app-main {
@@ -722,8 +748,6 @@ a:focus-visible {
   color: var(--tank-label);
 }
 
-.conn-cell-state .state-dot { width: 6px; height: 6px; }
-.conn-cell-state .state-dot.off { background: var(--tank-dim); }
 
 /* Forms — equipment, not signup */
 .form {
@@ -1087,7 +1111,7 @@ a:focus-visible {
   .stat-value { font-size: 0.78rem; }
   .event-panel { display: none; }
   .brand-word span { display: none; }
-  .live-text { display: none; }
+  .live-signal .glyph-word { display: none; }
 }
 
 @media (max-width: 640px) {
@@ -1114,7 +1138,8 @@ a:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .rail-seg,
   .rail-seg.lit.edge,
-  .live-signal.on .live-dot,
+  .live-signal.on .glyph-shape,
+  .glyph-critical .glyph-shape,
   .state-dot.danger,
   .card-slot,
   .sweep-fill {

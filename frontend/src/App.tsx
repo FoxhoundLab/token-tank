@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Dashboard } from "./components/Dashboard";
 import { Settings } from "./components/Settings";
 import { TokenTankLogo } from "./components/TokenTankLogo";
+import { StatusGlyph } from "./components/StatusGlyph";
 import { getDashboard } from "./api/client";
 import { getInitialTheme, applyTheme, nextTheme, THEME_META } from "./theme";
 import type { ThemeName } from "./theme";
@@ -112,22 +113,18 @@ export default function App() {
           </span>
         </div>
         <nav className="topnav" aria-label="Primary">
-          <span
-            className={`live-signal ${live ? "on" : ""}`}
-            title={
-              live
-                ? "Proxy received traffic in the last 60s"
-                : link === "error"
-                  ? "Backend unreachable"
-                  : "No proxy traffic in the last 60s"
-            }
-            role="status"
-          >
-            <span
-              className="live-dot"
-              style={link === "error" ? { background: "var(--tank-danger)" } : undefined}
+          <span className={`live-signal ${live ? "on" : ""}`}>
+            <StatusGlyph
+              kind={link === "error" ? "error" : live ? "live" : "standby"}
+              label={signalText}
+              title={
+                live
+                  ? "Proxy received traffic in the last 60s"
+                  : link === "error"
+                    ? "Backend unreachable"
+                    : "No proxy traffic in the last 60s"
+              }
             />
-            <span className="live-text">{signalText}</span>
           </span>
           <button
             className={`nav-btn ${view === "dashboard" ? "active" : ""}`}

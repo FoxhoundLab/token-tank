@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ProviderCard } from "./ProviderCard";
+import { StatusGlyph } from "./StatusGlyph";
 import { SystemStatus } from "./SystemStatus";
 import { TokenTankLogo } from "./TokenTankLogo";
 import { getAllQuotas } from "../api/client";
@@ -88,6 +89,7 @@ export function Dashboard({ data, error }: DashboardProps) {
     return (
       <div className="state-panel state-error">
         <TokenTankLogo size={240} className="state-watermark" />
+        <StatusGlyph kind="error" label="link down" />
         <h2 className="state-title">Link down</h2>
         <p className="state-sub">No response from the pump</p>
         <div className="state-diag">

@@ -6,6 +6,7 @@
  */
 
 import { FuelGauge } from "./FuelGauge";
+import { StatusGlyph } from "./StatusGlyph";
 import type { ProviderSummary } from "../types";
 
 interface SystemStatusProps {
@@ -26,10 +27,10 @@ export function SystemStatus({ providers }: SystemStatusProps) {
 
   const status =
     minFuel >= 0.5
-      ? { word: "Nominal", cls: "ok" }
+      ? { word: "Nominal", cls: "ok", kind: "live" as const }
       : minFuel >= 0.2
-        ? { word: "Running hot", cls: "warn" }
-        : { word: "Reserve", cls: "danger" };
+        ? { word: "Running hot", cls: "warn", kind: "warn" as const }
+        : { word: "Reserve", cls: "danger", kind: "critical" as const };
 
   const todayTokens = providers.reduce((s, p) => s + p.today_tokens, 0);
   const totalBurn = providers.reduce((s, p) => s + p.burn_rate_tokens_per_hour, 0);
@@ -47,8 +48,11 @@ export function SystemStatus({ providers }: SystemStatusProps) {
       </div>
       <div className="panel-band">
         <span className="panel-title">System Status</span>
-        <span className={`status-word status-${status.cls}`} role="status">
-          {status.word}
+        <span className="panel-band-right">
+          <StatusGlyph kind={status.kind} />
+          <span className={`status-word status-${status.cls}`} role="status">
+            {status.word}
+          </span>
         </span>
       </div>
       <div className="panel-body status-body">

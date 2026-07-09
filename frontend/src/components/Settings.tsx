@@ -3,6 +3,7 @@ import { getProviders, addProvider, removeProvider } from "../api/client";
 import type { ProviderResponse, DashboardData } from "../types";
 import { THEMES, THEME_META } from "../theme";
 import type { ThemeName } from "../theme";
+import { StatusGlyph } from "./StatusGlyph";
 
 interface ProviderOption {
   id: string;
@@ -133,11 +134,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
                 >
                   <span className="conn-cell-name">{opt.name}</span>
                   <span className="conn-cell-state">
-                    <span
-                      className={`state-dot ${state === "offline" ? "off" : ""}`}
-                      style={state === "live" ? undefined : state === "registered" ? { background: "var(--tank-dim)" } : undefined}
+                    <StatusGlyph
+                      kind={state === "live" ? "live" : state === "registered" ? "standby" : "info"}
+                      label={state}
                     />
-                    {state === "live" ? "live" : state === "registered" ? "registered" : "offline"}
                   </span>
                 </button>
               );
