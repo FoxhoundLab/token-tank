@@ -1329,54 +1329,68 @@ a:focus-visible {
   to { opacity: 1; }
 }
 
-/* ── Compact: quarter-screen quadrant is a feature ────────────── */
+/* ── Compact: quadrant + mobile. Chrome stays intact — brackets
+   shrink to 6px, ID tags and status shapes survive, heroes still
+   dominate at 1.8-2.2rem. ────────────────────────────────────── */
 @media (max-width: 640px), (max-height: 560px) {
-  .app-main { padding: 8px; gap: 8px; }
-  .provider-grid { gap: 8px; }
+  :root { --bracket-size: 6px; }
+  .app-main { padding: 10px; gap: 10px; }
+  .provider-grid { gap: 10px; }
   .topbar { padding: 3px 10px; }
-  .brand-pill { padding: 3px 10px 3px 8px; }
-  .nav-btn { min-height: 36px; padding: 7px 10px; }
-  .panel-body { padding: 8px 10px; gap: 6px; }
-  .panel-band { min-height: 26px; padding: 0 10px; }
-  .panel-title { font-size: var(--type-micro); letter-spacing: 0.2em; }
+  .status-strip { padding: 3px 10px; gap: 12px; }
+  .brand-pill { padding: 3px 8px 3px 4px; gap: 0.5rem; }
+  .nav-btn { min-height: 36px; padding: 7px 9px; letter-spacing: 0.08em; }
+  .panel-body { padding: 10px; gap: 8px; }
+  .panel-band { min-height: 28px; padding: 0 10px; }
+  .panel-id { padding: 3px 10px; }
+  .panel-title { font-size: 14px; }
 
-  /* Hero compresses but survives; bars + labels stay intact */
-  .card-hero { font-size: 1.5rem; }
-  .status-gauge { display: none; }
+  /* Hero compresses but still dominates; rails + labels stay intact */
+  .card-hero { font-size: 1.9rem; }
+  .hero-block.secondary .card-hero { font-size: 1.3rem; }
+  .hero-num { font-size: 1.9rem; }
   .status-hero { padding-right: 16px; gap: 2px; }
-  .hero-num { font-size: 1.7rem; }
   .status-body { gap: 12px; }
-  .status-cell { padding: 4px 10px; gap: 2px; }
+  .status-cell { padding: 6px 10px; gap: 2px; }
   .status-cell-value { font-size: 0.9rem; }
 
-  .rail { height: 9px; }
-  .rail-row { gap: 3px; }
+  .rail { height: 10px; }
+  .rail-row { gap: 4px; }
   .card-foot { padding-top: 6px; }
   .readout { padding: 5px 8px; }
   .readout-value { font-size: 0.78rem; }
-  .event-panel { display: none; }
   .brand-word span { display: none; }
-  .live-signal .glyph-word { display: none; }
 }
 
+/* Narrow: cards stack vertically, full chrome intact */
 @media (max-width: 640px) {
-  .provider-grid { grid-template-columns: repeat(2, 1fr); }
+  .provider-grid { grid-template-columns: 1fr; }
   .conn-grid { grid-template-columns: repeat(2, 1fr); }
   .theme-grid { grid-template-columns: repeat(2, 1fr); }
   .status-stats { min-width: 0; }
+  .status-gauge { width: 120px; }
+  .live-rate { display: none; }
 }
 
-/* Ultra-compact: single column, header + rail per card */
-@media (max-width: 380px) {
-  .provider-grid { grid-template-columns: 1fr; }
-  .model-strip { display: none; }
-  .quota-stack { display: none; }
+/* Very narrow: trim the wordmark so the switches never overflow */
+@media (max-width: 480px) {
+  .brand-word { display: none; }
+  .live-signal .glyph-word { display: none; }
+}
+
+/* Short heights: quarter-screen quadrant trims optional panels */
+@media (max-height: 560px) {
+  .event-panel { display: none; }
+  .status-gauge { display: none; }
+  .live-signal .glyph-word,
+  .live-rate { display: none; }
 }
 
 /* Wide-short quadrant: keep 3 columns, trim card innards */
 @media (max-height: 560px) and (min-width: 641px) {
   .provider-grid { grid-template-columns: repeat(3, 1fr); }
   .quota-stack { display: none; }
+  .model-strip { display: none; }
 }
 
 /* ── Reduced motion: strip everything except the needle snap ──── */
