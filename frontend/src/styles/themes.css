@@ -49,7 +49,7 @@
   --type-micro: 11px;
   --type-label: 13px;
   --type-value: 15px;
-  --type-hero: clamp(2.4rem, 4.5vw, 4rem);
+  --type-hero: clamp(2.5rem, 4.5vw, 4rem);
 
   /* Sharp. Period. */
   --radius: 0px;

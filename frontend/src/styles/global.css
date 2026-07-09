@@ -67,24 +67,25 @@ a:focus-visible {
 
 /* ── Shared vocabulary ────────────────────────────────────────── */
 
-/* Label: uppercase, tracked, mid-cyan. NEVER bold. */
+/* Label: mono uppercase, tracked. Instrument etching, never bold. */
 .t-label {
-  font-family: var(--font-ui);
+  font-family: var(--font-mono);
   font-weight: 400;
   font-size: var(--type-label);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: var(--tank-label);
 }
 
-/* Micro caption */
+/* Micro caption — JetBrains Mono etched label */
 .t-micro {
-  font-family: var(--font-ui);
+  font-family: var(--font-mono);
   font-weight: 400;
-  font-size: var(--type-micro);
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   color: var(--tank-label);
+  opacity: 0.75;
 }
 
 /* Data value: weight belongs to data */
@@ -151,28 +152,45 @@ a:focus-visible {
   text-overflow: ellipsis;
 }
 
+/* Inverted band — the Novean signature: heavy ink type on a light strip */
 .panel-band {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  min-height: 38px;
+  min-height: 36px;
   padding: 0 16px;
-  background: var(--tank-panel-hi);
+  background: var(--tank-fg);
+  color: var(--tank-ink);
   border-bottom: 1px solid var(--tank-line);
 }
 
 .panel-title {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 0.95;
   text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: var(--tank-label);
+  letter-spacing: -0.02em;
+  color: var(--tank-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Chips riding the inverted band swap to ink */
+.panel-band .tag {
+  color: var(--tank-ink);
+  border-color: rgba(var(--tank-panel-rgb), 0.5);
+}
+
+.panel-band .tag-warn {
+  color: var(--tank-ink);
+  border-color: var(--tank-ink);
+  background: var(--tank-warn);
+}
+
+.panel-band .status-ok { color: var(--tank-ink); }
 
 .panel-band-right {
   display: flex;
@@ -319,30 +337,37 @@ a:focus-visible {
 /* ── Hero numbers — the loudest voice ─────────────────────────── */
 .hero-num {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 700;
   font-size: var(--type-hero);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   line-height: 0.95;
   color: var(--tank-fg);
   font-variant-numeric: tabular-nums;
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
+  gap: 0.4rem;
   white-space: nowrap;
 }
 
+/* Magnitude suffix (K / M / B) — smaller character at the baseline */
+.hero-suffix {
+  font-size: 0.5em;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
 .hero-unit {
-  font-family: var(--font-ui);
+  font-family: var(--font-mono);
   font-weight: 400;
-  font-size: var(--type-label);
+  font-size: 0.7rem;
   letter-spacing: 0.08em;
   color: var(--tank-label);
-  text-transform: lowercase;
+  text-transform: uppercase;
 }
 
 /* Card-level hero (fits a 300px module) */
 .card-hero {
-  font-size: clamp(2rem, 3.2vw, 2.9rem);
+  font-size: clamp(2.2rem, 3.4vw, 3.1rem);
 }
 
 /* ── Shell ────────────────────────────────────────────────────── */
@@ -473,11 +498,12 @@ a:focus-visible {
 
 /* ── System status: the flight controller ─────────────────────── */
 .status-word {
-  font-family: var(--font-ui);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 800;
   font-size: 14px;
+  line-height: 0.95;
   text-transform: uppercase;
-  letter-spacing: 0.25em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
@@ -582,12 +608,13 @@ a:focus-visible {
 }
 
 .stat-label {
-  font-family: var(--font-ui);
+  font-family: var(--font-mono);
   font-weight: 400;
-  font-size: var(--type-micro);
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   color: var(--tank-label);
+  opacity: 0.75;
 }
 
 .stat-value {
@@ -705,11 +732,12 @@ a:focus-visible {
 }
 
 .conn-cell-name {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: var(--type-label);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 0.95;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: -0.01em;
   color: var(--tank-fg);
 }
 
@@ -906,11 +934,11 @@ a:focus-visible {
 .provider-list li:last-child { border-bottom: none; }
 
 .provider-name {
-  font-family: var(--font-ui);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: var(--type-label);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: -0.01em;
 }
 
 /* ── Empty / error states ─────────────────────────────────────── */
@@ -941,9 +969,10 @@ a:focus-visible {
 
 .state-title {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 800;
   font-size: clamp(1.6rem, 4vw, 2.4rem);
-  letter-spacing: 0.1em;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
   text-transform: uppercase;
   color: var(--tank-fg);
   z-index: 1;
