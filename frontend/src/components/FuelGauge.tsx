@@ -1,13 +1,15 @@
 /**
  * FuelGauge — brutalist SVG instrument gauge.
  * Sharp triangle needle (140ms snap via CSS), 11 major ticks + minors,
- * gradient glow under the arc. State color rides on currentColor.
- * Thresholds (fuel remaining): ok ≥50%, warn ≥20%, danger below.
+ * center percentage readout under the hub, alarm glow on the arc when
+ * the tank runs low. State color rides on currentColor.
+ * Thresholds (fuel remaining): ok ≥20%, warn ≥10%, danger below.
  */
 
 interface FuelGaugeProps {
   level: number; // 0.0 (empty) to 1.0 (full = fuel remaining)
-  label?: string;
+  /** Mono uppercase sub-label under the dial. */
+  subLabel?: string;
   /** Local providers have no meter — pin the needle full and show ∞. */
   infinite?: boolean;
 }
@@ -22,10 +24,11 @@ function arcPoint(pct: number, radius: number): [number, number] {
   return [CX + radius * Math.cos(rad), CY + radius * Math.sin(rad)];
 }
 
-export function FuelGauge({ level, label, infinite = false }: FuelGaugeProps) {
+export function FuelGauge({ level, subLabel = "fuel remaining", infinite = false }: FuelGaugeProps) {
   const pct = infinite ? 1 : Math.max(0, Math.min(1, level));
 
   // Monochrome by default; color escalates only as the tank empties.
+  const alarm = !infinite && pct < 0.2;
   const color = infinite
     ? "var(--tank-accent)"
     : pct >= 0.2
@@ -46,10 +49,24 @@ export function FuelGauge({ level, label, infinite = false }: FuelGaugeProps) {
 
   const [ax0, ay0] = arcPoint(0, R);
   const [ax1, ay1] = arcPoint(1, R);
+  const readout = infinite ? "∞" : `${Math.round(pct * 100)}%`;
 
   return (
-    <div className="fuel-gauge" style={{ color }}>
-      <svg viewBox="0 0 200 132" className="gauge-svg" role="img" aria-label={label ?? `Fuel ${Math.round(pct * 100)}%`}>
+    <div className={`fuel-gauge ${alarm ? "alarm" : ""}`} style={{ color }}>
+      <svg
+        viewBox="0 0 200 136"
+        className="gauge-svg"
+        role="img"
+        aria-label={`Fuel ${infinite ? "unmetered" : `${Math.round(pct * 100)}%`}`}
+      >
+        {/* Alarm glow — soft inner arc, pulses when the tank runs low */}
+        <path
+          d={`M ${ax0} ${ay0} A ${R} ${R} 0 0 1 ${ax1} ${ay1}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="7"
+          className="gauge-glow"
+        />
         {/* Arc track */}
         <path
           d={`M ${ax0} ${ay0} A ${R} ${R} 0 0 1 ${ax1} ${ay1}`}
@@ -85,8 +102,12 @@ export function FuelGauge({ level, label, infinite = false }: FuelGaugeProps) {
         {/* E / F markings */}
         <text x={CX - R + 2} y={CY + 16} className="gauge-ef">E</text>
         <text x={CX + R - 10} y={CY + 16} className="gauge-ef">F</text>
+        {/* Center readout — the number IS the instrument */}
+        <text x={CX} y={CY + 24} textAnchor="middle" className="gauge-center">
+          {readout}
+        </text>
       </svg>
-      {label && <div className="gauge-readout">{label}</div>}
+      <div className="gauge-readout">{subLabel}</div>
     </div>
   );
 }

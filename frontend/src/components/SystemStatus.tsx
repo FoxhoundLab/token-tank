@@ -64,10 +64,7 @@ export function SystemStatus({ providers }: SystemStatusProps) {
           </span>
         </div>
         <div className="status-gauge">
-          <FuelGauge
-            level={minFuel}
-            label={`min tank ${Math.round(minFuel * 100)}%`}
-          />
+          <FuelGauge level={minFuel} subLabel="min tank · fuel remaining" />
         </div>
         <div className="status-stats">
           <div className="status-cell">

@@ -799,6 +799,26 @@ a:focus-visible {
   fill: var(--tank-label);
 }
 
+/* Center number readout — mono, heavy, inside the arc below the hub */
+.gauge-center {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 22px;
+  fill: var(--tank-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Alarm glow — visible only when the tank runs low, pulses softly */
+.gauge-glow {
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.fuel-gauge.alarm .gauge-glow {
+  opacity: 0.22;
+  animation: rail-pulse 1.6s ease-in-out infinite;
+}
+
 .gauge-readout {
   font-family: var(--font-mono);
   font-size: var(--type-micro);
