@@ -40,7 +40,11 @@ export function SystemStatus({ providers }: SystemStatusProps) {
   );
 
   return (
-    <section className="panel notched" aria-label="System status">
+    <section className="panel" aria-label="System status">
+      <div className="panel-id">
+        <span>LIVE TELEMETRY · 00</span>
+        <span className="panel-id-right">TT-SYS-MASTER</span>
+      </div>
       <div className="panel-band">
         <span className="panel-title">System Status</span>
         <span className={`status-word status-${status.cls}`} role="status">

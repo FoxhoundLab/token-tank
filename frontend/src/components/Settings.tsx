@@ -106,6 +106,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
     <div className="settings">
       {/* Connection flow — step 1: pick, step 2: credentials, step 3: live state */}
       <section className="panel" aria-label="Providers">
+        <div className="panel-id">
+          <span>PROVIDERS · REGISTRY</span>
+          <span className="panel-id-right">TT-CFG-CONN</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Providers</span>
           <span className="tag">{providers.length}/6 registered</span>
@@ -178,6 +182,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
 
       {/* Registered providers */}
       <section className="panel" aria-label="Registered providers">
+        <div className="panel-id">
+          <span>MANIFOLD · UNITS</span>
+          <span className="panel-id-right">TT-CFG-REG</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Registered</span>
         </div>
@@ -206,6 +214,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
 
       {/* Theme */}
       <section className="panel" aria-label="Theme">
+        <div className="panel-id">
+          <span>THEME · DISPLAY</span>
+          <span className="panel-id-right">TT-CFG-THM</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Theme</span>
         </div>
@@ -234,6 +246,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
 
       {/* Proxy */}
       <section className="panel" aria-label="Proxy">
+        <div className="panel-id">
+          <span>PROXY · MANIFOLD</span>
+          <span className="panel-id-right">TT-CFG-PRX</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Proxy</span>
         </div>
@@ -265,6 +281,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
 
       {/* Privacy */}
       <section className="panel" aria-label="Privacy and security">
+        <div className="panel-id">
+          <span>PRIVACY · SECURITY</span>
+          <span className="panel-id-right">TT-CFG-SEC</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Privacy &amp; Security</span>
         </div>

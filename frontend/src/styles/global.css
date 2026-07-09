@@ -26,6 +26,36 @@ body {
   color: var(--tank-fg);
 }
 
+/* Scanline overlay — the cockpit's CRT atmosphere. One texture, whole app. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(var(--tank-fg-rgb), var(--scanline-alpha)) 0px,
+    rgba(var(--tank-fg-rgb), var(--scanline-alpha)) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* Ambient horizon glow behind the panels — depth without noise */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse 120% 60% at 50% -10%,
+    rgba(var(--tank-accent-rgb), 0.07),
+    transparent 60%
+  );
+}
+
 /* Keyboard focus — hard 2px accent ring */
 button:focus-visible,
 input:focus-visible,
@@ -69,12 +99,56 @@ a:focus-visible {
 .muted { color: var(--tank-label); }
 .mono { font-family: var(--font-mono); font-size: 0.8rem; }
 
-/* ── Panel module: hairline border + header band ──────────────── */
+/* ── Panel module: hairline border + viewfinder brackets ──────── */
 .panel {
+  position: relative;
   background: var(--tank-panel);
   border: 1px solid var(--tank-line);
   display: flex;
   flex-direction: column;
+}
+
+/* Corner brackets — four L-shapes drawn as 8 gradient strokes on one
+   overlay. The single biggest "this is a cockpit" cue. */
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left top / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left top / var(--bracket-weight) var(--bracket-size),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right top / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right top / var(--bracket-weight) var(--bracket-size),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left bottom / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left bottom / var(--bracket-weight) var(--bracket-size),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right bottom / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right bottom / var(--bracket-weight) var(--bracket-size);
+  background-repeat: no-repeat;
+}
+
+/* Panel ID strip — hardware serial-number energy. Sits above the band. */
+.panel-id {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 4px 16px;
+  border-bottom: 1px solid var(--tank-line);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--type-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tank-label);
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.panel-id-right {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .panel-band {
@@ -469,31 +543,6 @@ a:focus-visible {
   color: var(--tank-label);
   letter-spacing: 0.08em;
   text-transform: lowercase;
-}
-
-/* Corner notches — viewport-frame feel, summary strip only */
-.notched {
-  position: relative;
-}
-.notched::before,
-.notched::after {
-  content: "";
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  pointer-events: none;
-}
-.notched::before {
-  top: -1px;
-  left: -1px;
-  border-top: 1px solid var(--tank-dim);
-  border-left: 1px solid var(--tank-dim);
-}
-.notched::after {
-  bottom: -1px;
-  right: -1px;
-  border-bottom: 1px solid var(--tank-dim);
-  border-right: 1px solid var(--tank-dim);
 }
 
 /* ── Provider cards ───────────────────────────────────────────── */

@@ -33,6 +33,13 @@
   --tank-danger: #ff4b4b;
   --tank-ink: #070a12;
 
+  /* Cockpit chrome. Brackets ride the accent so every theme keeps its hue.
+     Resolved at use time — theme blocks only need to override accent-rgb. */
+  --tank-bracket: rgba(var(--tank-accent-rgb), 0.75);
+  --bracket-size: 10px;
+  --bracket-weight: 2px;
+  --scanline-alpha: 0.045;
+
   /* Two families only. Sigurd + JetBrains Mono. No system fallback. */
   --font-display: "Sigurd Variable", sans-serif;
   --font-ui: "Sigurd Variable", sans-serif;

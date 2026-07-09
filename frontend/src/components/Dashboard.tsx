@@ -132,13 +132,17 @@ export function Dashboard({ data, error }: DashboardProps) {
     <>
       <SystemStatus providers={data.providers} />
       <div className="provider-grid">
-        {data.providers.map((p) => (
+        {data.providers.map((p, i) => (
           <div key={p.provider} className="card-slot">
-            <ProviderCard data={p} quota={quotaByProviderName.get(p.provider)} />
+            <ProviderCard data={p} quota={quotaByProviderName.get(p.provider)} unit={i + 1} />
           </div>
         ))}
       </div>
       <section className="panel event-panel" aria-label="Event log">
+        <div className="panel-id">
+          <span>EVENT LOG · SESSION</span>
+          <span className="panel-id-right">TT-LOG-CLIENT</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Event Log</span>
           <span className="tag">session</span>

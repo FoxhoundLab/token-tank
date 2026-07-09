@@ -5,6 +5,13 @@ import type { ProviderSummary, QuotaWindowsResponse } from "../types";
 interface ProviderCardProps {
   data: ProviderSummary;
   quota?: QuotaWindowsResponse;
+  /** Panel position on the board — drives the "PROVIDER · 03" ID tag. */
+  unit?: number;
+}
+
+/** Hardware serial tag: TT-ANT-SUB, TT-OLL-LOC, … */
+function serial(data: ProviderSummary): string {
+  return `TT-${data.provider.slice(0, 3)}-${data.provider_type.slice(0, 3)}`.toUpperCase();
 }
 
 function formatTokens(n: number): string {
@@ -20,19 +27,33 @@ function fuelState(fuel: number): "normal" | "low" | "danger" {
   return "normal";
 }
 
-function Band({ data, state }: { data: ProviderSummary; state: "normal" | "low" | "danger" }) {
+function Band({
+  data,
+  state,
+  unit,
+}: {
+  data: ProviderSummary;
+  state: "normal" | "low" | "danger";
+  unit?: number;
+}) {
   const dotCls = state === "danger" ? "state-dot danger" : state === "low" ? "state-dot warn" : "state-dot";
   return (
-    <div className="panel-band">
-      <span className="panel-title">{data.display_name}</span>
-      <span className="panel-band-right">
-        <span className="tag">{data.provider_type}</span>
-        {data.api_tier && data.api_tier !== "plan" && (
-          <span className="tag tag-warn">payg</span>
-        )}
-        <span className={dotCls} aria-label={`state ${state}`} />
-      </span>
-    </div>
+    <>
+      <div className="panel-id">
+        <span>PROVIDER · {String(unit ?? 0).padStart(2, "0")}</span>
+        <span className="panel-id-right">{serial(data)}</span>
+      </div>
+      <div className="panel-band">
+        <span className="panel-title">{data.display_name}</span>
+        <span className="panel-band-right">
+          <span className="tag">{data.provider_type}</span>
+          {data.api_tier && data.api_tier !== "plan" && (
+            <span className="tag tag-warn">payg</span>
+          )}
+          <span className={dotCls} aria-label={`state ${state}`} />
+        </span>
+      </div>
+    </>
   );
 }
 
@@ -71,12 +92,12 @@ function Quotas({ quota }: { quota?: QuotaWindowsResponse }) {
 }
 
 /** Subscription: the usage window is the tank. Hero = % remaining. */
-function SubscriptionCard({ data, quota }: ProviderCardProps) {
+function SubscriptionCard({ data, quota, unit }: ProviderCardProps) {
   const pct = Math.round(data.fuel_level * 100);
   const state = fuelState(data.fuel_level);
   return (
     <section className="panel" aria-label={`${data.display_name} status`}>
-      <Band data={data} state={state} />
+      <Band data={data} state={state} unit={unit} />
       <div className="panel-body">
         <div className="hero-num card-hero">
           {pct}
@@ -97,12 +118,12 @@ function SubscriptionCard({ data, quota }: ProviderCardProps) {
 }
 
 /** API: pay-per-token. Hero = spend today. Rail = balance. */
-function ApiCard({ data, quota }: ProviderCardProps) {
+function ApiCard({ data, quota, unit }: ProviderCardProps) {
   const pct = Math.round(data.fuel_level * 100);
   const state = fuelState(data.fuel_level);
   return (
     <section className="panel" aria-label={`${data.display_name} status`}>
-      <Band data={data} state={state} />
+      <Band data={data} state={state} unit={unit} />
       <div className="panel-body">
         <div className="hero-num card-hero">
           ${data.today_cost.toFixed(2)}
@@ -123,10 +144,10 @@ function ApiCard({ data, quota }: ProviderCardProps) {
 }
 
 /** Local: no meter, no bill. Hero = tokens today. */
-function LocalCard({ data }: ProviderCardProps) {
+function LocalCard({ data, unit }: ProviderCardProps) {
   return (
     <section className="panel" aria-label={`${data.display_name} status`}>
-      <Band data={data} state="normal" />
+      <Band data={data} state="normal" unit={unit} />
       <div className="panel-body">
         <div className="hero-num card-hero">
           {formatTokens(data.today_tokens)}
@@ -145,13 +166,13 @@ function LocalCard({ data }: ProviderCardProps) {
   );
 }
 
-export function ProviderCard({ data, quota }: ProviderCardProps) {
+export function ProviderCard({ data, quota, unit }: ProviderCardProps) {
   switch (data.provider_type) {
     case "subscription":
-      return <SubscriptionCard data={data} quota={quota} />;
+      return <SubscriptionCard data={data} quota={quota} unit={unit} />;
     case "local":
-      return <LocalCard data={data} />;
+      return <LocalCard data={data} unit={unit} />;
     default:
-      return <ApiCard data={data} quota={quota} />;
+      return <ApiCard data={data} quota={quota} unit={unit} />;
   }
 }
