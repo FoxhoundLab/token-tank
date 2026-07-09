@@ -13,6 +13,7 @@ import { QuotaBar } from "./QuotaBar";
 import { SegmentRail } from "./SegmentRail";
 import { SpendTiles } from "./SpendTiles";
 import { StatusGlyph } from "./StatusGlyph";
+import { effectiveFuel } from "../utils/fuel";
 import type {
   ProviderHistory,
   ProviderSummary,
@@ -52,6 +53,12 @@ function formatTokens(n: number): string {
   return `${value}${suffix}`;
 }
 
+/** Adaptive decimals so sub-cent spend never reads as a dead $0.00. */
+function formatCost(v: number): string {
+  if (v >= 0.01 || v === 0) return v.toFixed(2);
+  return v.toFixed(4);
+}
+
 /** Escalation from fuel remaining: accent until 15%, warm, then red. */
 function fuelState(fuel: number): "normal" | "low" | "danger" {
   if (fuel <= 0.05) return "danger";
@@ -63,8 +70,9 @@ function fuelState(fuel: number): "normal" | "low" | "danger" {
 function statusFlag(
   data: ProviderSummary,
   pulse: PulseState,
+  fuel: number,
 ): { kind: "live" | "standby" | "critical"; label: string } {
-  if (data.provider_type !== "local" && data.fuel_level <= 0.05) {
+  if (data.provider_type !== "local" && fuel <= 0.05) {
     return { kind: "critical", label: "reserve" };
   }
   return pulse === "live" ? { kind: "live", label: "live" } : { kind: "standby", label: "standby" };
@@ -79,13 +87,15 @@ function todayUTC(): string {
 function Band({
   data,
   pulse,
+  fuel,
   unit,
 }: {
   data: ProviderSummary;
   pulse: PulseState;
+  fuel: number;
   unit?: number;
 }) {
-  const flag = statusFlag(data, pulse);
+  const flag = statusFlag(data, pulse, fuel);
   return (
     <>
       <div className="panel-id">
@@ -160,13 +170,15 @@ function ModelStrip({ history }: { history?: ProviderHistory }) {
 function CardFoot({
   data,
   pulse,
+  fuel,
   updatedAt,
 }: {
   data: ProviderSummary;
   pulse: PulseState;
+  fuel: number;
   updatedAt?: number;
 }) {
-  const flag = statusFlag(data, pulse);
+  const flag = statusFlag(data, pulse, fuel);
   return (
     <div className="card-foot">
       <StatusGlyph kind={flag.kind} label={flag.label} />
@@ -227,18 +239,19 @@ const fmtOrDash = (v: number | null, fmt: (n: number) => string): string =>
 
 /** Subscription: the usage window is the tank. Fuel rail + reset strip. */
 function SubscriptionCard({ data, quota, history, pulse = "standby", updatedAt, unit }: ProviderCardProps) {
-  const pct = Math.round(data.fuel_level * 100);
-  const state = fuelState(data.fuel_level);
+  const fuel = effectiveFuel(data, quota);
+  const pct = Math.round(fuel * 100);
+  const state = fuelState(fuel);
   const d = derive(data, history);
   const tok = splitTokens(data.today_tokens);
   const countdownWindow = (quota?.windows || []).find((w) => w.reset_at);
   return (
     <section className="panel" aria-label={`${data.display_name} status`}>
-      <Band data={data} pulse={pulse} unit={unit} />
+      <Band data={data} pulse={pulse} fuel={fuel} unit={unit} />
       <div className="panel-body">
         <div className="hero-row">
           <Hero value={tok.value} suffix={tok.suffix} label="Tokens today" />
-          <Hero value={data.today_cost.toFixed(2)} prefix="$" label="Cost today" secondary />
+          <Hero value={formatCost(data.today_cost)} prefix="$" label="Cost today" secondary />
         </div>
         <div className="rail-row">
           <div className="rail-head">
@@ -258,11 +271,11 @@ function SubscriptionCard({ data, quota, history, pulse = "standby", updatedAt, 
           <Readout label="Burn / min" value={formatTokens(d.burnPerMin)} />
           <Readout label="Burn / hr" value={formatTokens(data.burn_rate_tokens_per_hour)} />
           <Readout label="Month tok" value={formatTokens(data.month_tokens)} />
-          <Readout label="Month cost" value={`$${data.month_cost.toFixed(2)}`} />
+          <Readout label="Month cost" value={`$${formatCost(data.month_cost)}`} />
         </div>
         <Quotas quota={quota} />
         <ModelStrip history={history} />
-        <CardFoot data={data} pulse={pulse} updatedAt={updatedAt} />
+        <CardFoot data={data} pulse={pulse} fuel={fuel} updatedAt={updatedAt} />
       </div>
     </section>
   );
@@ -270,17 +283,18 @@ function SubscriptionCard({ data, quota, history, pulse = "standby", updatedAt, 
 
 /** API: pay-per-token. Balance rail + 7-day spend tiles. */
 function ApiCard({ data, quota, history, pulse = "standby", updatedAt, unit }: ProviderCardProps) {
-  const pct = Math.round(data.fuel_level * 100);
-  const state = fuelState(data.fuel_level);
+  const fuel = effectiveFuel(data, quota);
+  const pct = Math.round(fuel * 100);
+  const state = fuelState(fuel);
   const d = derive(data, history);
   const tok = splitTokens(data.today_tokens);
   const weekCost = history?.daily_totals.reduce((s, day) => s + day.total_cost, 0) ?? null;
   return (
     <section className="panel" aria-label={`${data.display_name} status`}>
-      <Band data={data} pulse={pulse} unit={unit} />
+      <Band data={data} pulse={pulse} fuel={fuel} unit={unit} />
       <div className="panel-body">
         <div className="hero-row">
-          <Hero value={data.today_cost.toFixed(2)} prefix="$" label="Cost today" />
+          <Hero value={formatCost(data.today_cost)} prefix="$" label="Cost today" />
           <Hero value={tok.value} suffix={tok.suffix} label="Tokens today" secondary />
         </div>
         <div className="rail-row">
@@ -290,7 +304,7 @@ function ApiCard({ data, quota, history, pulse = "standby", updatedAt, unit }: P
           </div>
           <SegmentRail pct={pct} state={state} ariaLabel={`Balance ${pct}%`} />
           <div className="rail-foot">
-            <span>${data.month_cost.toFixed(2)} month</span>
+            <span>${formatCost(data.month_cost)} month</span>
             <span>{pct}% remaining</span>
           </div>
         </div>
@@ -299,13 +313,13 @@ function ApiCard({ data, quota, history, pulse = "standby", updatedAt, unit }: P
           <Readout label="Requests" value={fmtOrDash(d.requests, (n) => `${n}`)} />
           <Readout label="Avg / req" value={fmtOrDash(d.avgTokPerReq, formatTokens)} />
           <Readout label="Burn / min" value={formatTokens(d.burnPerMin)} />
-          <Readout label="Avg $ / day" value={fmtOrDash(weekCost, (c) => `$${(c / 7).toFixed(2)}`)} />
+          <Readout label="Avg $ / day" value={fmtOrDash(weekCost, (c) => `$${formatCost(c / 7)}`)} />
           <Readout label="Month tok" value={formatTokens(data.month_tokens)} />
-          <Readout label="Month cost" value={`$${data.month_cost.toFixed(2)}`} />
+          <Readout label="Month cost" value={`$${formatCost(data.month_cost)}`} />
         </div>
         <Quotas quota={quota} />
         <ModelStrip history={history} />
-        <CardFoot data={data} pulse={pulse} updatedAt={updatedAt} />
+        <CardFoot data={data} pulse={pulse} fuel={fuel} updatedAt={updatedAt} />
       </div>
     </section>
   );
@@ -313,11 +327,12 @@ function ApiCard({ data, quota, history, pulse = "standby", updatedAt, unit }: P
 
 /** Local: no meter, no bill. Unmetered plate + throughput. */
 function LocalCard({ data, history, pulse = "standby", updatedAt, unit }: ProviderCardProps) {
+  const fuel = 1;
   const d = derive(data, history);
   const tok = splitTokens(data.today_tokens);
   return (
     <section className="panel" aria-label={`${data.display_name} status`}>
-      <Band data={data} pulse={pulse} unit={unit} />
+      <Band data={data} pulse={pulse} fuel={fuel} unit={unit} />
       <div className="panel-body">
         <div className="hero-row">
           <Hero value={tok.value} suffix={tok.suffix} label="Tokens today" />
@@ -344,7 +359,7 @@ function LocalCard({ data, history, pulse = "standby", updatedAt, unit }: Provid
           )} />
         </div>
         <ModelStrip history={history} />
-        <CardFoot data={data} pulse={pulse} updatedAt={updatedAt} />
+        <CardFoot data={data} pulse={pulse} fuel={fuel} updatedAt={updatedAt} />
       </div>
     </section>
   );

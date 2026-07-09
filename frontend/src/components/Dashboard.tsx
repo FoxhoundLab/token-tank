@@ -194,7 +194,7 @@ export function Dashboard({ data, error }: DashboardProps) {
 
   return (
     <>
-      <SystemStatus providers={data.providers} />
+      <SystemStatus providers={data.providers} quotas={quotas} />
       <div className="provider-grid">
         {data.providers.map((p, i) => (
           <div key={p.provider} className="card-slot">

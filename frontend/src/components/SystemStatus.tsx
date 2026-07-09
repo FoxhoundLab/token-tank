@@ -7,10 +7,12 @@
 
 import { FuelGauge } from "./FuelGauge";
 import { StatusGlyph } from "./StatusGlyph";
-import type { ProviderSummary } from "../types";
+import { effectiveFuel } from "../utils/fuel";
+import type { ProviderSummary, QuotaWindowsResponse } from "../types";
 
 interface SystemStatusProps {
   providers: ProviderSummary[];
+  quotas?: QuotaWindowsResponse[];
 }
 
 function formatTokens(n: number): string {
@@ -19,10 +21,11 @@ function formatTokens(n: number): string {
   return Math.round(n).toString();
 }
 
-export function SystemStatus({ providers }: SystemStatusProps) {
+export function SystemStatus({ providers, quotas = [] }: SystemStatusProps) {
+  const quotaByProvider = new Map(quotas.map((q) => [q.provider, q]));
   const metered = providers.filter((p) => p.provider_type !== "local");
   const minFuel = metered.length
-    ? Math.min(...metered.map((p) => p.fuel_level))
+    ? Math.min(...metered.map((p) => effectiveFuel(p, quotaByProvider.get(p.provider))))
     : 1;
 
   const status =
@@ -69,7 +72,9 @@ export function SystemStatus({ providers }: SystemStatusProps) {
         <div className="status-stats">
           <div className="status-cell">
             <span className="t-micro">Spend today</span>
-            <span className="status-cell-value">${spendToday.toFixed(2)}</span>
+            <span className="status-cell-value">
+              ${spendToday >= 0.01 || spendToday === 0 ? spendToday.toFixed(2) : spendToday.toFixed(4)}
+            </span>
           </div>
           <div className="status-cell">
             <span className="t-micro">Burn rate</span>

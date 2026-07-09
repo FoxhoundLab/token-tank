@@ -8,6 +8,7 @@
 
 import { useEffect, useState } from "react";
 import { SegmentRail } from "./SegmentRail";
+import { parseUTC } from "../utils/time";
 import type { QuotaWindow } from "../types";
 
 interface CountdownStripProps {
@@ -45,7 +46,7 @@ export function CountdownStrip({ window: w }: CountdownStripProps) {
   const shape = windowShape(w.window_type);
   if (!shape || !w.reset_at) return null;
 
-  const resetMs = new Date(w.reset_at).getTime();
+  const resetMs = parseUTC(w.reset_at);
   const remainingMs = Math.max(0, resetMs - now);
   const totalMs = shape.hours * 3600 * 1000;
   const elapsedPct = Math.max(0, Math.min(100, ((totalMs - remainingMs) / totalMs) * 100));
