@@ -567,43 +567,29 @@ a:focus-visible {
   text-transform: lowercase;
 }
 
-/* ── Provider cards ───────────────────────────────────────────── */
-.card-state {
+/* ── Provider cards — dense instrument anatomy ────────────────── */
+
+/* Hero duo: primary readout dominates, secondary rides beside it */
+.hero-row {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.state-dot {
-  width: 7px;
-  height: 7px;
-  background: var(--tank-accent);
-  flex: none;
-}
-
-.state-dot.warn { background: var(--tank-warn); }
-.state-dot.danger {
-  background: var(--tank-danger);
-  animation: rail-pulse 1.1s ease-in-out infinite;
-}
-
-.card-stats {
-  display: flex;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
-  border-top: 1px solid var(--tank-line);
-  padding-top: 10px;
-  margin-top: auto;
+  gap: 16px;
 }
 
-.stat {
+.hero-block {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   min-width: 0;
 }
 
-.stat-label {
+.hero-block.secondary .card-hero {
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
+  color: var(--tank-label);
+}
+
+.hero-label {
   font-family: var(--font-mono);
   font-weight: 400;
   font-size: 0.7rem;
@@ -613,20 +599,172 @@ a:focus-visible {
   opacity: 0.75;
 }
 
-.stat-value {
+/* Readout grid — hairline cells, 6-10 data points per card */
+.readout-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--tank-line);
+  border: 1px solid var(--tank-line);
+}
+
+.readout-grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+.readout {
+  background: var(--tank-panel);
+  padding: 7px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.readout-label {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--tank-label);
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.readout-value {
   font-family: var(--font-mono);
   font-weight: 500;
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
   color: var(--tank-fg);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.stat-sub {
+/* Model mix strip — top models with their token share */
+.model-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid var(--tank-line);
+  padding-top: 8px;
+}
+
+.model-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.model-name {
+  color: var(--tank-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.model-share { color: var(--tank-label); flex: none; }
+
+/* Card foot — status flag + last poll stamp */
+.card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid var(--tank-line);
+  padding-top: 8px;
+  margin-top: auto;
+}
+
+.card-foot-time {
   font-family: var(--font-mono);
   font-size: var(--type-micro);
-  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
   color: var(--tank-label);
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Spend tiles — API cards' last 7 days, today highlighted */
+.spend-tiles {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.spend-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 2px 4px;
+  background: var(--tank-bg);
+  border: 1px solid var(--tank-line);
+  min-width: 0;
+}
+
+.spend-tile.today {
+  border-color: var(--tank-accent);
+  background: rgba(var(--tank-accent-rgb), 0.08);
+}
+
+.spend-tile-day {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  color: var(--tank-label);
+  opacity: 0.75;
+}
+
+.spend-tile-bar {
+  position: relative;
+  width: 100%;
+  max-width: 18px;
+  height: 22px;
+  background: rgba(var(--tank-fg-rgb), 0.06);
+  overflow: hidden;
+}
+
+.spend-tile-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--tank-accent);
+}
+
+.spend-tile.today .spend-tile-fill { background: var(--tank-fg); }
+
+.spend-tile-value {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--tank-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Countdown strip — subscription reset window */
+.countdown-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.countdown-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--type-value);
+  font-variant-numeric: tabular-nums;
+  color: var(--tank-fg);
 }
 
 .quota-stack {
@@ -1106,9 +1244,9 @@ a:focus-visible {
 
   .rail { height: 9px; }
   .rail-row { gap: 3px; }
-  .card-stats { padding-top: 6px; gap: 8px; }
-  .card-stats .stat-sub { display: none; }
-  .stat-value { font-size: 0.78rem; }
+  .card-foot { padding-top: 6px; }
+  .readout { padding: 5px 8px; }
+  .readout-value { font-size: 0.78rem; }
   .event-panel { display: none; }
   .brand-word span { display: none; }
   .live-signal .glyph-word { display: none; }
@@ -1124,7 +1262,7 @@ a:focus-visible {
 /* Ultra-compact: single column, header + rail per card */
 @media (max-width: 380px) {
   .provider-grid { grid-template-columns: 1fr; }
-  .card-stats { display: none; }
+  .model-strip { display: none; }
   .quota-stack { display: none; }
 }
 
@@ -1140,7 +1278,6 @@ a:focus-visible {
   .rail-seg.lit.edge,
   .live-signal.on .glyph-shape,
   .glyph-critical .glyph-shape,
-  .state-dot.danger,
   .card-slot,
   .sweep-fill {
     animation: none !important;

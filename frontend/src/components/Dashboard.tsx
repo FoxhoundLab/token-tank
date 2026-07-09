@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { ProviderCard } from "./ProviderCard";
+import type { PulseState } from "./ProviderCard";
 import { StatusGlyph } from "./StatusGlyph";
 import { SystemStatus } from "./SystemStatus";
 import { TokenTankLogo } from "./TokenTankLogo";
-import { getAllQuotas } from "../api/client";
-import type { DashboardData, QuotaWindowsResponse } from "../types";
+import { getAllQuotas, getProviderHistory, getProviders } from "../api/client";
+import type { DashboardData, ProviderHistory, QuotaWindowsResponse } from "../types";
 
 interface DashboardProps {
   data: DashboardData | null;
@@ -64,21 +65,82 @@ function useEventLog(data: DashboardData | null): LogEvent[] {
   return events;
 }
 
+/** Per-provider traffic pulse — LIVE while the observed token total keeps
+    climbing, decaying to STANDBY 60s after the last increase. Same honest
+    detection the topbar signal uses, per unit. */
+function useProviderPulse(data: DashboardData | null): Map<string, PulseState> {
+  const [pulse, setPulse] = useState<Map<string, PulseState>>(new Map());
+  const prev = useRef<Map<string, number>>(new Map());
+  const lastTraffic = useRef<Map<string, number>>(new Map());
+
+  useEffect(() => {
+    if (!data) return;
+    const now = Date.now();
+    for (const p of data.providers) {
+      const last = prev.current.get(p.provider);
+      if (last !== undefined && p.today_tokens > last) {
+        lastTraffic.current.set(p.provider, now);
+      }
+      prev.current.set(p.provider, p.today_tokens);
+    }
+    setPulse(
+      new Map(
+        data.providers.map((p) => {
+          const at = lastTraffic.current.get(p.provider);
+          return [p.provider, at !== undefined && now - at < 60_000 ? "live" : "standby"];
+        }),
+      ),
+    );
+  }, [data]);
+
+  return pulse;
+}
+
 export function Dashboard({ data, error }: DashboardProps) {
   const [quotas, setQuotas] = useState<QuotaWindowsResponse[]>([]);
+  const [histories, setHistories] = useState<Map<string, ProviderHistory>>(new Map());
+  const [polledAt, setPolledAt] = useState<number | undefined>(undefined);
   const events = useEventLog(data);
+  const pulse = useProviderPulse(data);
 
-  // Quotas refresh less often (30s) — they change slower than per-request usage
+  // Stamp the moment fresh telemetry arrives — the cards' POLL readout.
   useEffect(() => {
-    const fetchQuotas = async () => {
+    if (data) setPolledAt(Date.now());
+  }, [data]);
+
+  // Quotas + 7d histories refresh less often (30s) — they change slower
+  // than per-request usage. Both come from pre-existing endpoints.
+  useEffect(() => {
+    const fetchSlow = async () => {
       try {
         setQuotas(await getAllQuotas());
       } catch {
         // Silent failure — quotas are optional enhancement
       }
+      try {
+        const registered = await getProviders();
+        const results = await Promise.all(
+          registered.map(async (p) => {
+            try {
+              return await getProviderHistory(p.id, "7d");
+            } catch {
+              return null;
+            }
+          }),
+        );
+        setHistories(
+          new Map(
+            results
+              .filter((h): h is ProviderHistory => h !== null)
+              .map((h) => [h.provider, h]),
+          ),
+        );
+      } catch {
+        // Silent failure — history readouts degrade to "—"
+      }
     };
-    fetchQuotas();
-    const interval = setInterval(fetchQuotas, 30000);
+    fetchSlow();
+    const interval = setInterval(fetchSlow, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -136,7 +198,14 @@ export function Dashboard({ data, error }: DashboardProps) {
       <div className="provider-grid">
         {data.providers.map((p, i) => (
           <div key={p.provider} className="card-slot">
-            <ProviderCard data={p} quota={quotaByProviderName.get(p.provider)} unit={i + 1} />
+            <ProviderCard
+              data={p}
+              quota={quotaByProviderName.get(p.provider)}
+              history={histories.get(p.provider)}
+              pulse={pulse.get(p.provider) ?? "standby"}
+              updatedAt={polledAt}
+              unit={i + 1}
+            />
           </div>
         ))}
       </div>
