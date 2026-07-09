@@ -232,11 +232,28 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
                 aria-pressed={theme === t}
               >
                 <span className="theme-preview">
-                  <span className="theme-preview-accent" />
-                  <span className="theme-preview-line" />
-                  <span className="theme-preview-line short" />
+                  {/* Tiny fuel gauge — arc, needle, square hub */}
+                  <svg viewBox="0 0 60 28" className="theme-preview-gauge" aria-hidden="true">
+                    <path
+                      d="M 6 24 A 24 24 0 0 1 54 24"
+                      fill="none"
+                      stroke="var(--tank-dim)"
+                      strokeWidth="2"
+                    />
+                    <line x1="30" y1="24" x2="37" y2="3" stroke="var(--tank-accent)" strokeWidth="2" />
+                    <rect x="27.5" y="21.5" width="5" height="5" fill="var(--tank-fg)" />
+                  </svg>
+                  {/* Tiny segment rail */}
+                  <span className="theme-preview-rail" aria-hidden="true">
+                    {Array.from({ length: 6 }, (_, i) => (
+                      <span key={i} className={`tp-seg ${i < 4 ? "lit" : ""}`} />
+                    ))}
+                  </span>
                 </span>
-                <span className="theme-card-name">{THEME_META[t].label}</span>
+                <span className="theme-card-head">
+                  <span className="theme-card-name">{THEME_META[t].label}</span>
+                  {theme === t && <span className="tag">active</span>}
+                </span>
                 <span className="theme-card-tag">{THEME_META[t].tagline}</span>
               </button>
             ))}

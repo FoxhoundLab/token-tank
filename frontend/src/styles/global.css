@@ -1102,25 +1102,55 @@ a:focus-visible {
 .theme-card:hover { border-color: var(--tank-dim); }
 .theme-card.selected { border-color: var(--tank-accent); }
 
+/* Theme preview — a miniature instrument: tiny gauge + tiny rail */
 .theme-preview {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  gap: 8px;
   background: var(--tank-panel);
   border: 1px solid var(--tank-line);
   padding: 8px;
 }
 
-.theme-preview-accent { height: 4px; width: 62%; background: var(--tank-accent); }
-.theme-preview-line { height: 3px; width: 90%; background: var(--tank-dim); }
-.theme-preview-line.short { width: 50%; }
+.theme-preview-gauge {
+  width: 44px;
+  height: auto;
+  flex: none;
+  display: block;
+}
+
+.theme-preview-rail {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+  height: 8px;
+}
+
+.tp-seg {
+  flex: 1 1 0;
+  background: var(--tank-dim);
+  opacity: 0.4;
+}
+
+.tp-seg.lit {
+  background: var(--tank-accent);
+  opacity: 1;
+}
+
+.theme-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
 
 .theme-card-name {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: var(--type-micro);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--type-label);
+  line-height: 0.95;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: -0.01em;
   color: var(--tank-fg);
 }
 
