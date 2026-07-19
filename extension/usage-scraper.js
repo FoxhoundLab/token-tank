@@ -279,7 +279,19 @@
                     provider: providerKey,
                     payload: { windows, timestamp: new Date().toISOString() },
                 })
-                .catch(() => {});
+                .catch((err) => {
+                    // Surface it — a swallowed failure here reads as a
+                    // successful capture that mysteriously never syncs.
+                    chrome.storage.local.set({
+                        [`${providerKey}_sync`]: {
+                            ok: false,
+                            status: 0,
+                            detail: `message failed: ${err && err.message ? err.message : err}`,
+                            windows: windows.length,
+                            timestamp: new Date().toISOString(),
+                        },
+                    });
+                });
         }
 
         if (document.readyState === 'complete') capture();

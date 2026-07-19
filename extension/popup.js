@@ -52,10 +52,11 @@
             if (sync && sync.ok) {
                 note.textContent = `captured ${captured} · synced ✓`;
             } else if (sync) {
-                note.textContent = `captured ${captured} · SYNC FAILED (${sync.status || 'backend offline'}) — is Token Tank running?`;
+                const why = sync.detail || (sync.status ? `HTTP ${sync.status}` : 'backend unreachable');
+                note.textContent = `captured ${captured} · SYNC FAILED — ${why}`;
                 note.classList.add('warn');
             } else {
-                note.textContent = `captured ${captured} · not yet synced`;
+                note.textContent = `captured ${captured} · not yet synced (reload the extension, then revisit this page)`;
             }
             row.appendChild(value);
             row.appendChild(note);

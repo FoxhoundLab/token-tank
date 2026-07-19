@@ -232,10 +232,25 @@
         chrome.storage.local.set({
             claude_web_quota: { windows, timestamp: new Date().toISOString() },
         });
-        chrome.runtime.sendMessage({
-            type: 'CLAUDE_QUOTA',
-            payload: { windows, timestamp: new Date().toISOString() },
-        }).catch(() => {});
+        chrome.runtime
+            .sendMessage({
+                type: 'CLAUDE_QUOTA',
+                payload: { windows, timestamp: new Date().toISOString() },
+            })
+            .catch((err) => {
+                // Don't swallow this. If the worker is gone or the
+                // extension was reloaded under an open tab, the capture
+                // would otherwise look successful while never syncing.
+                chrome.storage.local.set({
+                    claude_web_sync: {
+                        ok: false,
+                        status: 0,
+                        detail: `message failed: ${err && err.message ? err.message : err}`,
+                        windows: windows.length,
+                        timestamp: new Date().toISOString(),
+                    },
+                });
+            });
     }
 
     function runAll() {

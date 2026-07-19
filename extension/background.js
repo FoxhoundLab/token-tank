@@ -1,6 +1,12 @@
 /**
  * Background service worker — receives data from content scripts,
  * stores in chrome.storage, and forwards to Token Tank backend.
+ *
+ * MV3 lifecycle note: the worker can be terminated as soon as a message
+ * listener responds. Any fetch still in flight dies with it. So every
+ * handler here *awaits* its network call and only then calls
+ * sendResponse — keeping the message channel (and the worker) alive for
+ * the duration. Responding early is what silently loses syncs.
  */
 
 // Default backend port is 8000, but port 8000 is often already taken by
@@ -13,76 +19,106 @@ const USAGE_PROVIDER = {
     CHATGPT_USAGE: 'chatgpt_web',
 };
 
-/** POST scraped quota windows; record sync outcome for the popup. */
-function syncQuota(providerKey, windows) {
-    fetch(`${TOKEN_TANK_BASE}/extension/quota`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider: providerKey, windows }),
-    })
-        .then((resp) => {
-            chrome.storage.local.set({
-                [`${providerKey}_sync`]: {
-                    ok: resp.ok,
-                    status: resp.status,
-                    windows: windows.length,
-                    timestamp: new Date().toISOString(),
-                },
-            });
-        })
-        .catch(() => {
-            chrome.storage.local.set({
-                [`${providerKey}_sync`]: {
-                    ok: false,
-                    status: 0,
-                    windows: windows.length,
-                    timestamp: new Date().toISOString(),
-                },
-            });
-        });
+function setLocal(items) {
+    return new Promise((resolve) => chrome.storage.local.set(items, resolve));
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    // Legacy rate-limit heuristic captures (claude.ai chat, chatgpt.com)
-    if (message.type === 'CLAUDE_USAGE' || message.type === 'CHATGPT_USAGE') {
-        const provider = USAGE_PROVIDER[message.type];
+function getLocal(keys) {
+    return new Promise((resolve) => chrome.storage.local.get(keys, resolve));
+}
 
-        chrome.storage.local.get([provider], (result) => {
-            const history = result[provider] || [];
-            history.push(message.payload);
-            if (history.length > 1000) history.shift();
-            chrome.storage.local.set({ [provider]: history });
+/** POST scraped quota windows; record the outcome for the popup. */
+async function syncQuota(providerKey, windows) {
+    const stamp = new Date().toISOString();
+    try {
+        const resp = await fetch(`${TOKEN_TANK_BASE}/extension/quota`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: providerKey, windows }),
         });
+        let detail = null;
+        if (!resp.ok) {
+            // Surface the backend's own explanation (unknown provider,
+            // provider not configured, validation error) rather than a
+            // bare status code — it's usually the actual fix.
+            try {
+                const body = await resp.json();
+                detail = body?.detail ?? null;
+            } catch {
+                detail = null;
+            }
+        }
+        await setLocal({
+            [`${providerKey}_sync`]: {
+                ok: resp.ok,
+                status: resp.status,
+                detail,
+                windows: windows.length,
+                timestamp: stamp,
+            },
+        });
+    } catch (err) {
+        await setLocal({
+            [`${providerKey}_sync`]: {
+                ok: false,
+                status: 0,
+                detail: String(err && err.message ? err.message : err),
+                windows: windows.length,
+                timestamp: stamp,
+            },
+        });
+    }
+}
 
-        fetch(`${TOKEN_TANK_BASE}/extension/usage`, {
+/** Legacy rate-limit heuristic capture (claude.ai chat, chatgpt.com). */
+async function recordUsage(provider, payload) {
+    const result = await getLocal([provider]);
+    const history = result[provider] || [];
+    history.push(payload);
+    if (history.length > 1000) history.shift();
+    await setLocal({ [provider]: history });
+
+    try {
+        await fetch(`${TOKEN_TANK_BASE}/extension/usage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 provider,
-                data: message.payload,
-                timestamp: message.payload.timestamp,
+                data: payload,
+                timestamp: payload.timestamp,
             }),
-        }).catch(() => {
-            // Backend may not be running; data is still in chrome.storage
         });
+    } catch {
+        // Backend may not be running; data is still in chrome.storage
+    }
+}
 
-        sendResponse({ status: 'captured' });
-        return true;
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'CLAUDE_USAGE' || message.type === 'CHATGPT_USAGE') {
+        recordUsage(USAGE_PROVIDER[message.type], message.payload).then(
+            () => sendResponse({ status: 'captured' }),
+            (err) => sendResponse({ status: 'error', error: String(err) }),
+        );
+        return true; // keep the channel open until the work finishes
     }
 
     // Claude's dedicated plan-limits scraper
     if (message.type === 'CLAUDE_QUOTA') {
-        syncQuota('claude_web', message.payload.windows);
-        sendResponse({ status: 'captured' });
+        syncQuota('claude_web', message.payload.windows).then(
+            () => sendResponse({ status: 'synced' }),
+            (err) => sendResponse({ status: 'error', error: String(err) }),
+        );
         return true;
     }
 
     // Generic scraper (Grok, Z.AI, MiniMax, Ollama Pro)
     if (message.type === 'PROVIDER_QUOTA' && message.provider) {
-        syncQuota(message.provider, message.payload.windows);
-        sendResponse({ status: 'captured' });
+        syncQuota(message.provider, message.payload.windows).then(
+            () => sendResponse({ status: 'synced' }),
+            (err) => sendResponse({ status: 'error', error: String(err) }),
+        );
         return true;
     }
 
-    return true;
+    return false;
 });
