@@ -42,9 +42,10 @@ class Provider(Base):
 PROVIDER_TYPES: dict[str, str] = {
     "anthropic": "subscription",
     "openai": "subscription",
-    "zai": "api",
-    "minimax": "api",
-    "ollama": "local",
+    "grok": "subscription",
+    "zai": "subscription",
+    "minimax": "subscription",
+    "ollama": "subscription",
     "lmstudio": "local",
 }
 

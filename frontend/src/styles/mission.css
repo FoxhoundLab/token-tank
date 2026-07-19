@@ -1,0 +1,685 @@
+/* ── Mission Control — VAULT-style sticky stage over the mesh ────
+   Full-bleed scroll driver + sticky 100vh stage. All color through
+   --tank-* vars. Sharp corners, hairlines, no blur shadows. */
+
+.mission {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: -24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mission-driver {
+  position: relative;
+  height: 175vh;
+}
+
+.mission-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse 70% 55% at 58% 45%,
+      rgba(var(--tank-accent-rgb), 0.08),
+      transparent 70%
+    ),
+    var(--tank-bg);
+}
+
+/* Canvas backdrop fills the stage */
+.graph-canvas-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.graph-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+}
+
+/* ── Masthead ── */
+.mission-masthead {
+  position: absolute;
+  top: 96px;
+  left: 32px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+}
+
+/* The wordmark rides the Fin editorial serif — mixed case, no tracking */
+.mission-title {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.8rem, 4.8vw, 4.4rem);
+  letter-spacing: 0.005em;
+  line-height: 0.95;
+  text-transform: none;
+  color: var(--tank-fg);
+}
+
+.mission-subtitle {
+  font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--tank-label);
+}
+
+.mission-masthead-status {
+  display: flex;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+/* ── Vitals rail (left instrument column) ── */
+.vitals-rail {
+  position: absolute;
+  z-index: 2;
+  top: 244px;
+  bottom: 20px;
+  left: 32px;
+  width: 272px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--tank-dim) transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 14px;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--tank-panel-rgb), 0.82),
+    rgba(var(--tank-panel-rgb), 0.42) 78%,
+    transparent
+  );
+}
+
+.rail-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0 4px;
+  border-bottom: 1px solid var(--tank-line);
+  color: var(--tank-fg);
+  font-size: var(--type-micro);
+  letter-spacing: 0.18em;
+}
+
+.rail-section-sub {
+  color: var(--tank-label);
+  opacity: 0.6;
+  letter-spacing: 0.1em;
+}
+
+/* Claude-plan-limits meter pattern: name, reset line, thin track + % */
+.vital {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 12px;
+}
+
+.vital-name {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--tank-fg);
+}
+
+.vital-meter-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 2px;
+}
+
+.vital-meter-block + .vital-meter-block {
+  margin-top: 6px;
+}
+
+.vital-meter-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vital-meter-label {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--type-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--tank-label);
+  white-space: nowrap;
+}
+
+.vital-meter-head .vital-reset {
+  text-align: right;
+}
+
+.vital-reset {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  color: var(--tank-label);
+  opacity: 0.8;
+}
+
+.vital-meter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.vital-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(var(--tank-fg-rgb), 0.12);
+}
+
+.vital-fill {
+  height: 100%;
+  min-width: 4px;
+  background: var(--tank-accent);
+  transition: width 120ms ease;
+}
+
+.vital-pct {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  color: var(--tank-label);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.rail-directives,
+.rail-docs {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.rail-directive {
+  display: flex;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--tank-fg);
+}
+
+.rail-directive-box {
+  color: var(--tank-accent);
+  flex: none;
+}
+
+.rail-doc {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--tank-label);
+}
+
+.rail-doc-note {
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--type-micro);
+}
+
+/* ── Floating bracket chips around the mesh ── */
+.mission-chips {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.mesh-chip {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 14px;
+  border: 1px solid var(--tank-line);
+  background: rgba(var(--tank-panel-rgb), 0.85);
+  will-change: transform, opacity;
+}
+
+/* viewfinder brackets, same language as .panel */
+.mesh-chip::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left top / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left top / var(--bracket-weight) var(--bracket-size),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right top / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right top / var(--bracket-weight) var(--bracket-size),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left bottom / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left bottom / var(--bracket-weight) var(--bracket-size),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right bottom / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right bottom / var(--bracket-weight) var(--bracket-size);
+  background-repeat: no-repeat;
+}
+
+.mesh-chip-title {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tank-fg);
+}
+
+.mesh-chip-sub {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  color: var(--tank-label);
+  opacity: 0.8;
+}
+
+/* Chips orbit the mesh — kept clear of the masthead's serif wordmark */
+.chip-tl { left: 47%; top: 108px; }
+.chip-tr { right: 56px; top: 148px; }
+.chip-bl { left: 43%; bottom: 218px; }
+.chip-br { right: 72px; bottom: 244px; }
+
+/* ── Bottom hero — primary directive ── */
+.mission-hero {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  text-align: center;
+}
+
+.mission-hero-eyebrow {
+  letter-spacing: 0.22em;
+  color: var(--tank-warn);
+  opacity: 0.9;
+}
+
+.mission-hero-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.6rem, 5.5vw, 4.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  color: var(--tank-fg);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.mission-hero-unit {
+  font-family: var(--font-mono);
+  font-size: var(--type-label);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--tank-label);
+}
+
+.mission-hero-strip {
+  display: flex;
+  gap: 22px;
+  padding-top: 6px;
+  border-top: 1px solid var(--tank-line);
+}
+
+.mission-hero-strip strong {
+  color: var(--tank-fg);
+  font-weight: 500;
+}
+
+/* ── Pinned node detail readout ── */
+.graph-detail {
+  position: absolute;
+  z-index: 4;
+  top: 120px;
+  right: 32px;
+  width: 264px;
+  max-height: calc(100% - 260px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: rgba(var(--tank-panel-rgb), 0.94);
+  border: 1px solid var(--tank-line);
+}
+
+.graph-detail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.graph-detail-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tank-fg);
+}
+
+.graph-detail-close {
+  background: none;
+  border: 1px solid var(--tank-line);
+  color: var(--tank-label);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 1px 6px;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.graph-detail-close:hover {
+  border-color: var(--tank-accent);
+  color: var(--tank-fg);
+}
+
+.graph-detail-line {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--tank-fg);
+  line-height: 1.4;
+}
+
+.graph-detail-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--tank-line);
+}
+
+.graph-detail-link {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  color: var(--tank-label);
+}
+
+.graph-detail-kind {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.65;
+}
+
+/* ── Legend ── */
+.graph-legend {
+  position: absolute;
+  z-index: 2;
+  right: 32px;
+  bottom: 20px;
+  display: flex;
+  gap: 14px;
+  pointer-events: none;
+}
+
+/* ── Below-stage band ── */
+.mission-band {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.ops-hot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--tank-warn);
+  background: rgba(var(--tank-accent-rgb), 0.05);
+}
+
+.ops-hot-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ops-hot-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 19px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--tank-fg);
+}
+
+.ops-deadline {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--tank-warn);
+}
+
+.ops-deadline.danger {
+  color: var(--tank-danger);
+}
+
+.ops-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  padding: 8px 0;
+  border-top: 1px solid var(--tank-line);
+  border-bottom: 1px solid var(--tank-line);
+}
+
+.ops-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fleet {
+  display: flex;
+  flex-direction: column;
+}
+
+.fleet-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(var(--tank-fg-rgb), 0.06);
+}
+
+.fleet-row:last-child {
+  border-bottom: none;
+}
+
+.fleet-name {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--tank-fg);
+  min-width: 110px;
+}
+
+.fleet-sub {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Commander ── */
+.commander-callsign {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.2rem, 3.5vw, 3rem);
+  line-height: 0.95;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tank-fg);
+}
+
+.commander-constraint {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--tank-line);
+  border-left: 2px solid var(--tank-warn);
+}
+
+.commander-constraint p {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--tank-fg);
+}
+
+.commander-doctrine {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.commander-doctrine-line {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--tank-label);
+}
+
+.commander-doctrine-line::before {
+  content: "— ";
+  color: var(--tank-dim);
+}
+
+.directive-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.directive {
+  display: flex;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--tank-fg);
+}
+
+.directive-num {
+  color: var(--tank-accent);
+  flex: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1000px) {
+  .mission-chips {
+    display: none;
+  }
+  .mission-band {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Stage unpins and stacks — the mesh becomes a framed instrument. */
+  .mission-driver {
+    height: auto;
+  }
+  .mission-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+  .mission-masthead {
+    position: static;
+    padding-top: 4px;
+  }
+  .graph-canvas-wrap {
+    position: relative;
+    inset: auto;
+    height: 340px;
+    border: 1px solid var(--tank-line);
+    order: 1;
+  }
+  .vitals-rail {
+    position: static;
+    width: 100%;
+    overflow: visible;
+    background: none;
+    padding-right: 0;
+    order: 2;
+  }
+  .mission-hero {
+    position: static;
+    transform: none;
+    align-items: flex-start;
+    text-align: left;
+    order: 3;
+  }
+  .graph-detail {
+    top: 12px;
+    right: 12px;
+    width: min(240px, 70%);
+    max-height: calc(340px - 24px);
+  }
+  .graph-legend {
+    display: none;
+  }
+}
+
+@media (max-width: 375px) {
+  .vital-hero {
+    font-size: 22px;
+  }
+  .mission-hero-strip {
+    flex-wrap: wrap;
+    gap: 8px 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-chip {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .graph-detail-close {
+    transition: none;
+  }
+}

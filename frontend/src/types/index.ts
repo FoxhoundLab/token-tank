@@ -49,3 +49,24 @@ export interface QuotaWindowsResponse {
   display_name: string;
   windows: QuotaWindow[];
 }
+
+export interface DailyTotal {
+  date: string; // YYYY-MM-DD (UTC)
+  total_tokens: number;
+  total_cost: number;
+  request_count: number;
+}
+
+export interface ModelBreakdownItem {
+  model: string;
+  total_tokens: number;
+  total_cost: number;
+  percentage: number; // 0.0 - 100.0
+}
+
+export interface ProviderHistory {
+  provider: string;
+  range: string; // '7d' | '30d' | '90d' | 'all'
+  daily_totals: DailyTotal[];
+  model_breakdown: ModelBreakdownItem[];
+}

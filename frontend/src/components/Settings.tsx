@@ -3,6 +3,7 @@ import { getProviders, addProvider, removeProvider } from "../api/client";
 import type { ProviderResponse, DashboardData } from "../types";
 import { THEMES, THEME_META } from "../theme";
 import type { ThemeName } from "../theme";
+import { StatusGlyph } from "./StatusGlyph";
 
 interface ProviderOption {
   id: string;
@@ -106,6 +107,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
     <div className="settings">
       {/* Connection flow — step 1: pick, step 2: credentials, step 3: live state */}
       <section className="panel" aria-label="Providers">
+        <div className="panel-id">
+          <span>PROVIDERS · REGISTRY</span>
+          <span className="panel-id-right">TT-CFG-CONN</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Providers</span>
           <span className="tag">{providers.length}/6 registered</span>
@@ -129,11 +134,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
                 >
                   <span className="conn-cell-name">{opt.name}</span>
                   <span className="conn-cell-state">
-                    <span
-                      className={`state-dot ${state === "offline" ? "off" : ""}`}
-                      style={state === "live" ? undefined : state === "registered" ? { background: "var(--tank-dim)" } : undefined}
+                    <StatusGlyph
+                      kind={state === "live" ? "live" : state === "registered" ? "standby" : "info"}
+                      label={state}
                     />
-                    {state === "live" ? "live" : state === "registered" ? "registered" : "offline"}
                   </span>
                 </button>
               );
@@ -178,6 +182,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
 
       {/* Registered providers */}
       <section className="panel" aria-label="Registered providers">
+        <div className="panel-id">
+          <span>MANIFOLD · UNITS</span>
+          <span className="panel-id-right">TT-CFG-REG</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Registered</span>
         </div>
@@ -206,6 +214,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
 
       {/* Theme */}
       <section className="panel" aria-label="Theme">
+        <div className="panel-id">
+          <span>THEME · DISPLAY</span>
+          <span className="panel-id-right">TT-CFG-THM</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Theme</span>
         </div>
@@ -220,11 +232,28 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
                 aria-pressed={theme === t}
               >
                 <span className="theme-preview">
-                  <span className="theme-preview-accent" />
-                  <span className="theme-preview-line" />
-                  <span className="theme-preview-line short" />
+                  {/* Tiny fuel gauge — arc, needle, square hub */}
+                  <svg viewBox="0 0 60 28" className="theme-preview-gauge" aria-hidden="true">
+                    <path
+                      d="M 6 24 A 24 24 0 0 1 54 24"
+                      fill="none"
+                      stroke="var(--tank-dim)"
+                      strokeWidth="2"
+                    />
+                    <line x1="30" y1="24" x2="37" y2="3" stroke="var(--tank-accent)" strokeWidth="2" />
+                    <rect x="27.5" y="21.5" width="5" height="5" fill="var(--tank-fg)" />
+                  </svg>
+                  {/* Tiny segment rail */}
+                  <span className="theme-preview-rail" aria-hidden="true">
+                    {Array.from({ length: 6 }, (_, i) => (
+                      <span key={i} className={`tp-seg ${i < 4 ? "lit" : ""}`} />
+                    ))}
+                  </span>
                 </span>
-                <span className="theme-card-name">{THEME_META[t].label}</span>
+                <span className="theme-card-head">
+                  <span className="theme-card-name">{THEME_META[t].label}</span>
+                  {theme === t && <span className="tag">active</span>}
+                </span>
                 <span className="theme-card-tag">{THEME_META[t].tagline}</span>
               </button>
             ))}
@@ -234,6 +263,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
 
       {/* Proxy */}
       <section className="panel" aria-label="Proxy">
+        <div className="panel-id">
+          <span>PROXY · MANIFOLD</span>
+          <span className="panel-id-right">TT-CFG-PRX</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Proxy</span>
         </div>
@@ -265,6 +298,10 @@ export function Settings({ theme, onThemeChange, usage }: SettingsProps) {
 
       {/* Privacy */}
       <section className="panel" aria-label="Privacy and security">
+        <div className="panel-id">
+          <span>PRIVACY · SECURITY</span>
+          <span className="panel-id-right">TT-CFG-SEC</span>
+        </div>
         <div className="panel-band">
           <span className="panel-title">Privacy &amp; Security</span>
         </div>

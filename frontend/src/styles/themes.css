@@ -17,21 +17,30 @@
 
 :root,
 [data-theme="tank"] {
-  --tank-bg: #070a12;
-  --tank-panel: #0c1322;
-  --tank-panel-rgb: 12, 19, 34;
-  --tank-panel-hi: #152033;
-  --tank-fg: #ddf3ff;
-  --tank-fg-rgb: 221, 243, 255;
-  --tank-label: #7bb8e8;
-  --tank-label-rgb: 123, 184, 232;
-  --tank-accent: #3e8fd4;
-  --tank-accent-rgb: 62, 143, 212;
-  --tank-dim: #1f4d7a;
-  --tank-line: #0d2740;
+  /* Default: bronze/gold on warm space black — Fin.com direction.
+     Deep-space canvas, gilded instruments. */
+  --tank-bg: #0a0805;
+  --tank-panel: #14100a;
+  --tank-panel-rgb: 20, 16, 10;
+  --tank-panel-hi: #221a10;
+  --tank-fg: #f2e7d4;
+  --tank-fg-rgb: 242, 231, 212;
+  --tank-label: #c9a468;
+  --tank-label-rgb: 201, 164, 104;
+  --tank-accent: #c99b4e;
+  --tank-accent-rgb: 201, 155, 78;
+  --tank-dim: #6e5731;
+  --tank-line: #2a2114;
   --tank-warn: #e8b94a;
   --tank-danger: #ff4b4b;
-  --tank-ink: #070a12;
+  --tank-ink: #0a0805;
+
+  /* Cockpit chrome. Brackets ride the accent so every theme keeps its hue.
+     Resolved at use time — theme blocks only need to override accent-rgb. */
+  --tank-bracket: rgba(var(--tank-accent-rgb), 0.75);
+  --bracket-size: 10px;
+  --bracket-weight: 2px;
+  --scanline-alpha: 0.045;
 
   /* Two families only. Sigurd + JetBrains Mono. No system fallback. */
   --font-display: "Sigurd Variable", sans-serif;
@@ -42,7 +51,7 @@
   --type-micro: 11px;
   --type-label: 13px;
   --type-value: 15px;
-  --type-hero: clamp(2.4rem, 4.5vw, 4rem);
+  --type-hero: clamp(2.5rem, 4.5vw, 4rem);
 
   /* Sharp. Period. */
   --radius: 0px;

@@ -1,6 +1,11 @@
 /** API client for Token Tank backend. */
 
-import type { DashboardData, ProviderResponse, QuotaWindowsResponse } from "../types";
+import type {
+  DashboardData,
+  ProviderHistory,
+  ProviderResponse,
+  QuotaWindowsResponse,
+} from "../types";
 
 const BASE_URL = "/api/v1";
 
@@ -40,5 +45,17 @@ export async function removeProvider(id: string): Promise<void> {
 export async function getAllQuotas(): Promise<QuotaWindowsResponse[]> {
   const resp = await fetch(`${BASE_URL}/quota`);
   if (!resp.ok) throw new Error(`Quota fetch failed: ${resp.status}`);
+  return resp.json();
+}
+
+/** 7-day history (daily totals + model breakdown) from the pre-existing
+    /providers/{id}/history endpoint — feeds spend tiles, request counts
+    and model share readouts. */
+export async function getProviderHistory(
+  providerId: string,
+  range: "7d" | "30d" | "90d" | "all" = "7d",
+): Promise<ProviderHistory> {
+  const resp = await fetch(`${BASE_URL}/providers/${providerId}/history?range=${range}`);
+  if (!resp.ok) throw new Error(`History fetch failed: ${resp.status}`);
   return resp.json();
 }

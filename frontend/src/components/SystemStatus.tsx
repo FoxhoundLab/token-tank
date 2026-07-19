@@ -6,10 +6,13 @@
  */
 
 import { FuelGauge } from "./FuelGauge";
-import type { ProviderSummary } from "../types";
+import { StatusGlyph } from "./StatusGlyph";
+import { effectiveFuel } from "../utils/fuel";
+import type { ProviderSummary, QuotaWindowsResponse } from "../types";
 
 interface SystemStatusProps {
   providers: ProviderSummary[];
+  quotas?: QuotaWindowsResponse[];
 }
 
 function formatTokens(n: number): string {
@@ -18,18 +21,19 @@ function formatTokens(n: number): string {
   return Math.round(n).toString();
 }
 
-export function SystemStatus({ providers }: SystemStatusProps) {
+export function SystemStatus({ providers, quotas = [] }: SystemStatusProps) {
+  const quotaByProvider = new Map(quotas.map((q) => [q.provider, q]));
   const metered = providers.filter((p) => p.provider_type !== "local");
   const minFuel = metered.length
-    ? Math.min(...metered.map((p) => p.fuel_level))
+    ? Math.min(...metered.map((p) => effectiveFuel(p, quotaByProvider.get(p.provider))))
     : 1;
 
   const status =
     minFuel >= 0.5
-      ? { word: "Nominal", cls: "ok" }
+      ? { word: "Nominal", cls: "ok", kind: "live" as const }
       : minFuel >= 0.2
-        ? { word: "Running hot", cls: "warn" }
-        : { word: "Reserve", cls: "danger" };
+        ? { word: "Running hot", cls: "warn", kind: "warn" as const }
+        : { word: "Reserve", cls: "danger", kind: "critical" as const };
 
   const todayTokens = providers.reduce((s, p) => s + p.today_tokens, 0);
   const totalBurn = providers.reduce((s, p) => s + p.burn_rate_tokens_per_hour, 0);
@@ -40,11 +44,18 @@ export function SystemStatus({ providers }: SystemStatusProps) {
   );
 
   return (
-    <section className="panel notched" aria-label="System status">
+    <section className="panel" aria-label="System status">
+      <div className="panel-id">
+        <span>LIVE TELEMETRY · 00</span>
+        <span className="panel-id-right">TT-SYS-MASTER</span>
+      </div>
       <div className="panel-band">
         <span className="panel-title">System Status</span>
-        <span className={`status-word status-${status.cls}`} role="status">
-          {status.word}
+        <span className="panel-band-right">
+          <StatusGlyph kind={status.kind} />
+          <span className={`status-word status-${status.cls}`} role="status">
+            {status.word}
+          </span>
         </span>
       </div>
       <div className="panel-body status-body">
@@ -56,15 +67,14 @@ export function SystemStatus({ providers }: SystemStatusProps) {
           </span>
         </div>
         <div className="status-gauge">
-          <FuelGauge
-            level={minFuel}
-            label={`min tank ${Math.round(minFuel * 100)}%`}
-          />
+          <FuelGauge level={minFuel} subLabel="min tank · fuel remaining" />
         </div>
         <div className="status-stats">
           <div className="status-cell">
             <span className="t-micro">Spend today</span>
-            <span className="status-cell-value">${spendToday.toFixed(2)}</span>
+            <span className="status-cell-value">
+              ${spendToday >= 0.01 || spendToday === 0 ? spendToday.toFixed(2) : spendToday.toFixed(4)}
+            </span>
           </div>
           <div className="status-cell">
             <span className="t-micro">Burn rate</span>

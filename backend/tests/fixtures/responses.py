@@ -87,3 +87,22 @@ LMSTUDIO_RESPONSE = {
         "total_tokens": 20,
     },
 }
+
+GROK_RESPONSE = {
+    "id": "chatcmpl-grok-1",
+    "object": "chat.completion",
+    "created": 1752940000,
+    "model": "grok-4",
+    "choices": [
+        {
+            "index": 0,
+            "message": {"role": "assistant", "content": "Affirmative."},
+            "finish_reason": "stop",
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 30,
+        "completion_tokens": 12,
+        "total_tokens": 42,
+    },
+}

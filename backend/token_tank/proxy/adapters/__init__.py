@@ -7,11 +7,15 @@ from .zai import ZAIAdapter
 from .ollama import OllamaAdapter
 from .minimax import MiniMaxAdapter
 from .lmstudio import LMStudioAdapter
+from .grok import GrokAdapter
 
 # Registry of all available adapters
 # Order matters: more specific matchers first.
 # - Anthropic: unique /v1/messages path — always first
 # - ZAI: unique /api/paas/v4 path
+# - Grok: shares /v1/chat/completions but ONLY matches on an explicit
+#   xAI host/model signal, so it is safe this early and must precede
+#   MiniMax/OpenAI (both of which claim that path on shape alone)
 # - MiniMax: has /v1/text/chatcompletion_v2 (unique) + /v1/chat/completions (shared)
 # - OpenAI: /v1/chat/completions + /v1/responses (unique) + /v1/completions
 # - LM Studio: /v1/chat/completions + /v1/completions — SUBSET of OpenAI
@@ -21,6 +25,7 @@ from .lmstudio import LMStudioAdapter
 ADAPTERS: list[ProviderAdapter] = [
     AnthropicAdapter(),
     ZAIAdapter(),
+    GrokAdapter(),
     MiniMaxAdapter(),
     OpenAIAdapter(),
     LMStudioAdapter(),
@@ -47,4 +52,5 @@ __all__ = [
     "OllamaAdapter",
     "MiniMaxAdapter",
     "LMStudioAdapter",
+    "GrokAdapter",
 ]

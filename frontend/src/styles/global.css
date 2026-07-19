@@ -7,6 +7,7 @@
 @import "tailwindcss";
 @import "./fonts.css";
 @import "./themes.css";
+@import "./mission.css";
 
 * {
   margin: 0;
@@ -26,6 +27,36 @@ body {
   color: var(--tank-fg);
 }
 
+/* Scanline overlay — the cockpit's CRT atmosphere. One texture, whole app. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(var(--tank-fg-rgb), var(--scanline-alpha)) 0px,
+    rgba(var(--tank-fg-rgb), var(--scanline-alpha)) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* Ambient horizon glow behind the panels — depth without noise */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse 120% 60% at 50% -10%,
+    rgba(var(--tank-accent-rgb), 0.07),
+    transparent 60%
+  );
+}
+
 /* Keyboard focus — hard 2px accent ring */
 button:focus-visible,
 input:focus-visible,
@@ -37,24 +68,25 @@ a:focus-visible {
 
 /* ── Shared vocabulary ────────────────────────────────────────── */
 
-/* Label: uppercase, tracked, mid-cyan. NEVER bold. */
+/* Label: mono uppercase, tracked. Instrument etching, never bold. */
 .t-label {
-  font-family: var(--font-ui);
+  font-family: var(--font-mono);
   font-weight: 400;
   font-size: var(--type-label);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: var(--tank-label);
 }
 
-/* Micro caption */
+/* Micro caption — JetBrains Mono etched label */
 .t-micro {
-  font-family: var(--font-ui);
+  font-family: var(--font-mono);
   font-weight: 400;
-  font-size: var(--type-micro);
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   color: var(--tank-label);
+  opacity: 0.75;
 }
 
 /* Data value: weight belongs to data */
@@ -69,36 +101,97 @@ a:focus-visible {
 .muted { color: var(--tank-label); }
 .mono { font-family: var(--font-mono); font-size: 0.8rem; }
 
-/* ── Panel module: hairline border + header band ──────────────── */
+/* ── Panel module: hairline border + viewfinder brackets ──────── */
 .panel {
+  position: relative;
   background: var(--tank-panel);
   border: 1px solid var(--tank-line);
   display: flex;
   flex-direction: column;
 }
 
+/* Corner brackets — four L-shapes drawn as 8 gradient strokes on one
+   overlay. The single biggest "this is a cockpit" cue. */
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left top / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left top / var(--bracket-weight) var(--bracket-size),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right top / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right top / var(--bracket-weight) var(--bracket-size),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left bottom / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) left bottom / var(--bracket-weight) var(--bracket-size),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right bottom / var(--bracket-size) var(--bracket-weight),
+    linear-gradient(var(--tank-bracket), var(--tank-bracket)) right bottom / var(--bracket-weight) var(--bracket-size);
+  background-repeat: no-repeat;
+}
+
+/* Panel ID strip — hardware serial-number energy. Sits above the band. */
+.panel-id {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 4px 16px;
+  border-bottom: 1px solid var(--tank-line);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--type-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tank-label);
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.panel-id-right {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Inverted band — the Novean signature: heavy ink type on a light strip */
 .panel-band {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  min-height: 38px;
+  min-height: 36px;
   padding: 0 16px;
-  background: var(--tank-panel-hi);
+  background: var(--tank-fg);
+  color: var(--tank-ink);
   border-bottom: 1px solid var(--tank-line);
 }
 
 .panel-title {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 0.95;
   text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: var(--tank-label);
+  letter-spacing: -0.02em;
+  color: var(--tank-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Chips riding the inverted band swap to ink */
+.panel-band .tag {
+  color: var(--tank-ink);
+  border-color: rgba(var(--tank-panel-rgb), 0.5);
+}
+
+.panel-band .tag-warn {
+  color: var(--tank-ink);
+  border-color: var(--tank-ink);
+  background: var(--tank-warn);
+}
+
+.panel-band .status-ok { color: var(--tank-ink); }
 
 .panel-band-right {
   display: flex;
@@ -114,6 +207,51 @@ a:focus-visible {
   gap: 12px;
   flex: 1;
 }
+
+/* ── Status shape language — shape + color, never color alone ──── */
+.glyph {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.glyph-shape {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  flex: none;
+}
+
+.glyph-word {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.glyph-live .glyph-shape { color: var(--tank-accent); text-shadow: 0 0 6px rgba(var(--tank-accent-rgb), 0.8); }
+.glyph-live .glyph-word { color: var(--tank-fg); }
+.glyph-standby .glyph-shape { color: var(--tank-dim); }
+.glyph-standby .glyph-word { color: var(--tank-label); }
+.glyph-error .glyph-shape { color: var(--tank-danger); }
+.glyph-error .glyph-word { color: var(--tank-danger); }
+.glyph-info .glyph-shape { color: var(--tank-dim); }
+.glyph-info .glyph-word { color: var(--tank-label); }
+.glyph-warn .glyph-shape { color: var(--tank-warn); }
+.glyph-warn .glyph-word { color: var(--tank-warn); }
+.glyph-critical .glyph-shape {
+  color: var(--tank-danger);
+  animation: rail-pulse 1.1s ease-in-out infinite;
+}
+.glyph-critical .glyph-word { color: var(--tank-danger); }
+
+/* Glyphs riding the inverted band swap their text to ink */
+.panel-band .glyph-live .glyph-word,
+.panel-band .glyph-standby .glyph-word,
+.panel-band .glyph-info .glyph-word { color: var(--tank-ink); }
+.panel-band .glyph-standby .glyph-shape,
+.panel-band .glyph-info .glyph-shape { color: rgba(var(--tank-panel-rgb), 0.6); }
 
 /* Tag chip (type / tier / IDs) — mono, micro, hairline */
 .tag {
@@ -131,76 +269,46 @@ a:focus-visible {
 .tag-warn { color: var(--tank-warn); border-color: var(--tank-warn); }
 
 /* ── Segmented rail bar — the signature element ───────────────── */
-/* Single DOM node per layer: repeating-linear-gradient segments.
-   5px segment + 2px gap. Trailing glow on the fill edge only. */
+/* Discrete countable blocks, 2px gaps. Unused segments stay visible
+   (dim) behind the lit ones. The eye can count the segments. */
 .rail {
-  position: relative;
+  display: flex;
+  gap: 2px;
   height: 12px;
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--tank-dim) 0px,
-    var(--tank-dim) 5px,
-    transparent 5px,
-    transparent 7px
-  );
 }
 
-.rail-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--tank-accent) 0px,
-    var(--tank-accent) 5px,
-    transparent 5px,
-    transparent 7px
-  );
-  transition: width 300ms cubic-bezier(0.6, 0.04, 0.15, 1);
+.rail-seg {
+  flex: 1 1 0;
+  min-width: 4px;
+  background: var(--tank-dim);
+  opacity: 0.4;
+  transition: background 300ms cubic-bezier(0.6, 0.04, 0.15, 1),
+    opacity 300ms cubic-bezier(0.6, 0.04, 0.15, 1);
 }
 
-/* Trailing glow — the "energy" edge */
-.rail-fill::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
+.rail-seg.lit {
+  background: var(--tank-accent);
+  opacity: 1;
+}
+
+/* Trailing glow — the "energy" edge on the last lit block */
+.rail-seg.lit.edge {
   background: var(--tank-fg);
-  box-shadow: 0 0 6px var(--tank-accent);
-}
-
-/* Empty fill: hide the glow edge */
-.rail-fill[style*="width: 0%"]::after {
-  display: none;
+  box-shadow: 0 0 8px var(--tank-accent);
 }
 
 /* ≥90% used — tank low. Warm swap + slow pulse. No red until critical. */
-.rail-low .rail-fill {
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--tank-warn) 0px,
-    var(--tank-warn) 5px,
-    transparent 5px,
-    transparent 7px
-  );
-}
-.rail-low .rail-fill::after {
-  box-shadow: 0 0 6px var(--tank-warn);
+.rail-low .rail-seg.lit { background: var(--tank-warn); }
+.rail-low .rail-seg.lit.edge {
+  background: var(--tank-fg);
+  box-shadow: 0 0 8px var(--tank-warn);
   animation: rail-pulse 1.8s ease-in-out infinite;
 }
 
-.rail-danger .rail-fill {
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--tank-danger) 0px,
-    var(--tank-danger) 5px,
-    transparent 5px,
-    transparent 7px
-  );
-}
-.rail-danger .rail-fill::after {
-  box-shadow: 0 0 6px var(--tank-danger);
+.rail-danger .rail-seg.lit { background: var(--tank-danger); }
+.rail-danger .rail-seg.lit.edge {
+  background: var(--tank-fg);
+  box-shadow: 0 0 8px var(--tank-danger);
   animation: rail-pulse 1.1s ease-in-out infinite;
 }
 
@@ -245,30 +353,37 @@ a:focus-visible {
 /* ── Hero numbers — the loudest voice ─────────────────────────── */
 .hero-num {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 700;
   font-size: var(--type-hero);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   line-height: 0.95;
   color: var(--tank-fg);
   font-variant-numeric: tabular-nums;
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
+  gap: 0.4rem;
   white-space: nowrap;
 }
 
+/* Magnitude suffix (K / M / B) — smaller character at the baseline */
+.hero-suffix {
+  font-size: 0.5em;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
 .hero-unit {
-  font-family: var(--font-ui);
+  font-family: var(--font-mono);
   font-weight: 400;
-  font-size: var(--type-label);
+  font-size: 0.7rem;
   letter-spacing: 0.08em;
   color: var(--tank-label);
-  text-transform: lowercase;
+  text-transform: uppercase;
 }
 
 /* Card-level hero (fits a 300px module) */
 .card-hero {
-  font-size: clamp(2rem, 3.2vw, 2.9rem);
+  font-size: clamp(2.2rem, 3.4vw, 3.1rem);
 }
 
 /* ── Shell ────────────────────────────────────────────────────── */
@@ -297,15 +412,33 @@ a:focus-visible {
   align-items: center;
   gap: 0.65rem;
   border: 1px solid var(--tank-line);
-  padding: 6px 14px 6px 10px;
+  padding: 5px 14px 5px 6px;
+  color: var(--tank-accent);
+}
+
+/* Hardware badge around the pump glyph + TT monogram */
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 7px;
+  border: 1px solid var(--tank-bracket);
+  background: rgba(var(--tank-accent-rgb), 0.08);
+}
+
+.brand-monogram {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
   color: var(--tank-accent);
 }
 
 .brand-word {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 1.05rem;
-  letter-spacing: 0.05em;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
   color: var(--tank-fg);
 }
@@ -321,27 +454,66 @@ a:focus-visible {
   gap: 0.35rem;
 }
 
+/* Nav buttons — toggle switches, not links. Active = lit left edge. */
 .nav-btn {
-  font-family: var(--font-ui);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: var(--type-micro);
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.14em;
   padding: 10px 14px;
   min-height: 44px;
   background: transparent;
   color: var(--tank-label);
-  border: 1px solid transparent;
+  border: 1px solid var(--tank-line);
   cursor: pointer;
-  transition: color 120ms ease, border-color 120ms ease;
+  transition: color 120ms ease, border-color 120ms ease, box-shadow 120ms ease,
+    background 120ms ease;
 }
 
-.nav-btn:hover { color: var(--tank-fg); }
+.nav-btn:hover {
+  color: var(--tank-fg);
+  border-color: var(--tank-dim);
+  box-shadow: 0 0 10px rgba(var(--tank-accent-rgb), 0.25);
+}
 
 .nav-btn.active {
   color: var(--tank-fg);
-  border-color: var(--tank-line);
-  background: var(--tank-panel);
+  border-color: var(--tank-dim);
+  background: var(--tank-panel-hi);
+  box-shadow: inset 3px 0 0 var(--tank-accent);
+}
+
+/* Live signal rate — tok/s while live, time-since while standby */
+.live-rate {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 0.05em;
+  color: var(--tank-label);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Secondary instruments strip — under the topbar, one dim mono line */
+.status-strip {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 3px 24px;
+  border-bottom: 1px solid var(--tank-line);
+  background: var(--tank-bg);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.status-strip-cell {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 0.08em;
+  color: var(--tank-label);
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+  flex: none;
 }
 
 /* Live signal — pulses only when the proxy has seen traffic <60s ago */
@@ -352,28 +524,9 @@ a:focus-visible {
   padding: 0 10px;
 }
 
-.live-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--tank-dim);
-  flex: none;
-}
-
-.live-signal.on .live-dot {
-  background: var(--tank-accent);
-  box-shadow: 0 0 6px var(--tank-accent);
+.live-signal.on .glyph-shape {
   animation: rail-pulse 1.6s ease-in-out infinite;
 }
-
-.live-text {
-  font-family: var(--font-mono);
-  font-size: var(--type-micro);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--tank-label);
-}
-
-.live-signal.on .live-text { color: var(--tank-fg); }
 
 /* ── Main layout: 12-col rhythm, 24px gutters ─────────────────── */
 .app-main {
@@ -399,11 +552,12 @@ a:focus-visible {
 
 /* ── System status: the flight controller ─────────────────────── */
 .status-word {
-  font-family: var(--font-ui);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 800;
   font-size: 14px;
+  line-height: 0.95;
   text-transform: uppercase;
-  letter-spacing: 0.25em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
@@ -448,6 +602,7 @@ a:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .status-cell-value {
@@ -471,90 +626,204 @@ a:focus-visible {
   text-transform: lowercase;
 }
 
-/* Corner notches — viewport-frame feel, summary strip only */
-.notched {
-  position: relative;
-}
-.notched::before,
-.notched::after {
-  content: "";
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  pointer-events: none;
-}
-.notched::before {
-  top: -1px;
-  left: -1px;
-  border-top: 1px solid var(--tank-dim);
-  border-left: 1px solid var(--tank-dim);
-}
-.notched::after {
-  bottom: -1px;
-  right: -1px;
-  border-bottom: 1px solid var(--tank-dim);
-  border-right: 1px solid var(--tank-dim);
-}
+/* ── Provider cards — dense instrument anatomy ────────────────── */
 
-/* ── Provider cards ───────────────────────────────────────────── */
-.card-state {
+/* Hero duo: primary readout dominates, secondary rides beside it */
+.hero-row {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.state-dot {
-  width: 7px;
-  height: 7px;
-  background: var(--tank-accent);
-  flex: none;
-}
-
-.state-dot.warn { background: var(--tank-warn); }
-.state-dot.danger {
-  background: var(--tank-danger);
-  animation: rail-pulse 1.1s ease-in-out infinite;
-}
-
-.card-stats {
-  display: flex;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
-  border-top: 1px solid var(--tank-line);
-  padding-top: 10px;
-  margin-top: auto;
+  gap: 16px;
 }
 
-.stat {
+.hero-block {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   min-width: 0;
 }
 
-.stat-label {
-  font-family: var(--font-ui);
-  font-weight: 400;
-  font-size: var(--type-micro);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+.hero-block.secondary .card-hero {
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
   color: var(--tank-label);
 }
 
-.stat-value {
+.hero-label {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--tank-label);
+  opacity: 0.75;
+}
+
+/* Readout grid — hairline cells, 6-10 data points per card */
+.readout-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--tank-line);
+  border: 1px solid var(--tank-line);
+}
+
+.readout-grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+.readout {
+  background: var(--tank-panel);
+  padding: 7px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.readout-label {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--tank-label);
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.readout-value {
   font-family: var(--font-mono);
   font-weight: 500;
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
   color: var(--tank-fg);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.stat-sub {
+/* Model mix strip — top models with their token share */
+.model-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid var(--tank-line);
+  padding-top: 8px;
+}
+
+.model-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.model-name {
+  color: var(--tank-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.model-share { color: var(--tank-label); flex: none; }
+
+/* Card foot — status flag + last poll stamp */
+.card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid var(--tank-line);
+  padding-top: 8px;
+  margin-top: auto;
+}
+
+.card-foot-time {
   font-family: var(--font-mono);
   font-size: var(--type-micro);
-  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
   color: var(--tank-label);
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Spend tiles — API cards' last 7 days, today highlighted */
+.spend-tiles {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.spend-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 2px 4px;
+  background: var(--tank-bg);
+  border: 1px solid var(--tank-line);
+  min-width: 0;
+}
+
+.spend-tile.today {
+  border-color: var(--tank-accent);
+  background: rgba(var(--tank-accent-rgb), 0.08);
+}
+
+.spend-tile-day {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  color: var(--tank-label);
+  opacity: 0.75;
+}
+
+.spend-tile-bar {
+  position: relative;
+  width: 100%;
+  max-width: 18px;
+  height: 22px;
+  background: rgba(var(--tank-fg-rgb), 0.06);
+  overflow: hidden;
+}
+
+.spend-tile-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--tank-accent);
+}
+
+.spend-tile.today .spend-tile-fill { background: var(--tank-fg); }
+
+.spend-tile-value {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--tank-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Countdown strip — subscription reset window */
+.countdown-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.countdown-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--type-value);
+  font-variant-numeric: tabular-nums;
+  color: var(--tank-fg);
 }
 
 .quota-stack {
@@ -587,6 +856,26 @@ a:focus-visible {
   font-family: var(--font-mono);
   font-size: 9px;
   fill: var(--tank-label);
+}
+
+/* Center number readout — mono, heavy, inside the arc below the hub */
+.gauge-center {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 22px;
+  fill: var(--tank-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Alarm glow — visible only when the tank runs low, pulses softly */
+.gauge-glow {
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.fuel-gauge.alarm .gauge-glow {
+  opacity: 0.22;
+  animation: rail-pulse 1.6s ease-in-out infinite;
 }
 
 .gauge-readout {
@@ -656,11 +945,12 @@ a:focus-visible {
 }
 
 .conn-cell-name {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: var(--type-label);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 0.95;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: -0.01em;
   color: var(--tank-fg);
 }
 
@@ -675,8 +965,6 @@ a:focus-visible {
   color: var(--tank-label);
 }
 
-.conn-cell-state .state-dot { width: 6px; height: 6px; }
-.conn-cell-state .state-dot.off { background: var(--tank-dim); }
 
 /* Forms — equipment, not signup */
 .form {
@@ -816,25 +1104,55 @@ a:focus-visible {
 .theme-card:hover { border-color: var(--tank-dim); }
 .theme-card.selected { border-color: var(--tank-accent); }
 
+/* Theme preview — a miniature instrument: tiny gauge + tiny rail */
 .theme-preview {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  gap: 8px;
   background: var(--tank-panel);
   border: 1px solid var(--tank-line);
   padding: 8px;
 }
 
-.theme-preview-accent { height: 4px; width: 62%; background: var(--tank-accent); }
-.theme-preview-line { height: 3px; width: 90%; background: var(--tank-dim); }
-.theme-preview-line.short { width: 50%; }
+.theme-preview-gauge {
+  width: 44px;
+  height: auto;
+  flex: none;
+  display: block;
+}
+
+.theme-preview-rail {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+  height: 8px;
+}
+
+.tp-seg {
+  flex: 1 1 0;
+  background: var(--tank-dim);
+  opacity: 0.4;
+}
+
+.tp-seg.lit {
+  background: var(--tank-accent);
+  opacity: 1;
+}
+
+.theme-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
 
 .theme-card-name {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: var(--type-micro);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--type-label);
+  line-height: 0.95;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: -0.01em;
   color: var(--tank-fg);
 }
 
@@ -857,11 +1175,11 @@ a:focus-visible {
 .provider-list li:last-child { border-bottom: none; }
 
 .provider-name {
-  font-family: var(--font-ui);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: var(--type-label);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: -0.01em;
 }
 
 /* ── Empty / error states ─────────────────────────────────────── */
@@ -892,9 +1210,10 @@ a:focus-visible {
 
 .state-title {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 800;
   font-size: clamp(1.6rem, 4vw, 2.4rem);
-  letter-spacing: 0.1em;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
   text-transform: uppercase;
   color: var(--tank-fg);
   z-index: 1;
@@ -954,8 +1273,32 @@ a:focus-visible {
   background: var(--tank-panel);
 }
 
-.loading-strip .rail { width: min(360px, 80%); }
-.loading-strip .rail-fill { animation: rail-sweep 1.4s ease-in-out infinite; }
+.sweep-rail {
+  position: relative;
+  width: min(360px, 80%);
+  height: 12px;
+  overflow: hidden;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--tank-dim) 0px,
+    var(--tank-dim) 6px,
+    transparent 6px,
+    transparent 8px
+  );
+}
+
+.sweep-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--tank-accent) 0px,
+    var(--tank-accent) 6px,
+    transparent 6px,
+    transparent 8px
+  );
+  animation: rail-sweep 1.4s ease-in-out infinite;
+}
 
 @keyframes rail-sweep {
   0% { width: 4%; }
@@ -988,64 +1331,90 @@ a:focus-visible {
   to { opacity: 1; }
 }
 
-/* ── Compact: quarter-screen quadrant is a feature ────────────── */
+/* ── Compact: quadrant + mobile. Chrome stays intact — brackets
+   shrink to 6px, ID tags and status shapes survive, heroes still
+   dominate at 1.8-2.2rem. ────────────────────────────────────── */
 @media (max-width: 640px), (max-height: 560px) {
-  .app-main { padding: 8px; gap: 8px; }
-  .provider-grid { gap: 8px; }
+  :root { --bracket-size: 6px; }
+  .app-main { padding: 10px; gap: 10px; }
+  .provider-grid { gap: 10px; }
   .topbar { padding: 3px 10px; }
-  .brand-pill { padding: 3px 10px 3px 8px; }
-  .nav-btn { min-height: 36px; padding: 7px 10px; }
-  .panel-body { padding: 8px 10px; gap: 6px; }
-  .panel-band { min-height: 26px; padding: 0 10px; }
-  .panel-title { font-size: var(--type-micro); letter-spacing: 0.2em; }
+  .status-strip { padding: 3px 10px; gap: 12px; }
+  .brand-pill { padding: 3px 8px 3px 4px; gap: 0.5rem; }
+  .nav-btn { min-height: 36px; padding: 7px 9px; letter-spacing: 0.08em; }
+  .panel-body { padding: 10px; gap: 8px; }
+  .panel-band { min-height: 28px; padding: 0 10px; }
+  .panel-id { padding: 3px 10px; }
+  .panel-title { font-size: 14px; }
 
-  /* Hero compresses but survives; bars + labels stay intact */
-  .card-hero { font-size: 1.5rem; }
-  .status-gauge { display: none; }
+  /* Hero compresses but still dominates; rails + labels stay intact */
+  .card-hero { font-size: 1.9rem; }
+  .hero-block.secondary .card-hero { font-size: 1.3rem; }
+  .hero-num { font-size: 1.9rem; }
   .status-hero { padding-right: 16px; gap: 2px; }
-  .hero-num { font-size: 1.7rem; }
   .status-body { gap: 12px; }
-  .status-cell { padding: 4px 10px; gap: 2px; }
+  .status-cell { padding: 6px 10px; gap: 2px; }
   .status-cell-value { font-size: 0.9rem; }
 
-  .rail { height: 9px; }
-  .rail-row { gap: 3px; }
-  .card-stats { padding-top: 6px; gap: 8px; }
-  .card-stats .stat-sub { display: none; }
-  .stat-value { font-size: 0.78rem; }
-  .event-panel { display: none; }
+  .rail { height: 10px; }
+  .rail-row { gap: 4px; }
+  .card-foot { padding-top: 6px; }
+  .readout { padding: 5px 8px; }
+  .readout-value { font-size: 0.78rem; }
   .brand-word span { display: none; }
-  .live-text { display: none; }
 }
 
+/* Narrow: cards stack vertically, full chrome intact */
 @media (max-width: 640px) {
-  .provider-grid { grid-template-columns: repeat(2, 1fr); }
+  .provider-grid { grid-template-columns: 1fr; }
   .conn-grid { grid-template-columns: repeat(2, 1fr); }
   .theme-grid { grid-template-columns: repeat(2, 1fr); }
-  .status-stats { min-width: 0; }
+  .live-rate { display: none; }
+
+  /* System status stacks: hero row + gauge, stats grid full width */
+  .status-body { flex-direction: column; align-items: stretch; }
+  .status-hero {
+    border-right: none;
+    padding-right: 0;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .status-gauge { width: 140px; align-self: center; }
+  .status-stats { min-width: 0; width: 100%; }
 }
 
-/* Ultra-compact: single column, header + rail per card */
-@media (max-width: 380px) {
-  .provider-grid { grid-template-columns: 1fr; }
-  .card-stats { display: none; }
-  .quota-stack { display: none; }
+/* Very narrow: trim the wordmark so the switches never overflow */
+@media (max-width: 480px) {
+  .brand-word { display: none; }
+  .live-signal .glyph-word { display: none; }
+}
+
+/* Short heights: quarter-screen quadrant trims optional panels */
+@media (max-height: 560px) {
+  .event-panel { display: none; }
+  .status-gauge { display: none; }
+  .live-signal .glyph-word,
+  .live-rate { display: none; }
 }
 
 /* Wide-short quadrant: keep 3 columns, trim card innards */
 @media (max-height: 560px) and (min-width: 641px) {
   .provider-grid { grid-template-columns: repeat(3, 1fr); }
   .quota-stack { display: none; }
+  .model-strip { display: none; }
 }
 
 /* ── Reduced motion: strip everything except the needle snap ──── */
 @media (prefers-reduced-motion: reduce) {
-  .rail-fill,
-  .rail-fill::after,
-  .live-signal.on .live-dot,
-  .state-dot.danger,
+  .rail-seg,
+  .rail-seg.lit.edge,
+  .live-signal.on .glyph-shape,
+  .glyph-critical .glyph-shape,
   .card-slot,
-  .loading-strip .rail-fill {
+  .sweep-fill {
     animation: none !important;
     transition: none !important;
   }

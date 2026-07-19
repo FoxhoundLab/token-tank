@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from "react";
 import { SegmentRail } from "./SegmentRail";
+import { parseUTC } from "../utils/time";
 import type { QuotaWindow } from "../types";
 
 interface QuotaBarProps {
@@ -14,7 +15,7 @@ interface QuotaBarProps {
 function formatResetIn(resetAt: string | null): string {
   if (!resetAt) return "";
   const now = Date.now();
-  const reset = new Date(resetAt).getTime();
+  const reset = parseUTC(resetAt);
   const diffMs = reset - now;
   if (diffMs <= 0) return "resetting";
 
@@ -39,6 +40,7 @@ function formatValue(used: number, limit: number, unit: string): string {
   }
   if (unit === "requests") return `${used} / ${limit} req`;
   if (unit === "usd") return `$${used.toFixed(2)} / $${limit.toFixed(2)}`;
+  if (unit === "percent") return `${used.toFixed(0)}%`;
   return `${used} / ${limit} ${unit}`;
 }
 
