@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Dashboard } from "./components/Dashboard";
+import { MissionControl } from "./components/MissionControl";
 import { Settings } from "./components/Settings";
 import { TokenTankLogo } from "./components/TokenTankLogo";
 import { StatusGlyph } from "./components/StatusGlyph";
@@ -9,8 +10,11 @@ import { getInitialTheme, applyTheme, nextTheme, THEME_META } from "./theme";
 import type { ThemeName } from "./theme";
 import type { DashboardData } from "./types";
 
-type View = "dashboard" | "settings";
+type View = "mission" | "dashboard" | "settings";
 type LinkState = "ok" | "error" | "idle";
+
+/** Token Tank opens as Mission Control; the fuel wall is one tab away. */
+const DEFAULT_VIEW: View = "mission";
 
 /** Poll /health so the link indicator reflects backend connectivity. */
 function useLinkState(): LinkState {
@@ -106,7 +110,7 @@ function formatAgo(ms: number): string {
 }
 
 export default function App() {
-  const [view, setView] = useState<View>("dashboard");
+  const [view, setView] = useState<View>(DEFAULT_VIEW);
   const [theme, setTheme] = useState<ThemeName>(getInitialTheme);
   const link = useLinkState();
   const { data, error, lastTrafficAt, rate } = useTelemetry();
@@ -156,6 +160,12 @@ export default function App() {
             {signalValue && <span className="live-rate">{signalValue}</span>}
           </span>
           <button
+            className={`nav-btn ${view === "mission" ? "active" : ""}`}
+            onClick={() => setView("mission")}
+          >
+            Mission
+          </button>
+          <button
             className={`nav-btn ${view === "dashboard" ? "active" : ""}`}
             onClick={() => setView("dashboard")}
           >
@@ -179,7 +189,9 @@ export default function App() {
       </header>
       <StatusStrip link={link} pollMs={5000} />
       <main className="app-main">
-        {view === "dashboard" ? (
+        {view === "mission" ? (
+          <MissionControl data={data} error={error} />
+        ) : view === "dashboard" ? (
           <Dashboard data={data} error={error} />
         ) : (
           <Settings theme={theme} onThemeChange={setTheme} usage={data} />
