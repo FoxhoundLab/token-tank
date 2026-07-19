@@ -54,13 +54,14 @@
   pointer-events: none;
 }
 
+/* The wordmark rides the Fin editorial serif — mixed case, no tracking */
 .mission-title {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(2.4rem, 4vw, 3.6rem);
-  letter-spacing: 0.02em;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.8rem, 4.8vw, 4.4rem);
+  letter-spacing: 0.005em;
   line-height: 0.95;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--tank-fg);
 }
 
@@ -293,9 +294,10 @@
   opacity: 0.8;
 }
 
-.chip-tl { left: 380px; top: 132px; }
+/* Chips orbit the mesh — kept clear of the masthead's serif wordmark */
+.chip-tl { left: 47%; top: 108px; }
 .chip-tr { right: 56px; top: 148px; }
-.chip-bl { left: 408px; bottom: 218px; }
+.chip-bl { left: 43%; bottom: 218px; }
 .chip-br { right: 72px; bottom: 244px; }
 
 /* ── Bottom hero — primary directive ── */
@@ -602,11 +604,6 @@
 }
 
 /* ── Responsive ── */
-@media (max-width: 1240px) {
-  .chip-tl { left: 340px; }
-  .chip-bl { left: 352px; }
-}
-
 @media (max-width: 1000px) {
   .mission-chips {
     display: none;

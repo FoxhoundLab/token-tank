@@ -1,6 +1,7 @@
 /* Token Tank — Font Face Declarations
    Fonts are in frontend/public/assets/fonts/
-   Two families only: Sigurd Variable and JetBrains Mono.
+   Sigurd Variable (display/UI), JetBrains Mono (data), and Instrument
+   Serif (the FoxhoundLab wordmark only — Fin.com editorial direction).
    Collapse and Courier Prime woff2 files stay on disk but are not
    referenced — using fewer families more confidently is the point. */
 
@@ -33,5 +34,13 @@
   src: url("/assets/fonts/JetBrainsMono-Italic.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/assets/fonts/InstrumentSerif-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
   font-display: swap;
 }
