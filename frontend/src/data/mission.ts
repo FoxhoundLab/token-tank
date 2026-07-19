@@ -67,24 +67,6 @@ export const subscriptions: SubscriptionRow[] = [
     providerId: "minimax",
     windowPreference: ["monthly", "weekly", "5h"],
   },
-  {
-    id: "lmstudio",
-    name: "LM Studio",
-    vendor: "local",
-    kind: "local",
-    planNote: "on-metal · $0",
-    providerId: "lmstudio",
-    windowPreference: ["weekly", "5h"],
-  },
-  {
-    id: "n8n-cloud",
-    name: "n8n Cloud",
-    vendor: "n8n",
-    kind: "subscription",
-    planNote: "oshinaka.app.n8n.cloud",
-    providerId: null,
-    windowPreference: [],
-  },
 ];
 
 /* ── Zone 2: operations ────────────────────────────────────────── */
