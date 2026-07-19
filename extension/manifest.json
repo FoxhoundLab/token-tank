@@ -2,8 +2,8 @@
     "manifest_version": 3,
     "name": "Token Tank — Subscription Caps",
     "short_name": "Token Tank",
-    "version": "0.1.0",
-    "description": "Captures subscription usage caps from claude.ai and chatgpt.com and syncs to your local Token Tank instance.",
+    "version": "0.2.0",
+    "description": "Captures real plan usage limits from claude.ai (session + weekly, per model) and syncs to your local Token Tank instance.",
     "minimum_chrome_version": "114",
     "permissions": [
         "activeTab",

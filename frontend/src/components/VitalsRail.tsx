@@ -18,6 +18,27 @@ interface VitalsRailProps {
   histories: Map<string, ProviderHistory>;
 }
 
+/** Live data can arrive from more than one source for the same window
+    (a manual placeholder plus a real extension scrape, for instance).
+    Collapse to one row per window_type, preferring the most authoritative
+    source: extension scrape > provider API > hand-entered manual. */
+const SOURCE_RANK: Record<QuotaWindow["source"], number> = {
+  extension: 0,
+  api: 1,
+  manual: 2,
+};
+
+function bestPerWindowType(windows: QuotaWindow[]): QuotaWindow[] {
+  const best = new Map<string, QuotaWindow>();
+  for (const w of windows) {
+    const existing = best.get(w.window_type);
+    if (!existing || SOURCE_RANK[w.source] < SOURCE_RANK[existing.source]) {
+      best.set(w.window_type, w);
+    }
+  }
+  return Array.from(best.values());
+}
+
 /** Up to two meters per plan: the 5h session window plus the plan's
     preferred long window — the first non-5h match in windowPreference
     (weekly for most; Claude prefers the Fable 5 model cap). Labels do
@@ -29,19 +50,20 @@ function pickWindows(
   if (!sub.providerId) return [];
   const q = quotas.get(sub.providerId);
   if (!q) return [];
+  const windows = bestPerWindowType(q.windows);
   const rows: { key: string; win: QuotaWindow }[] = [];
-  const session = q.windows.find((w) => w.window_type === "5h");
+  const session = windows.find((w) => w.window_type === "5h");
   if (session) rows.push({ key: "session", win: session });
   const prefs = [...sub.windowPreference.filter((p) => p !== "5h"), "weekly"];
   for (const pref of prefs) {
-    const win = q.windows.find((w) => w.window_type === pref);
+    const win = windows.find((w) => w.window_type === pref);
     if (win) {
       rows.push({ key: meterLabel(win), win });
       break;
     }
   }
-  if (rows.length === 0 && q.windows[0]) {
-    rows.push({ key: meterLabel(q.windows[0]), win: q.windows[0] });
+  if (rows.length === 0 && windows[0]) {
+    rows.push({ key: meterLabel(windows[0]), win: windows[0] });
   }
   return rows;
 }
