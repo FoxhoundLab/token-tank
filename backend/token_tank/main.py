@@ -88,10 +88,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS for frontend dev (dev server on 5173, prod served from 8000)
+# CORS for frontend dev (dev server on 5173, prod served from 8000) and
+# the browser extension. Extensions with host permissions normally bypass
+# CORS, but Brave is stricter about localhost than Chrome — allowing the
+# chrome-extension:// origin explicitly costs nothing on a loopback app.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:8000"],
+    allow_origins=["http://localhost:5173", "http://localhost:8000", "http://localhost:8080"],
+    allow_origin_regex=r"chrome-extension://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

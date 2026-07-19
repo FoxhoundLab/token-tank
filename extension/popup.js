@@ -81,6 +81,62 @@
         return row;
     }
 
+    /**
+     * SYNC NOW — POST every stored capture straight from the popup.
+     * The popup page shares the extension's host permissions but not the
+     * service worker's lifecycle, so this works even if the worker is
+     * being torn down mid-fetch — and any failure is reported right
+     * here with the actual reason instead of vanishing.
+     */
+    const BACKEND = 'http://localhost:8080/api/v1';
+
+    async function syncNow() {
+        const result = document.getElementById('sync-now-result');
+        result.textContent = 'syncing…';
+        result.className = 'note';
+
+        const keys = PROVIDERS.map((p) => `${p.key}_quota`);
+        const stored = await new Promise((r) => chrome.storage.local.get(keys, r));
+        const outcomes = [];
+
+        for (const provider of PROVIDERS) {
+            const capture = stored[`${provider.key}_quota`];
+            if (!capture || !capture.windows || capture.windows.length === 0) continue;
+            try {
+                const resp = await fetch(`${BACKEND}/extension/quota`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ provider: provider.key, windows: capture.windows }),
+                });
+                let detail = null;
+                if (!resp.ok) {
+                    try { detail = (await resp.json())?.detail ?? null; } catch { /* keep null */ }
+                }
+                await new Promise((r) => chrome.storage.local.set({
+                    [`${provider.key}_sync`]: {
+                        ok: resp.ok,
+                        status: resp.status,
+                        detail,
+                        windows: capture.windows.length,
+                        timestamp: new Date().toISOString(),
+                    },
+                }, r));
+                outcomes.push(`${provider.name}: ${resp.ok ? '✓' : detail || `HTTP ${resp.status}`}`);
+            } catch (err) {
+                outcomes.push(`${provider.name}: ${err && err.message ? err.message : err}`);
+            }
+        }
+
+        if (outcomes.length === 0) {
+            result.textContent = 'nothing captured yet — visit a usage page first';
+            result.className = 'note warn';
+        } else {
+            result.textContent = outcomes.join(' · ');
+            result.className = outcomes.every((o) => o.endsWith('✓')) ? 'note' : 'note warn';
+            refresh();
+        }
+    }
+
     const container = document.getElementById('providers');
     const keys = PROVIDERS.flatMap((p) => [
         `${p.key}_quota`,
@@ -88,17 +144,22 @@
         `${p.key}_last_attempt`,
     ]);
 
-    chrome.storage.local.get(keys, (result) => {
-        if (!container) return;
-        container.innerHTML = '';
-        for (const provider of PROVIDERS) {
-            container.appendChild(
-                render(provider, {
-                    quota: result[`${provider.key}_quota`],
-                    sync: result[`${provider.key}_sync`],
-                    attempt: result[`${provider.key}_last_attempt`],
-                }),
-            );
-        }
-    });
+    function refresh() {
+        chrome.storage.local.get(keys, (result) => {
+            if (!container) return;
+            container.innerHTML = '';
+            for (const provider of PROVIDERS) {
+                container.appendChild(
+                    render(provider, {
+                        quota: result[`${provider.key}_quota`],
+                        sync: result[`${provider.key}_sync`],
+                        attempt: result[`${provider.key}_last_attempt`],
+                    }),
+                );
+            }
+        });
+    }
+
+    refresh();
+    document.getElementById('sync-now')?.addEventListener('click', syncNow);
 })();

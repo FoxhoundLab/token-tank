@@ -33,6 +33,20 @@
         .note.warn { color: #e8b94a; }
         .footer { font-size: 0.7rem; color: #6e5731; margin-top: 12px; line-height: 1.4; }
         a { color: #c99b4e; text-decoration: none; }
+        #sync-now {
+            width: 100%;
+            margin-top: 10px;
+            padding: 7px 0;
+            background: none;
+            border: 1px solid #c99b4e;
+            color: #c99b4e;
+            font-family: inherit;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            cursor: pointer;
+        }
+        #sync-now:hover { background: #c99b4e; color: #0a0805; }
+        #sync-now-result { min-height: 1em; margin-top: 6px; }
     </style>
 </head>
 <body>
@@ -42,6 +56,9 @@
     <div id="providers">
         <div class="status"><div class="value idle">Loading…</div></div>
     </div>
+
+    <button id="sync-now">SYNC NOW</button>
+    <div class="note" id="sync-now-result"></div>
 
     <div class="footer">
         Syncs to <code>localhost:8080</code>.
