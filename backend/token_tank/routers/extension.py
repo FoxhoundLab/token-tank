@@ -80,6 +80,7 @@ async def ingest_extension_quota(payload: ExtensionQuotaPayload, db: Session = D
     provider_map = {
         "claude_web": "anthropic",
         "chatgpt_web": "openai",
+        "grok_web": "grok",
         "zai_web": "zai",
         "minimax_web": "minimax",
         "ollama_web": "ollama",

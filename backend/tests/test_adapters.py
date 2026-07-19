@@ -335,3 +335,68 @@ class TestAdapterRegistry:
         from token_tank.proxy.adapters import get_adapter
 
         assert get_adapter("/unknown/path", {}) is None
+
+
+class TestGrokAdapter:
+    def setup_method(self):
+        from token_tank.proxy.adapters.grok import GrokAdapter
+
+        self.adapter = GrokAdapter()
+
+    def test_matches_xai_host(self):
+        assert self.adapter.matches("/v1/chat/completions", {"Host": "api.x.ai"})
+        assert self.adapter.matches("/v1/chat/completions", {"x-tt-upstream": "https://api.x.ai"})
+
+    def test_matches_is_case_insensitive(self):
+        assert self.adapter.matches("/v1/chat/completions", {"HOST": "API.X.AI"})
+
+    def test_matches_grok_model_header(self):
+        assert self.adapter.matches("/v1/chat/completions", {"x-tt-model": "grok-4"})
+
+    def test_does_not_hijack_generic_openai_traffic(self):
+        """Shared path with no xAI signal must NOT match — otherwise Grok
+        would claim every OpenAI-compatible request through the proxy."""
+        assert not self.adapter.matches("/v1/chat/completions", {})
+        assert not self.adapter.matches("/v1/chat/completions", {"Host": "api.openai.com"})
+
+    def test_does_not_match_other_paths(self):
+        assert not self.adapter.matches("/api/chat", {"Host": "api.x.ai"})
+
+    def test_parse_usage(self):
+        from tests.fixtures.responses import GROK_RESPONSE
+
+        usage = self.adapter.parse_usage(GROK_RESPONSE)
+        assert usage is not None
+        assert usage.input_tokens == 30
+        assert usage.output_tokens == 12
+        assert usage.total_tokens == 42
+        assert usage.model == "grok-4"
+
+    def test_parse_usage_missing(self):
+        assert self.adapter.parse_usage({"model": "grok-4"}) is None
+
+    def test_estimate_cost(self):
+        from token_tank.proxy.adapters.base import TokenUsage
+
+        usage = TokenUsage(input_tokens=1_000_000, output_tokens=0, total_tokens=1_000_000)
+        assert self.adapter.estimate_cost(usage, "grok-4") == 3.0
+
+    def test_estimate_cost_unknown_model_uses_default(self):
+        from token_tank.proxy.adapters.base import TokenUsage
+
+        usage = TokenUsage(input_tokens=1_000_000, output_tokens=0, total_tokens=1_000_000)
+        assert self.adapter.estimate_cost(usage, "grok-unreleased") == 3.0
+
+    def test_registry_resolves_grok_before_openai(self):
+        from token_tank.proxy.adapters import get_adapter
+
+        adapter = get_adapter("/v1/chat/completions", {"Host": "api.x.ai"})
+        assert adapter is not None
+        assert adapter.provider_id == "grok"
+
+    def test_registry_still_resolves_openai_without_xai_signal(self):
+        from token_tank.proxy.adapters import get_adapter
+
+        adapter = get_adapter("/v1/responses", {})
+        assert adapter is not None
+        assert adapter.provider_id == "openai"

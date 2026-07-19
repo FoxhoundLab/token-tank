@@ -2,8 +2,8 @@
     "manifest_version": 3,
     "name": "Token Tank — Subscription Caps",
     "short_name": "Token Tank",
-    "version": "0.2.0",
-    "description": "Captures real plan usage limits from claude.ai (session + weekly, per model) and syncs to your local Token Tank instance.",
+    "version": "0.3.0",
+    "description": "Captures real plan usage limits from Claude, Grok, Z.AI, MiniMax and Ollama Pro, and syncs them to your local Token Tank instance.",
     "minimum_chrome_version": "114",
     "permissions": [
         "activeTab",
@@ -13,7 +13,19 @@
     "host_permissions": [
         "https://claude.ai/*",
         "https://chatgpt.com/*",
-        "http://localhost:8000/*"
+        "https://grok.com/*",
+        "https://x.ai/*",
+        "https://console.x.ai/*",
+        "https://z.ai/*",
+        "https://*.z.ai/*",
+        "https://bigmodel.cn/*",
+        "https://*.bigmodel.cn/*",
+        "https://minimax.io/*",
+        "https://*.minimax.io/*",
+        "https://*.minimaxi.com/*",
+        "https://ollama.com/*",
+        "http://localhost:8000/*",
+        "http://localhost:8080/*"
     ],
     "action": {
         "default_title": "Token Tank",
@@ -32,6 +44,39 @@
         {
             "matches": ["https://chatgpt.com/*"],
             "js": ["content-chatgpt.js"],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://grok.com/*",
+                "https://x.ai/*",
+                "https://console.x.ai/*"
+            ],
+            "js": ["usage-scraper.js", "content-grok.js"],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://z.ai/*",
+                "https://*.z.ai/*",
+                "https://bigmodel.cn/*",
+                "https://*.bigmodel.cn/*"
+            ],
+            "js": ["usage-scraper.js", "content-zai.js"],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://minimax.io/*",
+                "https://*.minimax.io/*",
+                "https://*.minimaxi.com/*"
+            ],
+            "js": ["usage-scraper.js", "content-minimax.js"],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": ["https://ollama.com/*"],
+            "js": ["usage-scraper.js", "content-ollama.js"],
             "run_at": "document_idle"
         }
     ]

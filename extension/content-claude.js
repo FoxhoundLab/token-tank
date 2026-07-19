@@ -213,6 +213,16 @@
 
     function captureQuota() {
         const windows = extractQuotaWindows();
+        // Record every attempt so the popup can distinguish "never ran
+        // here" from "ran but found nothing" — a wrong page vs a broken
+        // scraper.
+        chrome.storage.local.set({
+            claude_web_last_attempt: {
+                timestamp: new Date().toISOString(),
+                found: windows.length,
+                url: location.href,
+            },
+        });
         // Never send an empty capture — the backend replaces all
         // extension-sourced windows for this provider on every POST, so
         // an empty payload (scraped on a page without the panel) would

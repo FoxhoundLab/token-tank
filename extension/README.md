@@ -1,14 +1,16 @@
 # Token Tank Browser Extension
 
-MV3 extension that captures subscription usage caps from **claude.ai** and **chatgpt.com** and syncs them to your local Token Tank backend.
+MV3 extension that captures subscription usage caps from **Claude Max, Grok, Z.AI, MiniMax and Ollama Pro** and syncs them to your local Token Tank backend.
+
+None of these providers expose plan usage through a public API — the numbers live only in the panels their own web apps render. This reads them off the page while you're signed in.
 
 ## Prerequisites
 
-**Token Tank backend must be running on `localhost:8000`** before the extension can sync captured data. If the backend is down, captures are still saved locally in `chrome.storage.local` but won't appear in your dashboard.
+**Token Tank backend must be running on `localhost:8080`** before the extension can sync captured data (port 8000 is the upstream default, but is often taken — see `TOKEN_TANK_BASE` in `background.js` if yours differs). If the backend is down, captures are still saved locally in `chrome.storage.local` but won't appear in your dashboard.
 
 ```bash
 pip install token-tank
-token-tank          # starts proxy on 8848 + backend on 8000
+token-tank          # starts proxy on 8848 + backend on 8000 (set TOKEN_TANK_API_PORT to change)
 ```
 
 ## Install (load unpacked)
@@ -36,25 +38,27 @@ token-tank          # starts proxy on 8848 + backend on 8000
 
 ## Getting real numbers into Mission Control
 
-The plan-limits panel only exists on claude.ai's **Settings → Usage**
-page — visiting the normal chat page won't capture anything (by design;
-an empty scrape is discarded rather than sent, so it never overwrites a
-good previous reading with nothing). To refresh your numbers:
+Usage panels only exist on each provider's account/usage page — visiting
+the normal chat page captures nothing. That's deliberate: an empty scrape
+is discarded rather than sent, so it can never overwrite a good previous
+reading with nothing.
 
-1. Sign in to claude.ai with the extension installed.
-2. Open **Settings → Usage** (wherever the "Plan usage limits" panel lives).
-3. Leave the tab open a few seconds — the scraper captures and syncs
-   automatically. Click the extension icon to confirm ("synced ✓").
-4. Token Tank's Mission Control picks it up on its next 30s poll.
+For each subscription:
 
-Revisit that page periodically to keep the numbers fresh — this isn't a
-push subscription, since claude.ai doesn't offer one.
+1. Sign in with the extension installed.
+2. Open that provider's usage page (see the table below).
+3. Leave the tab open a few seconds — capture and sync are automatic.
+   Click the extension icon to confirm ("synced ✓").
+4. Mission Control picks it up on its next 30s poll.
+
+Revisit periodically to keep the numbers fresh — none of these offer a
+push subscription, so a reading is only as current as your last visit.
 
 ## Privacy
 
 - **No content is sent** — only metadata about limits (message count, rate-limit flags, timestamps, plan-usage percentages)
 - **No keys, no prompts, no responses** ever leave your browser
-- Captured data goes to **localhost:8000** (your Token Tank instance)
+- Captured data goes to **localhost:8080** (your Token Tank instance)
 - `chrome.storage.local` (not `chrome.storage.sync`) — never leaves your machine
 
 ## Backend endpoints
@@ -98,6 +102,27 @@ extension (`source: "manual"`), those are automatically superseded once
 a real extension reading exists for the same window — Token Tank always
 prefers `extension` > `api` > `manual` per window.
 
+## Providers covered
+
+| Provider | Site | Status |
+|---|---|---|
+| **Claude Max** | claude.ai → Settings → Usage | Purpose-built scraper, verified against the real panel layout |
+| **Grok** | grok.com, console.x.ai | Generic engine, config unverified against live DOM |
+| **Z.AI GLM** | z.ai, bigmodel.cn | Generic engine, config unverified against live DOM |
+| **MiniMax** | minimax.io | Generic engine, config unverified against live DOM |
+| **Ollama Pro** | ollama.com | Generic engine, config unverified against live DOM |
+
+The four "unverified" scrapers share `usage-scraper.js`, a text-pattern
+engine that recognizes common usage shapes ("42% used", "1,240 / 5,000
+requests", "Resets in 3 hr"). The engine itself is unit-tested
+(`extension/test/`), but each site's wording could not be confirmed
+without a logged-in session. **Open the popup after visiting each usage
+page** — it reports per provider whether the scraper ran, what it found,
+and whether it synced, so a mismatch is visible immediately instead of
+surfacing as a silently stale number. If one reports "Ran, but found no
+usage panel", send a screenshot of that page and the config can be
+tightened.
+
 ## Limitations
 
 - DOM scraping is fragile — UI changes break it. `content-claude.js`
@@ -110,5 +135,5 @@ prefers `extension` > `api` > `manual` per window.
 - Only refreshes while you have the Usage settings page open in a tab —
   see "Getting real numbers" above.
 - Both claude.ai and chatgpt.com have login walls; scraper only runs when you're signed in
-- Background sync requires Token Tank backend running on localhost:8000
+- Background sync requires the Token Tank backend running (localhost:8080 by default here)
 - ChatGPT rate-limit capture shows in the browser extension popup, not the dashboard (yet)
